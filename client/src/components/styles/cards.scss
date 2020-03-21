@@ -1,0 +1,23 @@
+.cards {
+    display: flex;
+    width: 70%;
+    background: #e0e0e0;
+}
+.card{
+    transition: 0.5s;
+    width: 20%;
+    img {
+        border-radius: 1rem;
+        box-shadow: 4px 0px 5px 5px rgba(black, 0.15);
+    }
+    
+    &:hover{
+        ~ .card {
+            transform: translateX(4rem);
+        }
+    }
+    &:not(:first-child) {
+        margin-left:-4rem;
+    }
+
+}
