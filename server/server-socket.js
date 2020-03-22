@@ -30,8 +30,8 @@ module.exports = {
     io.on("connection", (socket) => {
       console.log(`socket has connected ${socket.id}`);
       socket.on("disconnect", (reason) => {
-        const user = getUserFromSocketID(socket.id);
-        removeUser(user, socket);
+        // const user = getUserFromSocketID(socket.id);
+        // removeUser(user, socket);
       });
     });
   },

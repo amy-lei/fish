@@ -128,7 +128,7 @@ class WaitingRoom extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            players: this.props.isCreator ? [this.props.name] : this.props.roomInfo.players,
+            players: this.props.isCreator ? [{name:this.props.name, index:0}] : this.props.roomInfo.players,
         };
     };
 
@@ -144,13 +144,14 @@ class WaitingRoom extends Component {
         return (
             <div>
                 Hi, your name is {this.props.name}. <br/>
+                You are player number {this.props.index.toString()} <br/>
                 Are you creator? {this.props.isCreator + ""} <br/>
                 Room Key: {this.props.room_key} <br/>
-                Here are the players in the room: <br/>
+                Here are the players in the room and their indices: <br/>
                 <ul>
                     {this.state.players.map((player, k) => (
                         <li key={k}>
-                            {player}
+                            {player.index} {player.name} 
                         </li>
                     ))}
                 </ul>
@@ -167,6 +168,7 @@ class Game extends Component {
             page: "home",
             key: "",
             name: "",
+            index: "",
             isCreator: "",
             info: null,
         };
@@ -189,6 +191,7 @@ class Game extends Component {
             page: "waiting_room",
             name: name,
             isCreator: true,
+            index: 0,
             key: game.content.key,
         });
     };
@@ -203,8 +206,10 @@ class Game extends Component {
             page: "waiting_room",
             name: name,
             isCreator: false,
+            index: roomInfo.self.index,
             info: roomInfo,
-        })
+        });
+        console.log(roomInfo);
     };
     
     render() {
@@ -228,6 +233,7 @@ class Game extends Component {
                 <WaitingRoom
                     room_key={this.state.key}
                     name={this.state.name}
+                    index={this.state.index}
                     isCreator={this.state.isCreator}
                     roomInfo={this.state.info}
                 />

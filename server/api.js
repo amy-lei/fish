@@ -52,11 +52,12 @@ router.post("/join_room", (req, res) => {
     const playerName = req.body.playerName;
     Game.findOne({key: requestedRoomKey})
         .then((foundGame) => {
-            socket.getIo().emit("joinedWaitingRoom", playerName);
-            foundGame.players = foundGame.players.concat([playerName]);
+            newPlayer = {name: playerName, index: foundGame.players.length};
+            socket.getIo().emit("joinedWaitingRoom", newPlayer);
+            foundGame.players.push(newPlayer);
             foundGame.save();
             // TODO: send back new name if duplicates
-            res.send({players: foundGame.players});
+            res.send({self: newPlayer, players: foundGame.players});
         });
 });
 
@@ -69,7 +70,7 @@ router.post("/create_room", (req, res) => {
     }
     const game = new Game({
         key: roomKey,
-        players: [req.body.creatorName],
+        players: [{name: req.body.creatorName, index: 0}],
         hands: [],
         teamEven: [],
         teamOdd: [],
