@@ -1,23 +1,21 @@
 let io;
 
+const gameToSocketsMap = {};
 const userToSocketMap = {}; // maps user ID to socket object
 const socketToUserMap = {}; // maps socket ID to user object
 
-const getSocketFromUserID = (userid) => userToSocketMap[userid];
-const getUserFromSocketID = (socketid) => socketToUserMap[socketid];
+const getAllSocketsFromGame = (key) => { 
+  if (key in gameToSocketsMap){ return gameToSocketsMap[key]; } 
+  else { return []; } 
+}
 const getSocketFromSocketID = (socketid) => io.sockets.connected[socketid];
 
-const addUser = (user, socket) => {
-  const oldSocket = userToSocketMap[user._id];
-  if (oldSocket && oldSocket.id !== socket.id) {
-    // there was an old tab open for this user, force it to disconnect
-    // FIXME: is this the behavior you want?
-    oldSocket.disconnect();
-    delete socketToUserMap[oldSocket.id];
+const addUser = (key, socket) => {
+  if (key in gameToSocketsMap) {
+    gameToSocketsMap[key].push(socket);
+  } else {
+    gameToSocketsMap[key] = [socket];
   }
-
-  userToSocketMap[user._id] = socket;
-  socketToUserMap[socket.id] = user;
 };
 
 const removeUser = (user, socket) => {
@@ -40,9 +38,7 @@ module.exports = {
 
   addUser: addUser,
   removeUser: removeUser,
-
-  getSocketFromUserID: getSocketFromUserID,
-  getUserFromSocketID: getUserFromSocketID,
   getSocketFromSocketID: getSocketFromSocketID,
+  getAllSocketsFromGame: getAllSocketsFromGame,
   getIo: () => io,
 };
