@@ -1,7 +1,6 @@
 import React, { Component } from "react";
-import { Router } from "@reach/router";
 import NotFound from "./pages/NotFound.js";
-import Chat from "./pages/Chat.js";
+import Game from "./pages/Game.js";
 
 import "../utilities.css";
 import "./styles/cards.scss";
@@ -20,13 +19,11 @@ class App extends Component {
     super(props);
     this.state = {
       userId: undefined,
-      numCards: 6, // hardcoded for now!!! 
+      numCards: 20, // hardcoded for now!!!
     };
   }
 
   render() {
-    console.log(cards);
-    // hardcoded hand for now!! 
     let hand = [];
     for(let i = 0; i < this.state.numCards; i++) {
       const i = Math.floor(Math.random() * 53);
@@ -38,16 +35,7 @@ class App extends Component {
     }
     return (
       <>
-        {/* <Router>
-          <Chat
-            path="/"
-          />
-          <NotFound default />
-        </Router> */}
-        <div className="cards">
-          {hand}
-        </div>
-
+        <Game/>
       </>
     );
   }
