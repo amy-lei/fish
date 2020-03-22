@@ -5,32 +5,11 @@ import Chat from "./pages/Chat.js";
 
 import "../utilities.css";
 import "./styles/cards.scss";
-import { cards } from "./cards.js";
+import { card_svgs } from "./card_svgs.js";
+import { cards } from "./card_objs.js";
 import { socket } from "../client-socket.js";
 
 import { get, post } from "../utilities";
-
-const SUITS = [
-  'heart', 
-  'diamond', 
-  'spade', 
-  'club',
-];
-const RANKS = [
-  'ace',
-  'two',
-  'three',
-  'four',
-  'five',
-  'six',
-  'seven',
-  'eight',
-  'nine',
-  'ten',
-  'jack',
-  'queen',
-  'king',
-];
 
 /**
  * Define the "App" component as a class.
@@ -46,14 +25,14 @@ class App extends Component {
   }
 
   render() {
+    console.log(cards);
     // hardcoded hand for now!! 
     let hand = [];
     for(let i = 0; i < this.state.numCards; i++) {
-      const rank = Math.floor(Math.random() * 12);
-      const suit = Math.floor(Math.random() * 3);
+      const i = Math.floor(Math.random() * 53);
       hand.push(
         <div className={`card card-${this.state.numCards}`}>
-          <img src={cards[`${RANKS[rank]}-${SUITS[suit]}.svg`]}/>
+          <img src={card_svgs[`${cards[i].rank}-${cards[i].suit}.svg`]}/>
         </div>
         );
     }
