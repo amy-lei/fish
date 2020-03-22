@@ -5,7 +5,7 @@ import Chat from "./pages/Chat.js";
 
 import "../utilities.css";
 import "./styles/cards.scss";
-import { images } from "./cards.js";
+import { cards } from "./cards.js";
 import { socket } from "../client-socket.js";
 
 import { get, post } from "../utilities";
@@ -41,41 +41,19 @@ class App extends Component {
     super(props);
     this.state = {
       userId: undefined,
-      numCards: 10,
+      numCards: 6, // hardcoded for now!!! 
     };
   }
 
-  // componentDidMount() {
-  //   get("/api/whoami").then((user) => {
-  //     if (user._id) {
-  //       // they are registed in the database, and currently logged in.
-  //       this.setState({ userId: user._id });
-  //     }
-  //   });
-  // }
-
-  // handleLogin = (res) => {
-  //   console.log(`Logged in as ${res.profileObj.name}`);
-  //   const userToken = res.tokenObj.id_token;
-  //   post("/api/login", { token: userToken }).then((user) => {
-  //     this.setState({ userId: user._id });
-  //     post("/api/initsocket", { socketid: socket.id });
-  //   });
-  // };
-
-  // handleLogout = () => {
-  //   this.setState({ userId: undefined });
-  //   post("/api/logout");
-  // };
-
   render() {
-    let cards = [];
+    // hardcoded hand for now!! 
+    let hand = [];
     for(let i = 0; i < this.state.numCards; i++) {
       const rank = Math.floor(Math.random() * 12);
       const suit = Math.floor(Math.random() * 3);
-      cards.push(
+      hand.push(
         <div className={`card card-${this.state.numCards}`}>
-          <img src={images[`${RANKS[rank]}-${SUITS[suit]}.svg`]}/>
+          <img src={cards[`${RANKS[rank]}-${SUITS[suit]}.svg`]}/>
         </div>
         );
     }
@@ -88,7 +66,7 @@ class App extends Component {
           <NotFound default />
         </Router> */}
         <div className="cards">
-          {cards}
+          {hand}
         </div>
 
       </>

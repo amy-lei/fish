@@ -1,4 +1,7 @@
 .cards {
+    position: absolute;
+    top: 20vh;
+    left: 10vw;
     display: flex;
     width: 70%;
 }
@@ -11,6 +14,7 @@
     }
     
     &:hover{
+        transform: translateY(-1rem);
         ~ .card {
             transform: translateX(4rem);
         }
