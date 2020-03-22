@@ -5,7 +5,7 @@
 }
 .card{
     transition: 0.5s;
-    width: 20%;
+    width: 13.5%;
     img {
         border-radius: 1rem;
         box-shadow: 4px 0px 5px 5px rgba(black, 0.15);
@@ -20,4 +20,20 @@
         margin-left:-4rem;
     }
 
+}
+
+@for $i from 1 through 20 {
+    @if $i < 7 {
+        .card-#{$i} {
+            width: 44% - $i * 4%;
+        }
+    } @else if $i < 11 {
+        .card-#{$i} {
+            width: 29% - $i * 1.5%;
+        }
+    } @else {
+        .card-#{$i} {
+            width: 16.5% - floor($i / 2) * 0.5%;
+        }
+    }
 }

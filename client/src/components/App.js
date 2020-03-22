@@ -41,6 +41,7 @@ class App extends Component {
     super(props);
     this.state = {
       userId: undefined,
+      numCards: 10,
     };
   }
 
@@ -69,23 +70,15 @@ class App extends Component {
 
   render() {
     let cards = [];
-    // SUITS.forEach(suit => {
-    //   RANKS.forEach(rank => {
-    //     cards.push(
-    //       (<div className={`card card-${rank}-${suit}`}></div>)
-    //     );
-    //   });
-    // });
-
-    // cards.sort(() => Math.random() - 0.5);
-    for(let i = 0; i < 1; i++) {
+    for(let i = 0; i < this.state.numCards; i++) {
+      const rank = Math.floor(Math.random() * 12);
+      const suit = Math.floor(Math.random() * 3);
       cards.push(
-        <div className="card">
-          <img src={images['ace-heart.svg']}/>
+        <div className={`card card-${this.state.numCards}`}>
+          <img src={images[`${RANKS[rank]}-${SUITS[suit]}.svg`]}/>
         </div>
         );
     }
-    console.log(images);
     return (
       <>
         {/* <Router>
@@ -95,7 +88,6 @@ class App extends Component {
           <NotFound default />
         </Router> */}
         <div className="cards">
-          {/* {cards.slice(0,6)} */}
           {cards}
         </div>
 
