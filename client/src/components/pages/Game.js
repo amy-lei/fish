@@ -2,7 +2,9 @@ import React, { Component } from "react";
 import "../../utilities.css";
 import {post} from "../../utilities";
 import { socket } from "../../client-socket";
-import { card_svgs } from "./card_svgs.js";
+import { card_svgs } from "../card_svgs.js";
+
+import "../styles/cards.scss";
 
 class Home extends Component {
     constructor(props) {
@@ -140,9 +142,10 @@ class WaitingRoom extends Component {
             })
         });
 
-        socket.on("startGame", (cards) => {
-            this.props.updateHand(cards[this.props.index]);
+        socket.on("startGame", (mes) => {
+            this.props.updateHand(mes.cards[this.props.index]);
             this.props.changePage("play_room");
+            console.log(mes.cards[this.props.index]);
         });
     }
 
@@ -152,7 +155,7 @@ class WaitingRoom extends Component {
         const body = {key: this.props.room_key}
         const hands = await post("/api/start_game", body);
         this.props.updateHand(hands[this.props.index]);
-        console.log(hands);
+        console.log(hands[this.props.index]);
         this.props.changePage("play_room");
     }
 
@@ -268,9 +271,20 @@ class Game extends Component {
             );
         }
         if (this.state.page == "play_room") {
+            let cards = "Loading cards";
+            console.log('hand', this.state.hand);
+            if (this.state.hand) {
+                cards = this.state.hand.map((card) => (
+                    <div className={`card card-${this.state.hand.length}`}>
+                        <img src={card_svgs[`${card.rank}-${card.suit}.svg`]}/>
+                    </div>
+                ));
+            }
+
             return (
                 <div>
                     Hello World
+                    <div className="cards">{cards}</div>
                 </div>
             );
         } 
