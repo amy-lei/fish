@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import "../../utilities.css";
 import {post} from "../../utilities";
+import { socket } from "../../client-socket";
 
 class Home extends Component {
     constructor(props) {
@@ -22,7 +23,7 @@ class Home extends Component {
         const body = {
             room_key: this.state.room_key,
         };
-        const canJoin = await post("/api/join_room", body);
+        const canJoin = await post("/api/check_room", body);
         if (canJoin) {
             this.props.enterKey(this.state.room_key);
             this.props.changePage("join_room");
@@ -127,16 +128,32 @@ class WaitingRoom extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            players: [this.props.name],
+            players: this.props.isCreator ? [this.props.name] : this.props.roomInfo.players,
         };
     };
+
+    componentDidMount() {
+        socket.on("joinedWaitingRoom", (newName) => {
+            this.setState({
+                players: this.state.players.concat(newName)
+            })
+        })
+    }
 
     render() {
         return (
             <div>
-                Hi {this.props.name}. <br/>
+                Hi, your name is {this.props.name}. <br/>
                 Are you creator? {this.props.isCreator + ""} <br/>
                 Room Key: {this.props.room_key} <br/>
+                Here are the players in the room: <br/>
+                <ul>
+                    {this.state.players.map((player, k) => (
+                        <li key={k}>
+                            {player}
+                        </li>
+                    ))}
+                </ul>
             </div>
         )
     }
@@ -151,6 +168,7 @@ class Game extends Component {
             key: "",
             name: "",
             isCreator: "",
+            info: null,
         };
     };
 
@@ -175,11 +193,17 @@ class Game extends Component {
         });
     };
 
-    enterRoom = (name) => {
+    enterRoom = async (name) => {
+        const body = {
+            playerName: name,
+            room_key: this.state.key,
+        };
+        const roomInfo = await post('/api/join_room', body);
         this.setState({
             page: "waiting_room",
             name: name,
             isCreator: false,
+            info: roomInfo,
         })
     };
     
@@ -201,7 +225,12 @@ class Game extends Component {
         }
         if (this.state.page === "waiting_room") {
             return (
-                <WaitingRoom room_key={this.state.key} name={this.state.name} isCreator={this.state.isCreator}/>
+                <WaitingRoom
+                    room_key={this.state.key}
+                    name={this.state.name}
+                    isCreator={this.state.isCreator}
+                    roomInfo={this.state.info}
+                />
             );
         }
         return (

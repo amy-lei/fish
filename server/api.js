@@ -39,25 +39,36 @@ router.post("/chat", (req, res) => {
     });
 });
 
-router.post("/join_room", (req, res) => {
+router.post("/check_room", (req, res) => {
     const requested_key = req.body.room_key;
-    console.log(requested_key);
     Game.find({key: requested_key})
-        .then((found_game) => {
-            res.send(found_game.length !== 0);
+        .then((foundGame) => {
+            res.send(foundGame.length === 1);
         });
+});
 
+router.post("/join_room", (req, res) => {
+    const requestedRoomKey = req.body.room_key;
+    const playerName = req.body.playerName;
+    Game.findOne({key: requestedRoomKey})
+        .then((foundGame) => {
+            socket.getIo().emit("joinedWaitingRoom", playerName);
+            foundGame.players = foundGame.players.concat([playerName]);
+            foundGame.save();
+            // TODO: send back new name if duplicates
+            res.send({players: foundGame.players});
+        });
 });
 
 router.post("/create_room", (req, res) => {
     // TODO: check that this room key does not already exist
     const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
-    let room_key = "";
+    let roomKey = "";
     for (let i = 0; i < 4; i++){
-        room_key = room_key.concat(chars[Math.floor(Math.random() * 36)]);
+        roomKey = roomKey.concat(chars[Math.floor(Math.random() * 36)]);
     }
     const game = new Game({
-        key: room_key,
+        key: roomKey,
         players: [req.body.creatorName],
         hands: [],
         teamEven: [],
