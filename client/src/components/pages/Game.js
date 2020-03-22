@@ -143,9 +143,8 @@ class WaitingRoom extends Component {
         });
 
         socket.on("startGame", (mes) => {
-            this.props.updateHand(mes.cards[this.props.index]);
-            this.props.changePage("play_room");
-            console.log(mes.cards[this.props.index]);
+            this.setUpGame(mes.cards[this.props.index]);
+            // this.props.changePage("play_room");
         });
     }
 
@@ -154,11 +153,25 @@ class WaitingRoom extends Component {
     start = async () => {
         const body = {key: this.props.room_key}
         const hands = await post("/api/start_game", body);
-        this.props.updateHand(hands[this.props.index]);
-        console.log(hands[this.props.index]);
-        this.props.changePage("play_room");
+        // this.props.updateHand(hands[this.props.index]);
+        // this.props.changePage("play_room");
+        this.setUpGame(hands[this.props.index]);
     }
 
+    setUpGame = (hand) => {
+        let otherTeam = [];
+        let yourTeam = [];
+        const parity = this.props.index % 2;
+        this.state.players.forEach((player) => {
+            console.log('my parity', parity);
+            console.log('parity of player', player.index, player.index % 2);
+            if (player.index % 2 == parity) yourTeam.push(player);
+            else otherTeam.push(player);
+        });
+        this.props.updateGame(hand, yourTeam, otherTeam);
+        this.props.changePage("play_room");
+
+    }
 
     render() {
         return (
@@ -183,6 +196,43 @@ class WaitingRoom extends Component {
     }
 }
 
+class PlayRoom extends Component {
+    constructor(props) {
+        super(props);
+        this.state = {};
+    }
+
+    render() {
+        let cards = "Loading cards";
+        if (this.props.hand) {
+            cards = this.props.hand.map((card) => (
+                <div className={`card card-${this.props.hand.length}`}>
+                    <img src={card_svgs[`${card.rank}-${card.suit}.svg`]}/>
+                </div>
+            ));
+        }
+        console.log("index", this.props.index);
+        console.log("mine", this.props.yourTeam);
+        console.log("other", this.props.otherTeam);
+        return (
+            <div>
+                Player's {this.props.whoseTurn} turn. <br/>
+                Turn type: {this.props.turnType}. <br/>
+                Your teammates: {
+                    this.props.yourTeam.map((player) => 
+                    (<span>{player.name}{player.index}</span>))
+                } <br/>
+                Opposing team: {
+                    this.props.otherTeam.map((player) => 
+                    (<span>{player.name}{player.index}</span>))
+                } <br/>
+                <div className="cards">{cards}</div>
+
+            </div>
+        );
+    }
+}
+
 
 class Game extends Component {
     constructor(props) {
@@ -196,6 +246,8 @@ class Game extends Component {
             hand: null,
             yourTeam: null,
             otherTeam: null,
+            turnType: "ask",
+            whoseTurn: 0,
             info: null,
         };
     };
@@ -237,8 +289,8 @@ class Game extends Component {
         });
     };
     
-    updateHand = (hand) => {
-        this.setState({hand});
+    updateGame = (hand, yourTeam, otherTeam) => {
+        this.setState({hand, yourTeam, otherTeam});
     }
 
     render() {
@@ -266,27 +318,20 @@ class Game extends Component {
                     isCreator={this.state.isCreator}
                     roomInfo={this.state.info}
                     changePage={this.changePage}
-                    updateHand={this.updateHand}
+                    updateGame={this.updateGame}
                 />
             );
         }
         if (this.state.page == "play_room") {
-            let cards = "Loading cards";
-            console.log('hand', this.state.hand);
-            if (this.state.hand) {
-                cards = this.state.hand.map((card) => (
-                    <div className={`card card-${this.state.hand.length}`}>
-                        <img src={card_svgs[`${card.rank}-${card.suit}.svg`]}/>
-                    </div>
-                ));
-            }
-
-            return (
-                <div>
-                    Hello World
-                    <div className="cards">{cards}</div>
-                </div>
-            );
+            return(
+            <PlayRoom
+                index={this.state.index}
+                hand={this.state.hand}
+                yourTeam={this.state.yourTeam}
+                otherTeam={this.state.otherTeam}
+                whoseTurn={this.state.whoseTurn}
+                turnType={this.state.turnType}
+            />);
         } 
         return (
             <div>Not Found</div>
