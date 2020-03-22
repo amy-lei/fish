@@ -10,7 +10,7 @@
 const express = require("express");
 const Message = require("./models/message.js");
 const Game = require("./models/game.js");
-
+const gen_cards = require("./cards.js");
 // api endpoints: all these paths will be prefixed with "/api/"
 const router = express.Router();
 
@@ -61,6 +61,7 @@ router.post("/join_room", (req, res) => {
         });
 });
 
+
 router.post("/create_room", (req, res) => {
     // TODO: check that this room key does not already exist
     const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
@@ -72,14 +73,23 @@ router.post("/create_room", (req, res) => {
         key: roomKey,
         players: [{name: req.body.creatorName, index: 0}],
         hands: [],
-        teamEven: [],
-        teamOdd: [],
     });
     game.save().then((game) => {
-        res.send({'content': game});
+        res.send(game);
     })
 });
 
+
+router.post("/start_game", (req, res) => {
+  Game
+    .findOne({ key: req.body.key })
+    .then((game) => {
+      cards = gen_cards(game.players.length);
+      game.hands = cards;
+      socket.getIo().emit("startGame", {cards: cards});
+      game.save().then(() => res.send(cards));
+    });
+});
 
 // anything else falls to this "not found" case
 router.all("*", (req, res) => {

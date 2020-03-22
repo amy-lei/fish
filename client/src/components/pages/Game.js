@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import "../../utilities.css";
 import {post} from "../../utilities";
 import { socket } from "../../client-socket";
+import { card_svgs } from "./card_svgs.js";
 
 class Home extends Component {
     constructor(props) {
@@ -137,8 +138,24 @@ class WaitingRoom extends Component {
             this.setState({
                 players: this.state.players.concat(newName)
             })
-        })
+        });
+
+        socket.on("startGame", (cards) => {
+            this.props.updateHand(cards[this.props.index]);
+            this.props.changePage("play_room");
+        });
     }
+
+    // TODO: add a ready button for non creators.
+    // for now, everyone will have access to the start btn regardless of readiness
+    start = async () => {
+        const body = {key: this.props.room_key}
+        const hands = await post("/api/start_game", body);
+        this.props.updateHand(hands[this.props.index]);
+        console.log(hands);
+        this.props.changePage("play_room");
+    }
+
 
     render() {
         return (
@@ -155,6 +172,9 @@ class WaitingRoom extends Component {
                         </li>
                     ))}
                 </ul>
+                <button onClick={this.start}>
+                    Start Game
+                </button>
             </div>
         )
     }
@@ -170,6 +190,9 @@ class Game extends Component {
             name: "",
             index: "",
             isCreator: "",
+            hand: null,
+            yourTeam: null,
+            otherTeam: null,
             info: null,
         };
     };
@@ -192,7 +215,7 @@ class Game extends Component {
             name: name,
             isCreator: true,
             index: 0,
-            key: game.content.key,
+            key: game.key,
         });
     };
 
@@ -209,9 +232,12 @@ class Game extends Component {
             index: roomInfo.self.index,
             info: roomInfo,
         });
-        console.log(roomInfo);
     };
     
+    updateHand = (hand) => {
+        this.setState({hand});
+    }
+
     render() {
         if (this.state.page === "home") {
             return (
@@ -236,9 +262,18 @@ class Game extends Component {
                     index={this.state.index}
                     isCreator={this.state.isCreator}
                     roomInfo={this.state.info}
+                    changePage={this.changePage}
+                    updateHand={this.updateHand}
                 />
             );
         }
+        if (this.state.page == "play_room") {
+            return (
+                <div>
+                    Hello World
+                </div>
+            );
+        } 
         return (
             <div>Not Found</div>
         );

@@ -6,9 +6,12 @@ const GameSchema = new mongoose.Schema({
         name: String,
         index: Number,
     }],
-    hands: [String],
-    teamEven: [String],
-    teamOdd: [String],
+    hands: [[
+        {
+            rank: String,
+            suit: String,
+        }
+    ]],
 });
 
 module.exports = mongoose.model("game", GameSchema);

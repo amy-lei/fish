@@ -4,7 +4,6 @@ import Game from "./pages/Game.js";
 
 import "../utilities.css";
 import "./styles/cards.scss";
-import { card_svgs } from "./card_svgs.js";
 import { cards } from "./card_objs.js";
 import { socket } from "../client-socket.js";
 
