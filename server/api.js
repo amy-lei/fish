@@ -52,6 +52,8 @@ router.post("/join_room", (req, res) => {
     const playerName = req.body.playerName;
     Game.findOne({key: requestedRoomKey})
         .then((foundGame) => {
+            // add user to list of sockets
+            socket.addUser(foundGame.key, socket.getSocketFromSocketID(req.body.socketid));
             newPlayer = {name: playerName, index: foundGame.players.length};
             socket.getIo().emit("joinedWaitingRoom", newPlayer);
             foundGame.players.push(newPlayer);
@@ -75,6 +77,7 @@ router.post("/create_room", (req, res) => {
         hands: [],
     });
     game.save().then((game) => {
+        socket.addUser(roomKey, socket.getSocketFromSocketID(req.body.socketid));
         res.send(game);
     })
 });
@@ -86,7 +89,9 @@ router.post("/start_game", (req, res) => {
     .then((game) => {
       cards = gen_cards(game.players.length);
       game.hands = cards;
-      socket.getIo().emit("startGame", {cards: cards});
+      socket.getAllSocketsFromGame(game.key).forEach(client => {
+        client.emit("startGame", {cards: cards});
+      });
       game.save().then(() => res.send(cards));
     });
 });

@@ -5,6 +5,7 @@ const userToSocketMap = {}; // maps user ID to socket object
 const socketToUserMap = {}; // maps socket ID to user object
 
 const getAllSocketsFromGame = (key) => { 
+  console.log("found",key in gameToSocketsMap);
   if (key in gameToSocketsMap){ return gameToSocketsMap[key]; } 
   else { return []; } 
 }
