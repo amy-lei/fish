@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import "../../utilities.css";
-import {post} from "../../utilities";
+import { post } from "../../utilities";
+import { hasCard } from "../../game-utilities";
 import { socket } from "../../client-socket";
 import { card_svgs } from "../card_svgs.js";
 
@@ -224,6 +225,7 @@ class PlayRoom extends Component {
             recipient: "",
             rank: "",
             suit: "",
+            response: "",
         };
     }
 
@@ -246,6 +248,14 @@ class PlayRoom extends Component {
             recipient: "",
             rank: "",
             suit: "",
+        });
+    }
+
+    respond = () => {
+        this.props.submitResponse(this.state.response);
+        this.setState({
+            responding: false,
+            response: "",
         });
     }
 
@@ -311,6 +321,25 @@ class PlayRoom extends Component {
             </div>
         );
 
+        let asker;
+        this.props.history.length !== 0 ? asker = this.props.history[this.props.history.length - 1].asker : asker = "";
+        const respondButton = (<button onClick={()=>this.setState({responding:true})}>Respond</button>);
+        const respondPrompt = (
+            <>
+                <div className="popup">
+                    Respond to {asker}:
+                    <input 
+                        type="text"
+                        onChange={(e) => this.setState({response: e.target.value})}
+                        value={this.state.response}
+                    />
+                </div>
+                <button onClick={this.respond}>
+                    Send
+                </button>
+            </>
+        );
+
         return (
             <div>
                 Your name: {this.props.name} <br/>
@@ -329,6 +358,8 @@ class PlayRoom extends Component {
                 {(this.state.recipient && this.state.rank && this.state.suit) &&
                     (<button onClick={this.ask}>Ask</button>)
                 }
+                {respondButton}
+                {this.state.responding && respondPrompt}
                 <div className="cards">{cards}</div>
 
             </div>
@@ -400,7 +431,7 @@ class Game extends Component {
     
     updateGame = (hand, yourTeam, otherTeam) => {
         this.setState({hand, yourTeam, otherTeam});
-    };
+    }
 
     ask = async (who, rank, suit) => {
         const body = {
@@ -412,6 +443,18 @@ class Game extends Component {
         };
 
         const move = await post('/api/ask', body);
+    }
+
+    respond = async (response) => {
+        const lastAsk = this.state.history[this.state.history.length - 1]
+        const card = { rank: lastAsk.rank, suit: lastAsk.suit };
+        const success = hasCard(this.state.hand, card);
+        console.log(success);
+        const body = {
+            key: this.state.key,
+            response: response,
+            success: success,
+        };
     }
 
     componentDidMount() {
@@ -473,6 +516,8 @@ class Game extends Component {
                         whoseTurn={this.state.whoseTurn}
                         turnType={this.state.turnType}
                         submitAsk={this.ask}
+                        submitResponse={this.respond}
+                        history={this.state.history}
                     />
             </>);
         } 
