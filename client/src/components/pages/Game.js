@@ -5,7 +5,32 @@ import { socket } from "../../client-socket";
 import { card_svgs } from "../card_svgs.js";
 
 import "../styles/cards.scss";
-
+const SUITS = [
+    'heart', 
+    'diamond', 
+    'spade', 
+    'club',
+  ];
+const JOKER_SUITS = [
+    'red',
+    'black',
+];
+const RANKS = [
+    'ace',
+    'two',
+    'three',
+    'four',
+    'five',
+    'six',
+    'seven',
+    'eight',
+    'nine',
+    'ten',
+    'jack',
+    'queen',
+    'king',
+    'joker',
+];
 class Home extends Component {
     constructor(props) {
         super(props);
@@ -144,7 +169,6 @@ class WaitingRoom extends Component {
 
         socket.on("startGame", (mes) => {
             this.setUpGame(mes.cards[this.props.index]);
-            // this.props.changePage("play_room");
         });
     }
 
@@ -153,8 +177,6 @@ class WaitingRoom extends Component {
     start = async () => {
         const body = {key: this.props.room_key}
         const hands = await post("/api/start_game", body);
-        // this.props.updateHand(hands[this.props.index]);
-        // this.props.changePage("play_room");
         this.setUpGame(hands[this.props.index]);
     }
 
@@ -163,8 +185,6 @@ class WaitingRoom extends Component {
         let yourTeam = [];
         const parity = this.props.index % 2;
         this.state.players.forEach((player) => {
-            console.log('my parity', parity);
-            console.log('parity of player', player.index, player.index % 2);
             if (player.index % 2 == parity) yourTeam.push(player);
             else otherTeam.push(player);
         });
@@ -199,21 +219,93 @@ class WaitingRoom extends Component {
 class PlayRoom extends Component {
     constructor(props) {
         super(props);
-        this.state = {};
+        this.state = {
+            asking: false,
+            responding: false,
+            recipient: "",
+            rank: "",
+            suit: "",
+        };
+    }
+
+    // Create ugly cards for now, its too distracting
+    createCards = (hand) => {
+        return hand.map(card => (
+            <div className="test-card">
+                {card.rank} {card.suit}
+            </div>
+            // <div className={`card card-${this.props.hand.length}`}>
+            //     <img src={card_svgs[`${card.rank}-${card.suit}.svg`]}/>
+            // </div>
+        ));
+    }
+
+    submitAsk = () => {
+        console.log('hi');
     }
 
     render() {
         let cards = "Loading cards";
         if (this.props.hand) {
-            cards = this.props.hand.map((card) => (
-                <div className={`card card-${this.props.hand.length}`}>
-                    <img src={card_svgs[`${card.rank}-${card.suit}.svg`]}/>
-                </div>
-            ));
+            // Use fake cards for now–too distracting 
+            cards = this.createCards(this.props.hand);
         }
-        console.log("index", this.props.index);
-        console.log("mine", this.props.yourTeam);
-        console.log("other", this.props.otherTeam);
+
+        const askButton = (
+            <button
+                className="btn"
+                onClick={() => this.setState({asking: true})}
+            >
+                ASK!!!!
+            </button>
+        );
+
+        const askPrompt = (
+            <div className="popup">
+                Who
+                <select 
+                    value={this.state.recipient} 
+                    onChange={(e) => this.setState({recipient: e.target.value})}
+                    >
+                    <option value=""></option>
+                    {this.props.otherTeam.map(player => (
+                        <option value={player.name}>{player.name}</option>    
+                        ))}
+                </select>
+
+                Rank
+                <select 
+                    value={this.state.rank} 
+                    onChange={(e) => this.setState({rank: e.target.value})}
+                    >
+                    <option value=""></option>
+                    {RANKS.map(rank => (
+                        <option value={rank}>{rank}</option>
+                        ))}
+                </select>
+
+                {this.state.rank && (
+                    <>
+                        Suit
+                        <select
+                            value={this.state.suit}
+                            onChange={(e) => this.setState({suit: e.target.value})}
+                            >
+                            <option value=""></option>
+                            { this.state.rank === "joker" ?
+                                JOKER_SUITS.map(suit => (
+                                    <option value={suit}>{suit}</option>
+                                    ))
+                                    : SUITS.map(suit => (
+                                        <option value={suit}>{suit}</option>
+                                    ))
+                            }
+                        </select>
+                    </>
+                )}
+            </div>
+        );
+
         return (
             <div>
                 Player's {this.props.whoseTurn} turn. <br/>
@@ -226,6 +318,11 @@ class PlayRoom extends Component {
                     this.props.otherTeam.map((player) => 
                     (<span>{player.name}{player.index}</span>))
                 } <br/>
+                {askButton}
+                {this.state.asking && askPrompt}
+                {(this.state.rank && this.state.suit) &&
+                    (<button onClick={this.submitAsk}>Ask</button>)
+                }
                 <div className="cards">{cards}</div>
 
             </div>
@@ -263,6 +360,7 @@ class Game extends Component {
     createRoom = async (name) => {
         const body = {
             creatorName: name,
+            socketid: socket.id,
         };
         const game = await post('/api/create_room', body);
         this.setState({
@@ -278,6 +376,7 @@ class Game extends Component {
         const body = {
             playerName: name,
             room_key: this.state.key,
+            socketid: socket.id,
         };
         const roomInfo = await post('/api/join_room', body);
         this.setState({
