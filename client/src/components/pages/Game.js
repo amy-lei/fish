@@ -156,7 +156,7 @@ class WaitingRoom extends Component {
         // this.props.updateHand(hands[this.props.index]);
         // this.props.changePage("play_room");
         this.setUpGame(hands[this.props.index]);
-    }
+    };
 
     setUpGame = (hand) => {
         let otherTeam = [];
@@ -171,7 +171,7 @@ class WaitingRoom extends Component {
         this.props.updateGame(hand, yourTeam, otherTeam);
         this.props.changePage("play_room");
 
-    }
+    };
 
     render() {
         return (
@@ -291,7 +291,7 @@ class Game extends Component {
     
     updateGame = (hand, yourTeam, otherTeam) => {
         this.setState({hand, yourTeam, otherTeam});
-    }
+    };
 
     render() {
         if (this.state.page === "home") {
@@ -322,7 +322,7 @@ class Game extends Component {
                 />
             );
         }
-        if (this.state.page == "play_room") {
+        if (this.state.page === "play_room") {
             return(
             <PlayRoom
                 index={this.state.index}
