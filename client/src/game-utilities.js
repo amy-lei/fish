@@ -1,5 +1,5 @@
 const rankToVal = {
-    'ace': 1,
+    'ace': 14,
     'two': 2,
     'three': 3,
     'four': 4,
