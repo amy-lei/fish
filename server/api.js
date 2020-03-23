@@ -106,7 +106,7 @@ router.post("/ask", (req, res) => {
     rank: req.body.rank,
     suit: req.body.suit,
   };
-
+  console.log("asking");
   Game
     .findOne({key: req.body.key})
     .then(game => {
@@ -120,6 +120,40 @@ router.post("/ask", (req, res) => {
 
       game.save();
     });
+});
+
+router.post("/respond", (req, res) => {
+  const move = {
+    type: "respond",
+    responder: req.body.responder,
+    asker: req.body.asker,
+    response: req.body.response,
+    success: req.body.success,
+    rank: req.body.card.rank,
+    suit: req.body.card.suit,
+  };
+  Game
+    .findOne({key: req.body.key})
+    .then(game => {
+      history = game.history;
+      if (history.length == 4) history.shift();
+      history.push(move);
+      socket.getAllSocketsFromGame(game.key).forEach(client => {
+        client.emit("respond", {history: history, move: move});
+      });
+
+      if (move.success) {
+            // remove from responder
+            newHand = game.hands[move.responder.index].filter(card => 
+                !(card.rank === move.rank && card.suit === move.suit));
+            game.hands[move.responder.index] = newHand;
+
+            // add to asker
+            game.hands[move.asker.index].push({rank: move.rank, suit: move.suit});
+      }
+      game.save();      
+    })
+
 });
 
 // anything else falls to this "not found" case

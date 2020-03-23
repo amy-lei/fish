@@ -5,6 +5,7 @@ import { hasCard } from "../../game-utilities";
 import { socket } from "../../client-socket";
 import { card_svgs } from "../card_svgs.js";
 
+import "../styles/game.scss";
 import "../styles/cards.scss";
 const SUITS = [
     'heart', 
@@ -266,79 +267,80 @@ class PlayRoom extends Component {
             cards = this.createCards(this.props.hand);
         }
 
-        const askButton = (
-            <button
-                className="btn"
-                onClick={() => this.setState({asking: true})}
-            >
-                ASK!!!!
-            </button>
-        );
+        const askFunc = (
+            <>
+                <button
+                    className="btn"
+                    onClick={() => this.setState({asking: true})}
+                >
+                    ASK!!!!
+                </button>
+                <div className={`popup ${this.state.asking ? "" : "hidden"}`}>
+                    Who
+                    <select 
+                        value={this.state.recipient} 
+                        onChange={(e) => this.setState({recipient: e.target.value})}
+                        >
+                        <option value=""></option>
+                        {this.props.otherTeam.map(player => (
+                            <option value={player.name}>{player.name}</option>    
+                            ))}
+                    </select>
 
-        const askPrompt = (
-            <div className="popup">
-                Who
-                <select 
-                    value={this.state.recipient} 
-                    onChange={(e) => this.setState({recipient: e.target.value})}
-                    >
-                    <option value=""></option>
-                    {this.props.otherTeam.map(player => (
-                        <option value={player.name}>{player.name}</option>    
-                        ))}
-                </select>
+                    Rank
+                    <select 
+                        value={this.state.rank} 
+                        onChange={(e) => this.setState({rank: e.target.value})}
+                        >
+                        <option value=""></option>
+                        {RANKS.map(rank => (
+                            <option value={rank}>{rank}</option>
+                            ))}
+                    </select>
 
-                Rank
-                <select 
-                    value={this.state.rank} 
-                    onChange={(e) => this.setState({rank: e.target.value})}
-                    >
-                    <option value=""></option>
-                    {RANKS.map(rank => (
-                        <option value={rank}>{rank}</option>
-                        ))}
-                </select>
-
-                {this.state.rank && (
-                    <>
-                        Suit
-                        <select
-                            value={this.state.suit}
-                            onChange={(e) => this.setState({suit: e.target.value})}
-                            >
-                            <option value=""></option>
-                            { this.state.rank === "joker" ?
-                                JOKER_SUITS.map(suit => (
-                                    <option value={suit}>{suit}</option>
-                                    ))
-                                    : SUITS.map(suit => (
+                    {this.state.rank && (
+                        <>
+                            Suit
+                            <select
+                                value={this.state.suit}
+                                onChange={(e) => this.setState({suit: e.target.value})}
+                                >
+                                <option value=""></option>
+                                { this.state.rank === "joker" ?
+                                    JOKER_SUITS.map(suit => (
                                         <option value={suit}>{suit}</option>
-                                    ))
-                            }
-                        </select>
-                    </>
-                )}
-            </div>
+                                        ))
+                                        : SUITS.map(suit => (
+                                            <option value={suit}>{suit}</option>
+                                        ))
+                                }
+                            </select>
+                        </>
+                    )}
+                    {(this.state.recipient && this.state.rank && this.state.suit) &&
+                        (<button onClick={this.ask}>Ask</button>)}
+                </div>
+            </>
         );
 
         let asker;
-        this.props.history.length !== 0 ? asker = this.props.history[this.props.history.length - 1].asker : asker = "";
-        const respondButton = (<button onClick={()=>this.setState({responding:true})}>Respond</button>);
-        const respondPrompt = (
+        this.props.history.length !== 0 ? asker = this.props.history[this.props.history.length - 1].asker.name : asker = "";
+        const respondFunc = (
             <>
-                <div className="popup">
+                <button onClick={()=>this.setState({responding:true})}>Respond</button>
+                <div className={`popup ${this.state.responding?"": "hidden"}`}>
                     Respond to {asker}:
                     <input 
                         type="text"
                         onChange={(e) => this.setState({response: e.target.value})}
                         value={this.state.response}
                     />
+                    <button onClick={this.respond}>
+                        Send
+                    </button>
                 </div>
-                <button onClick={this.respond}>
-                    Send
-                </button>
             </>
-        );
+            );
 
         return (
             <div>
@@ -353,15 +355,14 @@ class PlayRoom extends Component {
                     this.props.otherTeam.map((player) => 
                     (<span>{player.name}{player.index}</span>))
                 } <br/>
-                {askButton}
-                {this.state.asking && askPrompt}
-                {(this.state.recipient && this.state.rank && this.state.suit) &&
-                    (<button onClick={this.ask}>Ask</button>)
+                {
+                    this.props.whoseTurn === this.props.name ?
+                        this.props.turnType === "ask" ?
+                            askFunc
+                            : respondFunc
+                        : ""
                 }
-                {respondButton}
-                {this.state.responding && respondPrompt}
                 <div className="cards">{cards}</div>
-
             </div>
         );
     }
@@ -383,7 +384,6 @@ class Game extends Component {
             turnType: "ask",
             history: [],
             whoseTurn: "",
-            info: null,
         };
     };
 
@@ -423,8 +423,8 @@ class Game extends Component {
             name: name,
             isCreator: false,
             index: roomInfo.self.index,
-            info: roomInfo.info,
             whoseTurn: roomInfo.info.whoseTurn,
+            info: roomInfo.info,
             turnType: roomInfo.info.turnType,
         });
     };
@@ -436,25 +436,28 @@ class Game extends Component {
     ask = async (who, rank, suit) => {
         const body = {
             key: this.state.key,
-            asker: this.state.name,
+            asker: { name: this.state.name, index: this.state.index},
             recipient: who, 
             rank: rank,
             suit: suit,
         };
-
-        const move = await post('/api/ask', body);
+        console.log('asking');
+        const res = await post('/api/ask', body);
     }
 
     respond = async (response) => {
         const lastAsk = this.state.history[this.state.history.length - 1]
         const card = { rank: lastAsk.rank, suit: lastAsk.suit };
         const success = hasCard(this.state.hand, card);
-        console.log(success);
         const body = {
             key: this.state.key,
+            responder: {name: this.state.name, index: this.state.index},
+            asker: lastAsk.asker,
             response: response,
             success: success,
+            card: card,
         };
+        await post("/api/respond", body);
     }
 
     componentDidMount() {
@@ -465,14 +468,44 @@ class Game extends Component {
                 turnType: "respond",
             });
         });
+        socket.on("respond", update => {
+            const turn = update.move.success ? update.move.asker.name: update.move.responder.name;
+            if (update.move.success) {
+                // add to asker/remove from responder
+                if (update.move.responder.name === this.state.name) {
+                    const hand = this.state.hand.filter(card => 
+                        !(card.rank === update.move.rank && card.suit === update.move.suit)); 
+                    this.setState({hand})
+                } else if (update.move.asker.name === this.state.name) {
+                    this.setState({
+                        hand: this.state.hand.concat({rank:update.move.rank, suit: update.move.suit}),
+                    });
+                }
+            }
+            this.setState({
+                history: update.history,
+                whoseTurn: turn,
+                turnType: "ask",
+            });
+        });
     }
 
     render() {
-        let history = this.state.history.map(move => (
-            <div>
-                {move.asker} asked {move.recipient} for {move.rank} {move.suit}
-            </div>
-        ));
+        let history = this.state.history.map(move => {
+            if (move.type === "ask")
+                return (<div>
+                    {move.asker.name} asked {move.recipient} for {move.rank} {move.suit}
+                </div>);
+            else {
+                const result = move.success ? "did" : "did not"
+                return (<><div>
+                    {move.responder.name} responded with {move.response}
+                </div>
+                <div>
+                    {move.responder.name} {result} have the {move.rank} {move.suit}
+                </div><br/></>);
+            }
+        });
         
         if (this.state.page === "home") {
             return (
@@ -506,7 +539,7 @@ class Game extends Component {
             return(
                 <>
                     Game History: <br/>
-                    {history}
+                    {history}<br/>
                     <PlayRoom
                         name={this.state.name}
                         index={this.state.index}
