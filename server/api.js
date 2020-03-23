@@ -22,11 +22,12 @@ router.get("/chat", (req, res) => {
     .find({})
     .sort({date: 'desc'})
     .then((messages)=> {
-      console.log(`found: ${messages.length}`);
       res.send(messages);
     });
 });
 
+// TODO: update this to include game key and to 
+// only emit to players in this game 
 router.post("/chat", (req, res) => {
   const mes = new Message({
     sender_name: req.body.sender_name,
@@ -34,7 +35,6 @@ router.post("/chat", (req, res) => {
   });
   mes.save().then((message)=> {
       socket.getIo().emit("newMessage", message);
-      console.log(`sent message: ${message}`);
       res.send({'content': message.content});
     });
 });
@@ -52,10 +52,11 @@ router.post("/join_room", (req, res) => {
     const playerName = req.body.playerName;
     Game.findOne({key: requestedRoomKey})
         .then((foundGame) => {
-            // add user to list of sockets
             socket.addUser(foundGame.key, socket.getSocketFromSocketID(req.body.socketid));
             newPlayer = {name: playerName, index: foundGame.players.length};
-            socket.getIo().emit("joinedWaitingRoom", newPlayer);
+            socket.getAllSocketsFromGame(foundGame.key).forEach(client => {
+              client.emit("joinedWaitingRoom", newPlayer);
+            });
             foundGame.players.push(newPlayer);
             foundGame.save();
             // TODO: send back new name if duplicates
