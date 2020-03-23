@@ -441,7 +441,6 @@ class Game extends Component {
             rank: rank,
             suit: suit,
         };
-        console.log('asking');
         const res = await post('/api/ask', body);
     }
 

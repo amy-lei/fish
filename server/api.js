@@ -106,7 +106,6 @@ router.post("/ask", (req, res) => {
     rank: req.body.rank,
     suit: req.body.suit,
   };
-  console.log("asking");
   Game
     .findOne({key: req.body.key})
     .then(game => {
@@ -118,7 +117,7 @@ router.post("/ask", (req, res) => {
         client.emit("ask", {history: history, move: move});
       });
 
-      game.save();
+      game.save().then(()=>res.send());
     });
 });
 
@@ -151,7 +150,7 @@ router.post("/respond", (req, res) => {
             // add to asker
             game.hands[move.asker.index].push({rank: move.rank, suit: move.suit});
       }
-      game.save();      
+      game.save().then(()=>res.send({}));      
     })
 
 });
