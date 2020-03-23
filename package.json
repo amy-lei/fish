@@ -34,7 +34,8 @@
     "socket.io": "^2.3.0",
     "socket.io-client": "^2.3.0",
     "node-sass": "^4.13.1",
-    "url-loader": "^1.1.2"
+    "url-loader": "^1.1.2",
+    "dotenv": "^8.2.0"
   },
   "devDependencies": {
     "@babel/cli": "^7.4.4",

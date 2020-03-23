@@ -22,7 +22,7 @@ export const hasCard = (hand, target) => {
 }
 
 export const isValidAsk = (hand, target) => {
-    if (target.rank === "joker")
+    if (target.rank === "joker" || rankToVal[target.rank] == 8)
         for(let card of hand)
             {
                 console.log('checking',card);
