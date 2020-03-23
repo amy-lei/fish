@@ -67,20 +67,30 @@ router.post("/join_room", (req, res) => {
 
 router.post("/create_room", (req, res) => {
     // TODO: check that this room key does not already exist
-    const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
-    let roomKey = "";
-    for (let i = 0; i < 4; i++){
-        roomKey = roomKey.concat(chars[Math.floor(Math.random() * 36)]);
-    }
-    const game = new Game({
-        key: roomKey,
-        players: [{name: req.body.creatorName, index: 0}],
-        hands: [],
-    });
-    game.save().then((game) => {
-        socket.addUser(roomKey, socket.getSocketFromSocketID(req.body.socketid));
-        res.send(game);
-    })
+    Game.find({})
+        .then((games) => {
+            const existingRoomKeys = games.map((game) => game.key);
+            const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
+            let roomKey = "";
+            while (true) {
+                for (let i = 0; i < 4; i++){
+                    roomKey = roomKey.concat(chars[Math.floor(Math.random() * 36)]);
+                }
+                if (!existingRoomKeys.includes(roomKey)) {
+                    break;
+                }
+                roomKey = "";
+            }
+            const game = new Game({
+                key: roomKey,
+                players: [{name: req.body.creatorName, index: 0}],
+                hands: [],
+            });
+            game.save().then((game) => {
+                socket.addUser(roomKey, socket.getSocketFromSocketID(req.body.socketid));
+                res.send(game);
+            })
+        });
 });
 
 
