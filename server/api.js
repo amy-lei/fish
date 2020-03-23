@@ -60,7 +60,7 @@ router.post("/join_room", (req, res) => {
             foundGame.players.push(newPlayer);
             foundGame.save();
             // TODO: send back new name if duplicates
-            res.send({self: newPlayer, players: foundGame.players});
+            res.send({self: newPlayer, info: foundGame});
         });
 });
 
@@ -76,6 +76,7 @@ router.post("/create_room", (req, res) => {
         key: roomKey,
         players: [{name: req.body.creatorName, index: 0}],
         hands: [],
+        whoseTurn: req.body.creatorName,
     });
     game.save().then((game) => {
         socket.addUser(roomKey, socket.getSocketFromSocketID(req.body.socketid));
@@ -94,6 +95,30 @@ router.post("/start_game", (req, res) => {
         client.emit("startGame", {cards: cards});
       });
       game.save().then(() => res.send(cards));
+    });
+});
+
+router.post("/ask", (req, res) => {
+  const move = {
+    type: "ask",
+    asker: req.body.asker,
+    recipient: req.body.recipient,
+    rank: req.body.rank,
+    suit: req.body.suit,
+  };
+
+  Game
+    .findOne({key: req.body.key})
+    .then(game => {
+      history = game.history;
+      if (history.length === 4) history.shift();
+      history.push(move);
+      
+      socket.getAllSocketsFromGame(game.key).forEach(client => {
+        client.emit("ask", {history: history, move: move});
+      });
+
+      game.save();
     });
 });
 

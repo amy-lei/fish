@@ -12,6 +12,9 @@ const GameSchema = new mongoose.Schema({
             suit: String,
         }
     ]],
+    history: {type: [Object], default: []}, 
+    whoseTurn: String,
+    turnType: {type: String, default: "ask"},
 });
 
 module.exports = mongoose.model("game", GameSchema);

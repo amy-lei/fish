@@ -177,7 +177,6 @@ class WaitingRoom extends Component {
     start = async () => {
         const body = {key: this.props.room_key}
         const hands = await post("/api/start_game", body);
-        this.setUpGame(hands[this.props.index]);
     };
 
     setUpGame = (hand) => {
@@ -240,8 +239,14 @@ class PlayRoom extends Component {
         ));
     }
 
-    submitAsk = () => {
-        console.log('hi');
+    ask = () => {
+        this.props.submitAsk(this.state.recipient, this.state.rank, this.state.suit)
+        this.setState({
+            asking: false,
+            recipient: "",
+            rank: "",
+            suit: "",
+        });
     }
 
     render() {
@@ -308,6 +313,7 @@ class PlayRoom extends Component {
 
         return (
             <div>
+                Your name: {this.props.name} <br/>
                 Player's {this.props.whoseTurn} turn. <br/>
                 Turn type: {this.props.turnType}. <br/>
                 Your teammates: {
@@ -320,8 +326,8 @@ class PlayRoom extends Component {
                 } <br/>
                 {askButton}
                 {this.state.asking && askPrompt}
-                {(this.state.rank && this.state.suit) &&
-                    (<button onClick={this.submitAsk}>Ask</button>)
+                {(this.state.recipient && this.state.rank && this.state.suit) &&
+                    (<button onClick={this.ask}>Ask</button>)
                 }
                 <div className="cards">{cards}</div>
 
@@ -344,7 +350,8 @@ class Game extends Component {
             yourTeam: null,
             otherTeam: null,
             turnType: "ask",
-            whoseTurn: 0,
+            history: [],
+            whoseTurn: "",
             info: null,
         };
     };
@@ -369,6 +376,7 @@ class Game extends Component {
             isCreator: true,
             index: 0,
             key: game.key,
+            whoseTurn: name,
         });
     };
 
@@ -384,7 +392,9 @@ class Game extends Component {
             name: name,
             isCreator: false,
             index: roomInfo.self.index,
-            info: roomInfo,
+            info: roomInfo.info,
+            whoseTurn: roomInfo.info.whoseTurn,
+            turnType: roomInfo.info.turnType,
         });
     };
     
@@ -392,7 +402,35 @@ class Game extends Component {
         this.setState({hand, yourTeam, otherTeam});
     };
 
+    ask = async (who, rank, suit) => {
+        const body = {
+            key: this.state.key,
+            asker: this.state.name,
+            recipient: who, 
+            rank: rank,
+            suit: suit,
+        };
+
+        const move = await post('/api/ask', body);
+    }
+
+    componentDidMount() {
+        socket.on("ask", update => {
+            this.setState({
+                history: update.history,
+                whoseTurn: update.move.recipient,
+                turnType: "respond",
+            });
+        });
+    }
+
     render() {
+        let history = this.state.history.map(move => (
+            <div>
+                {move.asker} asked {move.recipient} for {move.rank} {move.suit}
+            </div>
+        ));
+        
         if (this.state.page === "home") {
             return (
                 <Home changePage={this.changePage} enterKey={this.updateKey}/>
@@ -423,14 +461,20 @@ class Game extends Component {
         }
         if (this.state.page === "play_room") {
             return(
-            <PlayRoom
-                index={this.state.index}
-                hand={this.state.hand}
-                yourTeam={this.state.yourTeam}
-                otherTeam={this.state.otherTeam}
-                whoseTurn={this.state.whoseTurn}
-                turnType={this.state.turnType}
-            />);
+                <>
+                    Game History: <br/>
+                    {history}
+                    <PlayRoom
+                        name={this.state.name}
+                        index={this.state.index}
+                        hand={this.state.hand}
+                        yourTeam={this.state.yourTeam}
+                        otherTeam={this.state.otherTeam}
+                        whoseTurn={this.state.whoseTurn}
+                        turnType={this.state.turnType}
+                        submitAsk={this.ask}
+                    />
+            </>);
         } 
         return (
             <div>Not Found</div>
