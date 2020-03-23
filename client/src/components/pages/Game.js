@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import "../../utilities.css";
 import {post} from "../../utilities";
 import { socket } from "../../client-socket";
+import Chat from "./Chat.js";
 import { card_svgs } from "../card_svgs.js";
 
 import "../styles/cards.scss";
@@ -175,7 +176,7 @@ class WaitingRoom extends Component {
     // TODO: add a ready button for non creators.
     // for now, everyone will have access to the start btn regardless of readiness
     start = async () => {
-        const body = {key: this.props.room_key}
+        const body = {key: this.props.room_key};
         const hands = await post("/api/start_game", body);
         this.setUpGame(hands[this.props.index]);
     };
@@ -185,7 +186,7 @@ class WaitingRoom extends Component {
         let yourTeam = [];
         const parity = this.props.index % 2;
         this.state.players.forEach((player) => {
-            if (player.index % 2 == parity) yourTeam.push(player);
+            if (player.index % 2 === parity) yourTeam.push(player);
             else otherTeam.push(player);
         });
         this.props.updateGame(hand, yourTeam, otherTeam);
@@ -211,6 +212,10 @@ class WaitingRoom extends Component {
                 <button onClick={this.start}>
                     Start Game
                 </button>
+                <Chat
+                    name={this.props.name}
+                    room_key={this.props.room_key}
+                />
             </div>
         )
     }
@@ -238,11 +243,11 @@ class PlayRoom extends Component {
             //     <img src={card_svgs[`${card.rank}-${card.suit}.svg`]}/>
             // </div>
         ));
-    }
+    };
 
     submitAsk = () => {
         console.log('hi');
-    }
+    };
 
     render() {
         let cards = "Loading cards";

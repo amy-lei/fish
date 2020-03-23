@@ -19,23 +19,24 @@ const socket = require("./server-socket");
 
 router.get("/chat", (req, res) => {
   Message
-    .find({})
+    .find({key: req.query.room_key})
     .sort({date: 'desc'})
     .then((messages)=> {
       res.send(messages);
     });
 });
 
-// TODO: update this to include game key and to 
-// only emit to players in this game 
 router.post("/chat", (req, res) => {
-  const mes = new Message({
-    sender_name: req.body.sender_name,
-    content: req.body.content,
-  });
-  mes.save().then((message)=> {
-      socket.getIo().emit("newMessage", message);
-      res.send({'content': message.content});
+    const mes = new Message({
+        sender_name: req.body.sender_name,
+        content: req.body.content,
+        key: req.body.room_key,
+    });
+    mes.save().then((message)=> {
+        socket.getAllSocketsFromGame(req.body.room_key).forEach(client => {
+            client.emit("newMessage", message);
+        });
+        res.send({'content': message.content});
     });
 });
 
