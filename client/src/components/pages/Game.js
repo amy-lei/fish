@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import "../../utilities.css";
 import { post } from "../../utilities";
-import { hasCard } from "../../game-utilities";
+import { hasCard, isValidAsk } from "../../game-utilities";
 import { socket } from "../../client-socket";
 import { card_svgs } from "../card_svgs.js";
 
@@ -222,6 +222,7 @@ class PlayRoom extends Component {
         super(props);
         this.state = {
             asking: false,
+            invalid: false,
             responding: false,
             recipient: "",
             rank: "",
@@ -243,13 +244,16 @@ class PlayRoom extends Component {
     }
 
     ask = () => {
-        this.props.submitAsk(this.state.recipient, this.state.rank, this.state.suit)
-        this.setState({
-            asking: false,
-            recipient: "",
-            rank: "",
-            suit: "",
-        });
+        if (isValidAsk(this.props.hand, {rank: this.state.rank, suit: this.state.suit})) {
+            this.props.submitAsk(this.state.recipient, this.state.rank, this.state.suit)
+            this.setState({
+                invalid: false,
+                asking: false,
+                recipient: "",
+                rank: "",
+                suit: "",
+            });
+        } else this.setState({invalid: true});
     }
 
     respond = () => {
@@ -266,7 +270,7 @@ class PlayRoom extends Component {
             // Use fake cards for now–too distracting 
             cards = this.createCards(this.props.hand);
         }
-
+        
         const askFunc = (
             <>
                 <button
@@ -319,6 +323,7 @@ class PlayRoom extends Component {
                     )}
                     {(this.state.recipient && this.state.rank && this.state.suit) &&
                         (<button onClick={this.ask}>Ask</button>)}
+                    {this.state.invalid && "You do not have a card in this half suit"}
                 </div>
             </>
         );

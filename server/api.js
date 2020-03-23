@@ -117,7 +117,7 @@ router.post("/ask", (req, res) => {
         client.emit("ask", {history: history, move: move});
       });
 
-      game.save().then(()=>res.send());
+      game.save().then(()=>res.send({}));
     });
 });
 
