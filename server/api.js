@@ -53,13 +53,24 @@ router.post("/join_room", (req, res) => {
     Game.findOne({key: requestedRoomKey})
         .then((foundGame) => {
             socket.addUser(foundGame.key, socket.getSocketFromSocketID(req.body.socketid));
-            newPlayer = {name: playerName, index: foundGame.players.length};
+            const allPlayerNames = foundGame.players.map((player) => player.name);
+            let newPlayerName = playerName;
+            for (let i = 2; i < 7; i++) {
+                if (!allPlayerNames.includes(newPlayerName)) {
+                    console.log(foundGame.players);
+                    break;
+                }
+                else {
+                    newPlayerName = playerName + `${i}`;
+                    console.log(newPlayerName)
+                }
+            }
+            const newPlayer = {name: newPlayerName, index: foundGame.players.length};
             socket.getAllSocketsFromGame(foundGame.key).forEach(client => {
-              client.emit("joinedWaitingRoom", newPlayer);
+                client.emit("joinedWaitingRoom", newPlayer);
             });
             foundGame.players.push(newPlayer);
             foundGame.save();
-            // TODO: send back new name if duplicates
             res.send({self: newPlayer, players: foundGame.players});
         });
 });

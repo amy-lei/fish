@@ -378,13 +378,13 @@ class Game extends Component {
             room_key: this.state.key,
             socketid: socket.id,
         };
-        const roomInfo = await post('/api/join_room', body);
+        const info = await post('/api/join_room', body);
         this.setState({
             page: "waiting_room",
-            name: name,
+            name: info.self.name,
             isCreator: false,
-            index: roomInfo.self.index,
-            info: roomInfo,
+            index: info.self.index,
+            info: info,
         });
     };
     
