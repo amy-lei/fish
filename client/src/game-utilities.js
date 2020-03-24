@@ -14,21 +14,39 @@ const rankToVal = {
     'king': 13,
 };
   
+/* 
+    Returns whether a card is in the list of cards
+
+    @hand (array):  list of cards
+    @target (object): card to check for
+ */
 export const hasCard = (hand, target) => {
     for(let card of hand) 
         if (card.rank === target.rank && card.suit === target.suit) return true;
-    
     return false;        
 }
 
+
+/*
+    Returns whether the player has a card in the halfsuit 
+
+    @hand (array): list of cards
+    @target (object): a card in the desired halfsuit
+ */
 export const isValidAsk = (hand, target) => {
     for (let card of hand) 
         if (sameHalfSuit(target, card)) return true;
     return false;
 }
 
+
+/*
+    Returns whether the declare is filled completely,
+    with cards in the same half suit.
+
+    @declare (array): list of guesses(objects)
+ */
 export const isValidDeclare = (declare) => {
-    // TODO: prevent duplicates
     let asked = [];
     for (let guess of declare) {
         // make sure nothing is empty 
@@ -40,6 +58,14 @@ export const isValidDeclare = (declare) => {
     return true;
 }
 
+/*
+    Returns whether the declare was correct in 
+    the perspective of the specified player
+
+    @hand (array): player's list of cards
+    @declare (array): list of guesses
+    @name (string): player's name
+ */
 export const canObject = (hand, declare, name) => {
     for (let guess of declare) {
         let have = hasCard(hand, guess);
@@ -50,6 +76,14 @@ export const canObject = (hand, declare, name) => {
     return false;
 }
 
+
+/*
+    Returns the hand with all of specified 
+    half suit removed 
+
+    @hand (array): list of cards
+    @declare (array): list of guesses 
+ */
 export const removeHalfSuit = (hand, declare) => {
     console.log(declare);
     const base = { rank: declare[0].rank, suit: declare[0].suit }
@@ -58,6 +92,13 @@ export const removeHalfSuit = (hand, declare) => {
         );
 }
 
+
+/*
+    Returns whether two cards are of the same half suit
+
+    @base (object): card to be compared with
+    @card (object): card that is being checked
+ */ 
 const sameHalfSuit = (base, card) => {
     if (base.rank === "joker" || rankToVal[base.rank] == 8)
         return card.rank === "joker" || rankToVal[card.rank] === 8;
