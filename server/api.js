@@ -7,6 +7,7 @@
 |
 */
 
+const removeHalfSuit = require("./util.js");
 const express = require("express");
 const Message = require("./models/message.js");
 const Game = require("./models/game.js");
@@ -64,7 +65,7 @@ router.post("/join_room", (req, res) => {
                     newPlayerName = playerName + `${i}`;
                 }
             }
-            const newPlayer = {name: newPlayerName, index: foundGame.players.length, ready: false};
+            const newPlayer = {name: newPlayerName, index: foundGame.players.length, ready: false, active: true};
             socket.getAllSocketsFromGame(foundGame.key).forEach(client => {
                 client.emit("joinedWaitingRoom", newPlayer);
             });
@@ -228,6 +229,23 @@ router.post("/score", (req, res)=> {
 
             game.save().then(() => res.send({}));
         });
+});
+
+router.post("/out", (req, res) => {
+  Game
+    .findOne({key:req.body.key})
+    .then((game)=>{
+      game.hands[req.body.index] = [];
+      game.players[req.body.index].active = false;
+
+      socket.getAllSocketsFromGame(req.body.key).forEach(client => {
+        client.emit("playerOut", {index: req.body.index});
+      });
+
+      game.save().then((g)=> res.send(g));
+
+    });
+
 });
 
 // anything else falls to this "not found" case
