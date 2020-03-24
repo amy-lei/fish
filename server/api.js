@@ -65,7 +65,7 @@ router.post("/join_room", (req, res) => {
                     newPlayerName = playerName + `${i}`;
                 }
             }
-            const newPlayer = {name: newPlayerName, index: foundGame.players.length};
+            const newPlayer = {name: newPlayerName, index: foundGame.players.length, active: true};
             socket.getAllSocketsFromGame(foundGame.key).forEach(client => {
                 client.emit("joinedWaitingRoom", newPlayer);
             });
@@ -204,17 +204,29 @@ router.post("/score", (req, res)=> {
             if (req.body.even) game.even += 1;
             else game.odd += 1;
 
-            for (let i=0; i< game.hands.length; i++) {
-              let newHand = removeHalfSuit(game.hands[i], req.body.declare);
-              game.hands[i] = newHand;
-            }
-
             socket.getAllSocketsFromGame(req.body.key).forEach(client => {
                 client.emit("updateScore", {even: req.body.even, declare: req.body.declare});
               });
 
             game.save().then(() => res.send({}));
         });
+});
+
+router.post("/out", (req, res) => {
+  Game
+    .findOne({key:req.body.key})
+    .then((game)=>{
+      game.hands[req.body.index] = [];
+      game.players[req.body.index].active = false;
+
+      socket.getAllSocketsFromGame(req.body.key).forEach(client => {
+        client.emit("playerOut", {index: req.body.index});
+      });
+
+      game.save().then((g)=> res.send(g));
+
+    });
+
 });
 
 // anything else falls to this "not found" case

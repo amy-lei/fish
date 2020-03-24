@@ -31,7 +31,6 @@ const sameHalfSuit = (base, card) => {
     @declare (array): list of guesses 
  */
 const removeHalfSuit = (hand, declare) => {
-    console.log(declare);
     const base = { rank: declare[0].rank, suit: declare[0].suit }
     return hand.filter(card => 
             !sameHalfSuit(card, base)

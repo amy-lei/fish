@@ -14,6 +14,8 @@ import { card_svgs } from "../card_svgs.js";
 import "../styles/game.scss";
 import "../styles/cards.scss";
 
+const WIN = 5;
+
 class Game extends Component {
     constructor(props) {
         super(props);
@@ -122,10 +124,25 @@ class Game extends Component {
 
     // Update your score if true, others if false
     updateScore = (yours) => {
+        let newScore;
         if (yours) {
-            this.setState({yourTeamScore: this.state.yourTeamScore + 1});
+            newScore = this.state.yourTeamScore + 1;
+            this.setState({yourTeamScore: newScore});
         } else {
-            this.setState({otherTeamScore: this.state.otherTeamScore + 1});
+            newScore = this.state.otherTeamScore + 1;
+            this.setState({otherTeamScore: newScore});
+        }
+        return newScore === WIN;
+    }
+
+    checkIfActive = async(hand) => {
+        if (hand.length === 0) {
+            const body = {
+                key: this.state.key,
+                index: this.state.index,
+            };
+            const g = await post("/api/out", body);
+            console.log(g);
         }
     }
 
@@ -144,14 +161,13 @@ class Game extends Component {
             const turn = update.move.success ? update.move.asker.name: update.move.responder.name;
             if (update.move.success) {
                 if (update.move.responder.name === this.state.name) {
-                    const hand = this.state.hand.filter(card => 
+                    let hand = this.state.hand.filter(card => 
                         !(card.rank === update.move.rank && card.suit === update.move.suit)); 
-                    this.setState({hand})
                 } else if (update.move.asker.name === this.state.name) {
-                    this.setState({
-                        hand: this.state.hand.concat({rank:update.move.rank, suit: update.move.suit}),
-                    });
+                    let hand = this.state.hand.concat({rank:update.move.rank, suit: update.move.suit})
                 }
+                this.setState({hand});
+                this.checkIfActive(hand);
             }
             // update history
             this.setState({
@@ -159,6 +175,26 @@ class Game extends Component {
                 whoseTurn: turn,
                 turnType: "ask",
             });
+        });
+
+
+        socket.on("playerOut", who => {
+            const sameTeam = (who.index % 2 === 0) === (this.state.index % 2 === 0);
+            if (sameTeam) {
+                let updated = this.state.yourTeam;
+                for (let player of updated) {
+                    if (player.index === who.index) player.active = false;
+                }
+                this.setState({yourTeam: updated});
+                console.log("lost a teammate", this.state.yourTeam);
+            } else {
+                let updated = this.state.otherTeam;
+                for (let player of updated) {
+                    if (player.index === who.index) player.active = false;
+                }
+                this.setState({otherTeam: updated});
+                console.log("they lost a teammate", this.state.otherTeam);
+            }
         });
     }
 
@@ -210,8 +246,8 @@ class Game extends Component {
                         Game History: <br/>
                         {history}<br/>
                         {this.state.index % 2 === 0 ? (
-                            <>Team Even: {this.state.yourTeamScore} Team Odd: {this.state.otherTeamScore}</>
-                        ) : (<>Team Even:{this.state.otherTeamScore} Team Odd: {this.state.yourTeamScore}</>)}
+                            <>Team Even (YOU): {this.state.yourTeamScore} Team Odd: {this.state.otherTeamScore}</>
+                        ) : (<>Team Even:{this.state.otherTeamScore} Team Odd (YOU): {this.state.yourTeamScore}</>)}
                         <br/>
                         <PlayRoom
                             roomKey={this.state.key}
@@ -227,6 +263,7 @@ class Game extends Component {
                             history={this.state.history}
                             updateScore={this.updateScore}
                             updateHand={this.updateHand}
+                            checkIfActive={this.checkIfActive}
                         />
                     </>)}
             </div>

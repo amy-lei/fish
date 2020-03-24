@@ -151,6 +151,8 @@ class PlayRoom extends Component {
             lie: false,
             voted: false,
             votes: [],
+            ongoing: true,
+            winner: null,
         };
     }
 
@@ -282,10 +284,17 @@ class PlayRoom extends Component {
         socket.on("updateScore", update => {
             const hand = removeHalfSuit(this.props.hand, update.declare);
             this.props.updateHand(hand);
+            this.props.checkIfActive(hand);
 
             const even = this.props.index % 2 === 0;
-            this.props.updateScore(update.even === even);
+            const win = this.props.updateScore(update.even === even);
            
+            if (win) {
+                this.setState({
+                    ongoing: false,
+                    winner: even ? "even" : "odd",
+                });
+            }
             // reset declaring states
             this.setState({
                 declaring: false,
@@ -437,25 +446,30 @@ class PlayRoom extends Component {
                 Turn type: {this.props.turnType}. <br/>
                 Your teammates: {
                     this.props.yourTeam.map((player) => 
-                    (<span>{player.name}{player.index}</span>))
+                    (<><span>{player.name}{player.active? "": "OUT"}</span><br/></>))
                 } <br/>
                 Opposing team: {
                     this.props.otherTeam.map((player) => 
-                    (<span>{player.name}{player.index}</span>))
+                    (<span>{player.name}{player.active? "": "OUT"}</span>))
                 } <br/>
-                {decBtn} 
-                { this.state.showDeclare && confirmation }
-                { this.state.declaring && declaration }
-                { (this.state.declarer === this.props.name && !this.state.guess)&& <Declare yourTeam={this.props.yourTeam} roomKey={this.props.roomKey}/>}
-                { guess }
-                { finish }
-                {
-                    this.props.whoseTurn === this.props.name ?
-                        this.props.turnType === "ask" ?
-                            askFunc
-                            : respondFunc
-                        : ""
-                }
+                <div className="game">
+                    { this.state.ongoing ? 
+                    (<>{decBtn} 
+                        { this.state.showDeclare && confirmation }
+                        { this.state.declaring && declaration }
+                        { (this.state.declarer === this.props.name && !this.state.guess)&& <Declare yourTeam={this.props.yourTeam} roomKey={this.props.roomKey}/>}
+                        { guess }
+                        { finish }
+                        {
+                            this.props.whoseTurn === this.props.name ?
+                                this.props.turnType === "ask" ?
+                                    askFunc
+                                    : respondFunc
+                                : ""
+                        }
+                        </>)
+                        : (<span>Game Over! {`Team ${this.state.winner} won!`}</span>) }
+                        </div>
                 <div className="cards">{cards}</div>
             </div>
         );

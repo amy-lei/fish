@@ -10,7 +10,7 @@ class WaitingRoom extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            players: this.props.isCreator ? [{name:this.props.name, index: 0}] : this.props.roomInfo.players,
+            players: this.props.isCreator ? [{name:this.props.name, index: 0, active:true}] : this.props.roomInfo.players,
             index: this.props.index,
         };
     };
