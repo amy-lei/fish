@@ -13,7 +13,6 @@ import { card_svgs } from "../card_svgs.js";
 
 import "../styles/game.scss";
 import "../styles/cards.scss";
-
 const SUITS = [
     'heart', 
     'diamond', 

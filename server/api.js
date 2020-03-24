@@ -7,6 +7,7 @@
 |
 */
 
+const removeHalfSuit = require("./util.js");
 const express = require("express");
 const Message = require("./models/message.js");
 const Game = require("./models/game.js");
@@ -202,6 +203,11 @@ router.post("/score", (req, res)=> {
         .then((game) => {
             if (req.body.even) game.even += 1;
             else game.odd += 1;
+
+            for (let i=0; i< game.hands.length; i++) {
+              let newHand = removeHalfSuit(game.hands[i], req.body.declare);
+              game.hands[i] = newHand;
+            }
 
             socket.getAllSocketsFromGame(req.body.key).forEach(client => {
                 client.emit("updateScore", {even: req.body.even, declare: req.body.declare});
