@@ -65,13 +65,13 @@ router.post("/join_room", (req, res) => {
                     newPlayerName = playerName + `${i}`;
                 }
             }
-            const newPlayer = {name: newPlayerName, index: foundGame.players.length, active: true};
+            const newPlayer = {name: newPlayerName, index: foundGame.players.length, ready: false, active: true};
             socket.getAllSocketsFromGame(foundGame.key).forEach(client => {
                 client.emit("joinedWaitingRoom", newPlayer);
             });
             foundGame.players.push(newPlayer);
             foundGame.save();
-            // TODO: send back new name if duplicates
+            //send back new name in case of duplicates
             res.send({self: newPlayer, info: foundGame});
         });
 });
@@ -95,7 +95,7 @@ router.post("/create_room", (req, res) => {
             }
             const game = new Game({
                 key: roomKey,
-                players: [{name: creatorName, index: 0}],
+                players: [{name: creatorName, index: 0, ready: true}],
                 hands: [],
             });
             game.save().then((game) => {
@@ -105,6 +105,25 @@ router.post("/create_room", (req, res) => {
         });
 });
 
+router.post("/ready", (req, res) => {
+    const roomKey = req.body.key;
+    const name = req.body.playerName;
+    Game.findOne({key: roomKey})
+        .then((game) => {
+            game.players = game.players.map(player => {
+                if (player.name === name) {
+                    player.ready = req.body.isReady;
+                }
+                return player;
+            });
+            game.save();
+
+            socket.getAllSocketsFromGame(req.body.key).forEach(client => {
+                client.emit("ready", {playerList: game.players, readyPlayer: name, readyState: req.body.isReady});
+                res.send(game.players);
+            })
+        });
+});
 
 router.post("/start_game", (req, res) => {
   Game

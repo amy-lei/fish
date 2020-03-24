@@ -18,11 +18,13 @@ class Chat extends Component {
 
   componentDidMount() {
     this.loadMessages();
+
     socket.on("newMessage", (message) => {
       this.setState({
         allMessages: this.state.allMessages.concat(message),
       });
     });
+
     socket.on("joinedWaitingRoom", (newPlayer) => {
       const joinedMessage = {
         sender_name: "server",
@@ -32,6 +34,7 @@ class Chat extends Component {
         allMessages: this.state.allMessages.concat(joinedMessage),
       });
     });
+
     socket.on("disconnected", (name) => {
       const disconnectMessage = {
         sender_name: "server",
@@ -40,7 +43,17 @@ class Chat extends Component {
       this.setState({
         allMessages: this.state.allMessages.concat(disconnectMessage),
       });
-    })
+    });
+
+    socket.on("ready", (readyInfo) => {
+      const readyMessage = {
+        sender_name: "server",
+        content: `${readyInfo.readyPlayer} is ${readyInfo.readyState ? "ready" : "not ready"}`,
+      };
+      this.setState({
+        allMessages: this.state.allMessages.concat(readyMessage),
+      });
+    });
   }
 
   loadMessages = async () => {

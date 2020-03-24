@@ -3,7 +3,6 @@ import Home from "./Home.js";
 import NameForm from "./NameForm.js";
 import WaitingRoom from "./WaitingRoom.js";
 import PlayRoom from "./PlayRoom.js";
-import Chat from "./Chat.js";
 
 import "../../utilities.css";
 import { post } from "../../utilities";
