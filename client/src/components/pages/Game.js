@@ -158,6 +158,7 @@ class WaitingRoom extends Component {
         super(props);
         this.state = {
             players: this.props.isCreator ? [{name:this.props.name, index:0}] : this.props.roomInfo.players,
+            index: this.props.index,
         };
     };
 
@@ -169,7 +170,15 @@ class WaitingRoom extends Component {
         });
 
         socket.on("startGame", (mes) => {
-            this.setUpGame(mes.cards[this.props.index]);
+            this.setUpGame(mes.cards[this.state.index]);
+        });
+
+        //TODO: change room info to just be player list
+        socket.on("updatedPlayerList", (list) => {
+            this.setState({
+                players: list,
+                index: list.filter((player) => player.name === this.props.name)[0].index, //gets the new index of the player
+            })
         });
     }
 
@@ -178,7 +187,7 @@ class WaitingRoom extends Component {
     start = async () => {
         const body = {key: this.props.room_key};
         const hands = await post("/api/start_game", body);
-        this.setUpGame(hands[this.props.index]);
+        this.setUpGame(hands[this.state.index]);
     };
 
     setUpGame = (hand) => {
@@ -198,7 +207,7 @@ class WaitingRoom extends Component {
         return (
             <div>
                 Hi, your name is {this.props.name}. <br/>
-                You are player number {this.props.index.toString()} <br/>
+                You are player number {this.state.index.toString()} <br/>
                 Are you creator? {this.props.isCreator + ""} <br/>
                 Room Key: {this.props.room_key} <br/>
                 Here are the players in the room and their indices: <br/>
@@ -363,6 +372,10 @@ class Game extends Component {
     };
 
     createRoom = async (name) => {
+        const trimmedName = name.trim();
+        if (trimmedName === "") {
+          return;
+        }
         const body = {
             creatorName: name,
             socketid: socket.id,
@@ -378,6 +391,10 @@ class Game extends Component {
     };
 
     enterRoom = async (name) => {
+        const trimmedName = name.trim();
+        if (trimmedName === "") {
+          return;
+        }
         const body = {
             playerName: name,
             room_key: this.state.key,

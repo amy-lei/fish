@@ -53,17 +53,15 @@ router.post("/join_room", (req, res) => {
     const playerName = req.body.playerName;
     Game.findOne({key: requestedRoomKey})
         .then((foundGame) => {
-            socket.addUser(foundGame.key, socket.getSocketFromSocketID(req.body.socketid));
+            socket.addUser(foundGame.key, socket.getSocketFromSocketID(req.body.socketid), playerName);
             const allPlayerNames = foundGame.players.map((player) => player.name);
             let newPlayerName = playerName;
             for (let i = 2; i < 7; i++) {
                 if (!allPlayerNames.includes(newPlayerName)) {
-                    console.log(foundGame.players);
                     break;
                 }
                 else {
                     newPlayerName = playerName + `${i}`;
-                    console.log(newPlayerName)
                 }
             }
             const newPlayer = {name: newPlayerName, index: foundGame.players.length};
@@ -78,7 +76,7 @@ router.post("/join_room", (req, res) => {
 
 
 router.post("/create_room", (req, res) => {
-    // TODO: check that this room key does not already exist
+    const creatorName = req.body.creatorName;
     Game.find({})
         .then((games) => {
             const existingRoomKeys = games.map((game) => game.key);
@@ -95,11 +93,11 @@ router.post("/create_room", (req, res) => {
             }
             const game = new Game({
                 key: roomKey,
-                players: [{name: req.body.creatorName, index: 0}],
+                players: [{name: creatorName, index: 0}],
                 hands: [],
             });
             game.save().then((game) => {
-                socket.addUser(roomKey, socket.getSocketFromSocketID(req.body.socketid));
+                socket.addUser(roomKey, socket.getSocketFromSocketID(req.body.socketid), creatorName);
                 res.send(game);
             })
         });

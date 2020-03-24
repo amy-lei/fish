@@ -31,6 +31,15 @@ class Chat extends Component {
       this.setState({
         allMessages: this.state.allMessages.concat(joinedMessage),
       });
+    });
+    socket.on("disconnected", (name) => {
+      const disconnectMessage = {
+        sender_name: "server",
+        content: name + " has left the room.",
+      };
+      this.setState({
+        allMessages: this.state.allMessages.concat(disconnectMessage),
+      });
     })
   }
 
@@ -39,7 +48,6 @@ class Chat extends Component {
       room_key: this.props.room_key,
     };
     const messages = await get('/api/chat', query);
-    console.log(messages);
     this.setState({ allMessages: messages });
   };
 
@@ -54,7 +62,6 @@ class Chat extends Component {
       room_key: this.props.room_key,
     };
     const message = await post('/api/chat', body);
-    console.log(message);
     this.setState({
       curMessage: "",
     });
@@ -69,16 +76,16 @@ class Chat extends Component {
   render() {
     let messages;
     if (this.state.allMessages) {
-      messages = this.state.allMessages.map( (mes) => {
+      messages = this.state.allMessages.map( (mes, k) => {
         if (mes.sender_name === "server") {
           return (
-            <div className="server_message">
+            <div className="server_message" key={k}>
               {mes.content}
             </div>
           )
         }
         return (
-          <div className="message">
+          <div className="message" key={k}>
             {mes.sender_name} : {mes.content}
           </div>
         );
