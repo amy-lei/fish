@@ -24,15 +24,6 @@ class App extends Component {
   }
 
   render() {
-    let hand = [];
-    for(let i = 0; i < this.state.numCards; i++) {
-      const i = Math.floor(Math.random() * 53);
-      hand.push(
-        <div className={`card card-${this.state.numCards}`}>
-          <img src={card_svgs[`${cards[i].rank}-${cards[i].suit}.svg`]}/>
-        </div>
-        );
-    }
     return (
       <>
         <Game/>

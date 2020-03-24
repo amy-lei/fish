@@ -41,7 +41,7 @@ router.post("/chat", (req, res) => {
 });
 
 router.post("/check_room", (req, res) => {
-    const requested_key = req.body.room_key;
+    const requested_key = req.body.roomKey;
     Game.find({key: requested_key})
         .then((foundGame) => {
             res.send(foundGame.length === 1);
