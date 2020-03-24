@@ -39,6 +39,17 @@ export const isValidDeclare = (declare) => {
     return true;
 }
 
+export const canObject = (hand, declare, name) => {
+    for (let guess of declare) {
+        let have = hasCard(hand, guess);
+        let you = declare.player === name;
+        if (have && !you) return true;
+        if (you && !have) return true;
+    }
+    return false;
+}
+
+
 const sameHalfSuit = (base, card) => {
     if (base.rank === "joker" || rankToVal[base.rank] == 8)
         return card.rank === "joker" || rankToVal[card.rank] === 8;

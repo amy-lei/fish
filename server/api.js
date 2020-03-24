@@ -170,6 +170,12 @@ router.post("/declare", (req, res)=> {
     res.send({});
 });
 
+router.post("/vote", (req, res) => {
+    socket.getAllSocketsFromGame(req.body.key).forEach(client => {
+        client.emit("vote", {agree: req.body.agree, name: req.body.player});
+      });
+});
+
 // anything else falls to this "not found" case
 router.all("*", (req, res) => {
   console.log(`API route not found: ${req.method} ${req.url}`);

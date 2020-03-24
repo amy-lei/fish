@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import "../../utilities.css";
 import { post } from "../../utilities";
-import { hasCard, isValidAsk, isValidDeclare } from "../../game-utilities";
+import { hasCard, isValidAsk, isValidDeclare, canObject } from "../../game-utilities";
 import { socket } from "../../client-socket";
 import { card_svgs } from "../card_svgs.js";
 
@@ -323,6 +323,9 @@ class PlayRoom extends Component {
             response: "",
             declarer: "",
             guess: null,
+            lie: false,
+            voted: false,
+            votes: [],
         };
     }
 
@@ -369,6 +372,22 @@ class PlayRoom extends Component {
         const res = post("/api/pause", {key: this.props.roomKey, player: this.props.name});
     }
 
+    resToDeclare = async (bool) => {
+        const body = {
+            key: this.props.roomKey,
+            player: this.props.name, 
+            agree: bool,
+        };
+        if (bool) await post("/api/vote", body);
+        else {
+            if (canObject(this.props.hand, this.state.guess, this.props.name)){
+                await post("/api/vote", body);
+                this.setState({lie: false});
+            } 
+            else this.setState({lie:true}); 
+        }
+    }
+
     componentDidMount() {
         socket.on("declaring", (info) => {
             this.setState({
@@ -380,7 +399,14 @@ class PlayRoom extends Component {
         socket.on("declared", info => {
             console.log(info.guess);
             this.setState({guess: info.guess});
-        })
+        });
+
+        socket.on("vote", vote => {
+            console.log(vote);
+            if (vote.name === this.props.name) this.setState({voted: true});
+            this.setState({votes: this.state.votes.concat(vote)});
+        });
+
     }
 
     render() {
@@ -496,14 +522,22 @@ class PlayRoom extends Component {
                     {this.state.declarer !== this.props.name &&
                     (<>
                     Press OBJECT if you see a contradiction. ACCEPT otherwise.
-                    <button>
+                    <button onClick={()=> this.resToDeclare(true)}>
                         Accept
                     </button>
-                    <button>
+                    <button onClick={() => this.resToDeclare(false)}>
                         Object
-                    </button></>)}
+                    </button>
+                    {this.state.lie && "Dont lie!!!!"}
+                    </>)}
+                    {this.state.votes.map(vote => 
+                        <div>{vote.name} {vote.agree ? "agees": "OBJECTED"}</div>)}
                 </>
             );
+        }
+        let finish;
+        if (this.state.declarer === this.props.name && this.state.votes.length === this.props.yourTeam.length + this.props.otherTeam.length - 1) {
+            finish = (<button>Finish</button>);
         }
 
         return (
@@ -524,6 +558,7 @@ class PlayRoom extends Component {
                 { this.state.declaring && declaration }
                 { (this.state.declarer === this.props.name && !this.state.guess)&& <Declare yourTeam={this.props.yourTeam} roomKey={this.props.roomKey}/>}
                 { guess }
+                { finish }
                 {
                     this.props.whoseTurn === this.props.name ?
                         this.props.turnType === "ask" ?
