@@ -9,6 +9,7 @@ import {
     removeHalfSuit, 
 } from "../../game-utilities";
 import { socket } from "../../client-socket";
+import Chat from "./Chat.js";
 import { card_svgs } from "../card_svgs.js";
 
 import "../styles/game.scss";
@@ -471,6 +472,7 @@ class PlayRoom extends Component {
                         : (<span>Game Over! {`Team ${this.state.winner} won!`}</span>) }
                         </div>
                 <div className="cards">{cards}</div>
+                <Chat name={this.props.name} roomKey={this.props.roomKey}/>
             </div>
         );
     }

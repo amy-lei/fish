@@ -45,7 +45,7 @@ class Chat extends Component {
 
   loadMessages = async () => {
     const query = {
-      room_key: this.props.room_key,
+      room_key: this.props.roomKey,
     };
     const messages = await get('/api/chat', query);
     this.setState({ allMessages: messages });
@@ -59,7 +59,7 @@ class Chat extends Component {
     const body = { 
       sender_name : this.props.name,
       content: trimmedMessage,
-      room_key: this.props.room_key,
+      room_key: this.props.roomKey,
     };
     const message = await post('/api/chat', body);
     this.setState({
