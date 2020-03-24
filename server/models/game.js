@@ -5,6 +5,7 @@ const GameSchema = new mongoose.Schema({
     players: [{
         name: String,
         index: Number,
+        ready: {type: Boolean, default: false},
     }],
     hands: [[
         {

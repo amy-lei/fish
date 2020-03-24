@@ -10,7 +10,7 @@ class WaitingRoom extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            players: this.props.isCreator ? [{name:this.props.name, index: 0}] : this.props.roomInfo.players,
+            players: this.props.isCreator ? [{name:this.props.name, index: 0, ready: true}] : this.props.roomInfo.players,
             index: this.props.index,
         };
     };
@@ -35,6 +35,11 @@ class WaitingRoom extends Component {
         socket.on("startGame", (info) => {
             this.setUpGame(info.cards[this.state.index]);
         });
+
+        // updates ready/ unready state
+        socket.on("ready", (readyInfo) => {
+            this.setState({players: readyInfo.playerList});
+        });
     }
 
     // TODO: add a ready button for non creators.
@@ -42,6 +47,16 @@ class WaitingRoom extends Component {
         const body = {key: this.props.roomKey};
         const hands = await post("/api/start_game", body);
         this.setUpGame(hands[this.state.index]);
+    };
+
+    ready = async (isReady) => {
+        const body = {
+            key: this.props.roomKey,
+            playerName: this.props.name,
+            isReady: isReady,
+        };
+        const players = await post("/api/ready", body);
+        this.setState({players});
     };
 
     /*
@@ -62,9 +77,10 @@ class WaitingRoom extends Component {
     };
 
     render() {
+        const areYouReady = this.state.players.filter(player => player.name === this.props.name)[0].ready;
         return (
             <div>
-                Hi, your name is {this.props.name}. <br/>
+                Hi, your name is {this.props.name} and you are {areYouReady}. <br/>
                 You are player number {this.state.index.toString()} <br/>
                 Are you creator? {this.props.isCreator + ""} <br/>
                 Room Key: {this.props.roomKey} <br/>
@@ -72,13 +88,26 @@ class WaitingRoom extends Component {
                 <ul>
                     {this.state.players.map((player, k) => (
                         <li key={k}>
-                            {player.index} {player.name} 
+                            {player.index} {player.name} Am I ready? {player.ready+""}
                         </li>
                     ))}
                 </ul>
-                <button onClick={this.start}>
-                    Start Game
-                </button>
+                {
+                    this.props.isCreator ?
+                    <button onClick={this.start}>
+                        Start Game
+                    </button>
+                    :
+                     areYouReady ?
+                        <button onClick={() => this.ready(false)}>
+                            Not Ready
+                        </button>
+                        :
+                        <button onClick={() => this.ready(true)}>
+                            Ready
+                        </button>
+                }
+
                 <Chat
                     name={this.props.name}
                     roomKey={this.props.roomKey}
