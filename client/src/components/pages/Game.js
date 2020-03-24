@@ -407,6 +407,44 @@ class PlayRoom extends Component {
             this.setState({votes: this.state.votes.concat(vote)});
         });
 
+        socket.on("updateScore", update => {
+            this.setState({
+                declaring: false,
+                showDeclare: false, 
+                pauseGame: false,
+                declarer: "",
+                guess: null,
+                lie: false,
+                voted: false,
+                votes: [],
+            });
+            const even = this.props.index % 2 === 0;
+            console.log('updating my score', update.even === even);
+            this.props.updateScore(update.even === even);
+        });
+    }
+
+    endDeclare = async () => {
+        // check for objections
+        const objections = !this.state.votes.every(vote => vote.agree);
+        const even = this.props.index % 2 === 0;
+        console.log("any objections", objections);
+        console.log("my team", even, "given index", this.props.index);
+        console.log("did team even get the point",objections ? !even : even);
+
+        await post("/api/score", {even: objections ? !even : even, key: this.props.roomKey});
+
+        // reset all affected states
+        this.setState({
+            declaring: false,
+            showDeclare: false, 
+            pauseGame: false,
+            declarer: "",
+            guess: null,
+            lie: false,
+            voted: false,
+            votes: [],
+        });
     }
 
     render() {
@@ -519,7 +557,7 @@ class PlayRoom extends Component {
                             {combo.player} has the {combo.rank} {combo.suit}
                         </div>
                     ))}
-                    {this.state.declarer !== this.props.name &&
+                    {(this.state.declarer !== this.props.name && !this.state.voted) &&
                     (<>
                     Press OBJECT if you see a contradiction. ACCEPT otherwise.
                     <button onClick={()=> this.resToDeclare(true)}>
@@ -537,7 +575,7 @@ class PlayRoom extends Component {
         }
         let finish;
         if (this.state.declarer === this.props.name && this.state.votes.length === this.props.yourTeam.length + this.props.otherTeam.length - 1) {
-            finish = (<button>Finish</button>);
+            finish = (<button onClick={this.endDeclare}>Finish</button>);
         }
 
         return (
@@ -588,6 +626,8 @@ class Game extends Component {
             turnType: "ask",
             history: [],
             whoseTurn: "",
+            yourTeamScore: 0,
+            otherTeamScore: 0,
         };
     };
 
@@ -663,6 +703,16 @@ class Game extends Component {
         await post("/api/respond", body);
     }
 
+    updateScore = (yours) => {
+        if (yours) {
+            this.setState({yourTeamScore: this.state.yourTeamScore + 1});
+            console.log("your new score", this.state.yourTeamScore);
+        } else {
+            this.setState({otherTeamScore: this.state.otherTeamScore + 1});
+            console.log("other team", this.state.otherTeamScore, "my index", this.state.index);
+        }
+    }
+
     componentDidMount() {
         socket.on("ask", update => {
             this.setState({
@@ -690,6 +740,12 @@ class Game extends Component {
                 whoseTurn: turn,
                 turnType: "ask",
             });
+        });
+
+        socket.on("updateScore", update => {
+            const even = this.state.index % 2 == 0;
+            console.log(even, "given my index", this.state.index);
+
         });
     }
 
@@ -743,6 +799,10 @@ class Game extends Component {
                 <>
                     Game History: <br/>
                     {history}<br/>
+                    {this.state.index % 2 === 0 ? (
+                        <>Team Even: {this.state.yourTeamScore} Team Odd: {this.state.otherTeamScore}</>
+                    ) : (<>Team Even:{this.state.otherTeamScore} Team Odd: {this.state.yourTeamScore}</>)}
+                    <br/>
                     <PlayRoom
                         roomKey={this.state.key}
                         name={this.state.name}
@@ -755,6 +815,7 @@ class Game extends Component {
                         submitAsk={this.ask}
                         submitResponse={this.respond}
                         history={this.state.history}
+                        updateScore={this.updateScore}
                     />
             </>);
         } 

@@ -174,6 +174,22 @@ router.post("/vote", (req, res) => {
     socket.getAllSocketsFromGame(req.body.key).forEach(client => {
         client.emit("vote", {agree: req.body.agree, name: req.body.player});
       });
+    res.send({});
+});
+
+router.post("/score", (req, res)=> {
+    Game
+        .findOne({key: req.body.key})
+        .then((game) => {
+            if (req.body.even) game.even += 1;
+            else game.odd += 1;
+
+            socket.getAllSocketsFromGame(req.body.key).forEach(client => {
+                client.emit("updateScore", {even: req.body.even});
+              });
+
+            game.save().then(game => {console.log(game); res.send({})});
+        });
 });
 
 // anything else falls to this "not found" case
