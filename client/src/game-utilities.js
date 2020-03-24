@@ -28,12 +28,13 @@ export const isValidAsk = (hand, target) => {
 }
 
 export const isValidDeclare = (declare) => {
-    
+    // TODO: prevent duplicates
+    let asked = [];
     for (let guess of declare) {
         // make sure nothing is empty 
         if (guess.player && guess.rank && guess.suit) {
-            // compare to first card 
-            if (!sameHalfSuit(declare[0], guess)) return false;
+            if (!sameHalfSuit(declare[0], guess) || hasCard(asked, guess)) return false;
+            else asked.push(guess);
         } else return false;
     }
     return true;
@@ -49,6 +50,13 @@ export const canObject = (hand, declare, name) => {
     return false;
 }
 
+export const removeHalfSuit = (hand, declare) => {
+    console.log(declare);
+    const base = { rank: declare[0].rank, suit: declare[0].suit }
+    return hand.filter(card => 
+            !sameHalfSuit(card, base)
+        );
+}
 
 const sameHalfSuit = (base, card) => {
     if (base.rank === "joker" || rankToVal[base.rank] == 8)

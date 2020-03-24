@@ -163,7 +163,6 @@ router.post("/pause", (req,res)=> {
 });
 
 router.post("/declare", (req, res)=> {
-    console.log("declared");
     socket.getAllSocketsFromGame(req.body.key).forEach(client => {
         client.emit("declared", {guess: req.body.guess});
       });
@@ -185,10 +184,10 @@ router.post("/score", (req, res)=> {
             else game.odd += 1;
 
             socket.getAllSocketsFromGame(req.body.key).forEach(client => {
-                client.emit("updateScore", {even: req.body.even});
+                client.emit("updateScore", {even: req.body.even, declare: req.body.declare});
               });
 
-            game.save().then(game => {console.log(game); res.send({})});
+            game.save().then(() => res.send({}));
         });
 });
 

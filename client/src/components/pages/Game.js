@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import "../../utilities.css";
 import { post } from "../../utilities";
-import { hasCard, isValidAsk, isValidDeclare, canObject } from "../../game-utilities";
+import { hasCard, isValidAsk, isValidDeclare, canObject, removeHalfSuit } from "../../game-utilities";
 import { socket } from "../../client-socket";
 import { card_svgs } from "../card_svgs.js";
 
@@ -397,17 +397,19 @@ class PlayRoom extends Component {
         });
 
         socket.on("declared", info => {
-            console.log(info.guess);
             this.setState({guess: info.guess});
         });
 
         socket.on("vote", vote => {
-            console.log(vote);
             if (vote.name === this.props.name) this.setState({voted: true});
             this.setState({votes: this.state.votes.concat(vote)});
         });
 
         socket.on("updateScore", update => {
+            // filter cards from the guess
+            const hand = removeHalfSuit(this.props.hand, update.declare);
+            this.props.updateHand(hand);
+
             this.setState({
                 declaring: false,
                 showDeclare: false, 
@@ -419,7 +421,6 @@ class PlayRoom extends Component {
                 votes: [],
             });
             const even = this.props.index % 2 === 0;
-            console.log('updating my score', update.even === even);
             this.props.updateScore(update.even === even);
         });
     }
@@ -428,11 +429,8 @@ class PlayRoom extends Component {
         // check for objections
         const objections = !this.state.votes.every(vote => vote.agree);
         const even = this.props.index % 2 === 0;
-        console.log("any objections", objections);
-        console.log("my team", even, "given index", this.props.index);
-        console.log("did team even get the point",objections ? !even : even);
 
-        await post("/api/score", {even: objections ? !even : even, key: this.props.roomKey});
+        await post("/api/score", {even: objections ? !even : even, key: this.props.roomKey, declare: this.state.guess});
 
         // reset all affected states
         this.setState({
@@ -677,6 +675,10 @@ class Game extends Component {
         this.setState({hand, yourTeam, otherTeam});
     }
 
+    updateHand = (hand) => {
+        this.setState({hand});
+    }
+
     ask = async (who, rank, suit) => {
         const body = {
             key: this.state.key,
@@ -706,10 +708,8 @@ class Game extends Component {
     updateScore = (yours) => {
         if (yours) {
             this.setState({yourTeamScore: this.state.yourTeamScore + 1});
-            console.log("your new score", this.state.yourTeamScore);
         } else {
             this.setState({otherTeamScore: this.state.otherTeamScore + 1});
-            console.log("other team", this.state.otherTeamScore, "my index", this.state.index);
         }
     }
 
@@ -744,7 +744,6 @@ class Game extends Component {
 
         socket.on("updateScore", update => {
             const even = this.state.index % 2 == 0;
-            console.log(even, "given my index", this.state.index);
 
         });
     }
@@ -816,6 +815,7 @@ class Game extends Component {
                         submitResponse={this.respond}
                         history={this.state.history}
                         updateScore={this.updateScore}
+                        updateHand={this.updateHand}
                     />
             </>);
         } 
