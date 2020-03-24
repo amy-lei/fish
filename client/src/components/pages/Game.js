@@ -3,6 +3,7 @@ import "../../utilities.css";
 import { post } from "../../utilities";
 import { hasCard, isValidAsk, isValidDeclare, canObject, removeHalfSuit } from "../../game-utilities";
 import { socket } from "../../client-socket";
+import Chat from "./Chat.js";
 import { card_svgs } from "../card_svgs.js";
 
 import "../styles/game.scss";
@@ -159,6 +160,7 @@ class WaitingRoom extends Component {
         super(props);
         this.state = {
             players: this.props.isCreator ? [{name:this.props.name, index:0}] : this.props.roomInfo.players,
+            index: this.props.index,
         };
     };
 
@@ -170,15 +172,24 @@ class WaitingRoom extends Component {
         });
 
         socket.on("startGame", (mes) => {
-            this.setUpGame(mes.cards[this.props.index]);
+            this.setUpGame(mes.cards[this.state.index]);
+        });
+
+        //TODO: change room info to just be player list
+        socket.on("updatedPlayerList", (list) => {
+            this.setState({
+                players: list,
+                index: list.filter((player) => player.name === this.props.name)[0].index, //gets the new index of the player
+            })
         });
     }
 
     // TODO: add a ready button for non creators.
     // for now, everyone will have access to the start btn regardless of readiness
     start = async () => {
-        const body = {key: this.props.room_key}
+        const body = {key: this.props.room_key};
         const hands = await post("/api/start_game", body);
+        this.setUpGame(hands[this.state.index]);
     };
 
     setUpGame = (hand) => {
@@ -186,7 +197,7 @@ class WaitingRoom extends Component {
         let yourTeam = [];
         const parity = this.props.index % 2;
         this.state.players.forEach((player) => {
-            if (player.index % 2 == parity) yourTeam.push(player);
+            if (player.index % 2 === parity) yourTeam.push(player);
             else otherTeam.push(player);
         });
         this.props.updateGame(hand, yourTeam, otherTeam);
@@ -198,7 +209,7 @@ class WaitingRoom extends Component {
         return (
             <div>
                 Hi, your name is {this.props.name}. <br/>
-                You are player number {this.props.index.toString()} <br/>
+                You are player number {this.state.index.toString()} <br/>
                 Are you creator? {this.props.isCreator + ""} <br/>
                 Room Key: {this.props.room_key} <br/>
                 Here are the players in the room and their indices: <br/>
@@ -212,6 +223,10 @@ class WaitingRoom extends Component {
                 <button onClick={this.start}>
                     Start Game
                 </button>
+                <Chat
+                    name={this.props.name}
+                    room_key={this.props.room_key}
+                />
             </div>
         )
     }
@@ -339,7 +354,7 @@ class PlayRoom extends Component {
             //     <img src={card_svgs[`${card.rank}-${card.suit}.svg`]}/>
             // </div>
         ));
-    }
+    };
 
     ask = () => {
         if (isValidAsk(this.props.hand, {rank: this.state.rank, suit: this.state.suit})) {
@@ -638,6 +653,10 @@ class Game extends Component {
     };
 
     createRoom = async (name) => {
+        const trimmedName = name.trim();
+        if (trimmedName === "") {
+          return;
+        }
         const body = {
             creatorName: name,
             socketid: socket.id,
@@ -654,20 +673,24 @@ class Game extends Component {
     };
 
     enterRoom = async (name) => {
+        const trimmedName = name.trim();
+        if (trimmedName === "") {
+          return;
+        }
         const body = {
             playerName: name,
             room_key: this.state.key,
             socketid: socket.id,
         };
-        const roomInfo = await post('/api/join_room', body);
+        const info = await post('/api/join_room', body);
         this.setState({
             page: "waiting_room",
-            name: name,
+            name: info.self.name,
             isCreator: false,
-            index: roomInfo.self.index,
-            whoseTurn: roomInfo.info.whoseTurn,
-            info: roomInfo.info,
-            turnType: roomInfo.info.turnType,
+            index: info.self.index,
+            info: info,
+            whoseTurn: info.whoseTurn,
+            turnType: info.turnType,
         });
     };
     
