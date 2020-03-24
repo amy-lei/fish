@@ -10,6 +10,7 @@
 | - Sets up error handling in case something goes wrong when handling a request
 | - Actually starts the webserver
 */
+require('dotenv').config();
 
 //import libraries needed for the webserver to work!
 const http = require("http");
@@ -19,7 +20,7 @@ const api = require("./api.js");
 const mongoose = require("mongoose");
 
 // connect to db 
-const connectionURL = "mongodb+srv://admin:May122001@fish-9ui45.mongodb.net/test?retryWrites=true&w=majority";
+const connectionURL = process.env.ATLAS_SRV;
 const dbName = "Fish";
 const options = {
   useNewUrlParser: true,
