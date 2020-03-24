@@ -159,7 +159,7 @@ class WaitingRoom extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            players: this.props.isCreator ? [{name:this.props.name, index:0}] : this.props.roomInfo.players,
+            players: this.props.isCreator ? [{name:this.props.name, index: 0}] : this.props.roomInfo.players,
             index: this.props.index,
         };
     };
@@ -688,9 +688,9 @@ class Game extends Component {
             name: info.self.name,
             isCreator: false,
             index: info.self.index,
-            info: info,
-            whoseTurn: info.whoseTurn,
-            turnType: info.turnType,
+            info: info.info,
+            whoseTurn: info.info.whoseTurn,
+            turnType: info.info.turnType,
         });
     };
     
@@ -772,6 +772,7 @@ class Game extends Component {
     }
 
     render() {
+        console.log("info",this.state.info);
         let history = this.state.history.map(move => {
             if (move.type === "ask")
                 return (<div>
