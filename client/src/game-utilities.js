@@ -22,16 +22,28 @@ export const hasCard = (hand, target) => {
 }
 
 export const isValidAsk = (hand, target) => {
-    if (target.rank === "joker" || rankToVal[target.rank] == 8)
-        for(let card of hand)
-            {
-                console.log('checking',card);
-                if (card.rank === "joker" || rankToVal[card.rank] === 8) return true;
-            }
-    else {
-        const upper = rankToVal[target.rank] > 8;
-        for (let card of hand) 
-            if (rankToVal[card.rank] > 8 === upper && card.suit === target.suit) return true;
-    }
+    for (let card of hand) 
+        if (sameHalfSuit(target, card)) return true;
     return false;
+}
+
+export const isValidDeclare = (declare) => {
+    
+    for (let guess of declare) {
+        // make sure nothing is empty 
+        if (guess.player && guess.rank && guess.suit) {
+            // compare to first card 
+            if (!sameHalfSuit(declare[0], guess)) return false;
+        } else return false;
+    }
+    return true;
+}
+
+const sameHalfSuit = (base, card) => {
+    if (base.rank === "joker" || rankToVal[base.rank] == 8)
+        return card.rank === "joker" || rankToVal[card.rank] === 8;
+    else {
+        const upper = rankToVal[base.rank] > 8;
+        return rankToVal[card.rank] > 8 === upper && card.suit === base.suit
+    }
 }

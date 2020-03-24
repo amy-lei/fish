@@ -155,6 +155,21 @@ router.post("/respond", (req, res) => {
 
 });
 
+router.post("/pause", (req,res)=> {
+    socket.getAllSocketsFromGame(req.body.key).forEach(client => {
+        client.emit("declaring", {player: req.body.player});
+      });
+    res.send({});
+});
+
+router.post("/declare", (req, res)=> {
+    console.log("declared");
+    socket.getAllSocketsFromGame(req.body.key).forEach(client => {
+        client.emit("declared", {guess: req.body.guess});
+      });
+    res.send({});
+});
+
 // anything else falls to this "not found" case
 router.all("*", (req, res) => {
   console.log(`API route not found: ${req.method} ${req.url}`);

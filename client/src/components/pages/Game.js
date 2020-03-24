@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import "../../utilities.css";
 import { post } from "../../utilities";
-import { hasCard, isValidAsk } from "../../game-utilities";
+import { hasCard, isValidAsk, isValidDeclare } from "../../game-utilities";
 import { socket } from "../../client-socket";
 import { card_svgs } from "../card_svgs.js";
 
@@ -216,18 +216,113 @@ class WaitingRoom extends Component {
         )
     }
 }
+class Declare extends Component {
+    constructor(props){
+        super(props);
+        this.state = {
+            guess: [],
+            invalid: false,
+        };
+    }
 
+    confirm = async () => {
+        if (isValidDeclare(this.state.guess)) {
+            this.setState({invalid: false,});
+            await post("/api/declare", {guess: this.state.guess, key: this.props.roomKey});
+
+        } else {
+            this.setState({invalid: true,});
+        }
+    }
+
+    componentDidMount() {
+        let guess = [];
+        for (let i = 0; i< 6; i++) {
+            guess.push({player: "", rank: "", suit: ""});
+        }
+        this.setState({guess});
+    }
+
+    render() {
+        return(            
+            <div className="popup">
+                {this.state.guess.map( (info, i) => (
+                    <>
+                        Who
+                        <select 
+                            value={this.state.guess[i].player} 
+                            onChange={(e) => {
+                                let cur = this.state.guess;
+                                cur[i].player = e.target.value
+                                this.setState({recipient: cur});
+                            }}
+                            >
+                            <option value=""></option>
+                            {this.props.yourTeam.map(player => (
+                                <option value={player.name}>{player.name}</option>    
+                                ))}
+                        </select>
+            
+                        Rank
+                        <select 
+                            value={this.state.guess[i].rank} 
+                            onChange={(e) => {
+                                let cur = this.state.guess;
+                                cur[i].rank = e.target.value
+                                this.setState({recipient: cur});
+                            }}
+                            >
+                            <option value=""></option>
+                            {RANKS.map(rank => (
+                                <option value={rank}>{rank}</option>
+                                ))}
+                        </select>
+                            Suit
+                        <select
+                            value={this.state.guess[i].suit}
+                            onChange={(e) => {
+                                let cur = this.state.guess;
+                                cur[i].suit = e.target.value
+                                this.setState({recipient: cur});
+                            }}
+                            >
+                            <option value=""></option>
+                            { this.state.guess[i].rank === "joker" ?
+                                JOKER_SUITS.map(suit => (
+                                    <option value={suit}>{suit}</option>
+                                    ))
+                                    : SUITS.map(suit => (
+                                        <option value={suit}>{suit}</option>
+                                    ))
+                            }
+                        </select>
+                        <br/>
+                    </>
+                ))}
+            <button onClick={this.confirm}>
+                Declare
+            </button>
+            {this.state.invalid && "invalid declare!!!"}
+            </div>);
+
+    }
+ }
 class PlayRoom extends Component {
     constructor(props) {
         super(props);
         this.state = {
             asking: false,
-            invalid: false,
             responding: false,
+            declaring: false,
+            showDeclare: false, 
+            pauseGame: false,
+            invalid: false,
             recipient: "",
             rank: "",
             suit: "",
             response: "",
+            declarer: "",
+            guess: null,
         };
     }
 
@@ -264,6 +359,30 @@ class PlayRoom extends Component {
         });
     }
 
+    declaring = () => {
+        this.setState({
+            declaring: true,
+            showDeclare: false,
+            declarer: this.props.name,
+        });
+
+        const res = post("/api/pause", {key: this.props.roomKey, player: this.props.name});
+    }
+
+    componentDidMount() {
+        socket.on("declaring", (info) => {
+            this.setState({
+                declaring: true,
+                declarer: info.player,
+            });
+        });
+
+        socket.on("declared", info => {
+            console.log(info.guess);
+            this.setState({guess: info.guess});
+        })
+    }
+
     render() {
         let cards = "Loading cards";
         if (this.props.hand) {
@@ -279,7 +398,7 @@ class PlayRoom extends Component {
                 >
                     ASK!!!!
                 </button>
-                <div className={`popup ${this.state.asking ? "" : "hidden"}`}>
+                <div className={`popup ${(!this.state.declaring && this.state.asking) ? "" : "hidden"}`}>
                     Who
                     <select 
                         value={this.state.recipient} 
@@ -333,7 +452,7 @@ class PlayRoom extends Component {
         const respondFunc = (
             <>
                 <button onClick={()=>this.setState({responding:true})}>Respond</button>
-                <div className={`popup ${this.state.responding?"": "hidden"}`}>
+                <div className={`popup ${(!this.state.declaring && this.state.responding)?"": "hidden"}`}>
                     Respond to {asker}:
                     <input 
                         type="text"
@@ -346,6 +465,46 @@ class PlayRoom extends Component {
                 </div>
             </>
             );
+
+        const decBtn = (<button onClick={()=>this.setState({showDeclare: true})}>Declare</button>);
+        const confirmation = (
+            <div className="popup">
+                Are you certain? You cannot back out in the middle of a declare.
+                This will pause the game.
+                <button onClick={this.declaring}>Yes</button>
+                <button onClick={()=>this.setState({showDeclare:false})}>No</button>
+            </div>
+            );
+
+        let declaration;
+        if (this.state.declarer) {
+            declaration = (
+            <div className="popup">
+                {this.state.declarer} is declaring!!
+            </div>);
+        }
+
+        let guess;
+        if (this.state.guess) {
+            guess = (
+                <>
+                    {this.state.guess.map(combo => (
+                        <div>
+                            {combo.player} has the {combo.rank} {combo.suit}
+                        </div>
+                    ))}
+                    {this.state.declarer !== this.props.name &&
+                    (<>
+                    Press OBJECT if you see a contradiction. ACCEPT otherwise.
+                    <button>
+                        Accept
+                    </button>
+                    <button>
+                        Object
+                    </button></>)}
+                </>
+            );
+        }
 
         return (
             <div>
@@ -360,6 +519,11 @@ class PlayRoom extends Component {
                     this.props.otherTeam.map((player) => 
                     (<span>{player.name}{player.index}</span>))
                 } <br/>
+                {decBtn} 
+                { this.state.showDeclare && confirmation }
+                { this.state.declaring && declaration }
+                { (this.state.declarer === this.props.name && !this.state.guess)&& <Declare yourTeam={this.props.yourTeam} roomKey={this.props.roomKey}/>}
+                { guess }
                 {
                     this.props.whoseTurn === this.props.name ?
                         this.props.turnType === "ask" ?
@@ -545,6 +709,7 @@ class Game extends Component {
                     Game History: <br/>
                     {history}<br/>
                     <PlayRoom
+                        roomKey={this.state.key}
                         name={this.state.name}
                         index={this.state.index}
                         hand={this.state.hand}
