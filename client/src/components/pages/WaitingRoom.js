@@ -39,7 +39,7 @@ class WaitingRoom extends Component {
 
     // TODO: add a ready button for non creators.
     start = async () => {
-        const body = {key: this.props.room_key};
+        const body = {key: this.props.roomKey};
         const hands = await post("/api/start_game", body);
         this.setUpGame(hands[this.state.index]);
     };
@@ -67,7 +67,7 @@ class WaitingRoom extends Component {
                 Hi, your name is {this.props.name}. <br/>
                 You are player number {this.state.index.toString()} <br/>
                 Are you creator? {this.props.isCreator + ""} <br/>
-                Room Key: {this.props.room_key} <br/>
+                Room Key: {this.props.roomKey} <br/>
                 Here are the players in the room and their indices: <br/>
                 <ul>
                     {this.state.players.map((player, k) => (
@@ -81,7 +81,7 @@ class WaitingRoom extends Component {
                 </button>
                 <Chat
                     name={this.props.name}
-                    room_key={this.props.room_key}
+                    roomKey={this.props.roomKey}
                 />
             </div>
         )

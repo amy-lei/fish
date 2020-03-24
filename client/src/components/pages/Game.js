@@ -86,11 +86,11 @@ class Game extends Component {
     
     updateGame = (hand, yourTeam, otherTeam) => {
         this.setState({hand, yourTeam, otherTeam});
-    }
+    };
 
     updateHand = (hand) => {
         this.setState({hand});
-    }
+    };
 
     // Send ask with info pertaining to who and what
     ask = async (who, rank, suit) => {
@@ -102,7 +102,7 @@ class Game extends Component {
             suit: suit,
         };
         const res = await post('/api/ask', body);
-    }
+    };
 
     // Send response with info about who, what, and success
     respond = async (response) => {
@@ -118,7 +118,7 @@ class Game extends Component {
             card: card,
         };
         await post("/api/respond", body);
-    }
+    };
 
     // Update your score if true, others if false
     updateScore = (yours) => {
@@ -127,7 +127,7 @@ class Game extends Component {
         } else {
             this.setState({otherTeamScore: this.state.otherTeamScore + 1});
         }
-    }
+    };
 
     componentDidMount() {
         // update history and update turn after an ask
@@ -169,7 +169,7 @@ class Game extends Component {
                     {move.asker.name} asked {move.recipient} for {move.rank} {move.suit}
                 </div>);
             else {
-                const result = move.success ? "did" : "did not"
+                const result = move.success ? "did" : "did not";
                 return (<><div>
                     {move.responder.name} responded with {move.response}
                 </div>
@@ -181,12 +181,6 @@ class Game extends Component {
         
         return (
             <div className="game-container">
-                <div className={`chat ${this.state.page in ["play_room", "waiting_room"] ? "": "hidden"}`}>
-                    <Chat 
-                        name={this.state.name}
-                        room_key={this.state.key}
-                    />
-                </div>
                 {this.state.page === "home" 
                     && <Home changePage={this.changePage} enterKey={this.updateKey}/>}
                 {this.state.page === "create_room"
@@ -196,7 +190,7 @@ class Game extends Component {
                 {this.state.page === "waiting_room"
                     &&                 
                     <WaitingRoom
-                        room_key={this.state.key}
+                        roomKey={this.state.key}
                         name={this.state.name}
                         index={this.state.index}
                         isCreator={this.state.isCreator}
