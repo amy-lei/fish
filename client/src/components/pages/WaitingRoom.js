@@ -44,6 +44,12 @@ class WaitingRoom extends Component {
 
     // TODO: add a ready button for non creators.
     start = async () => {
+        for (let player of this.state.players) {
+            if (!player.ready) {
+                alert("Not all players are ready!");
+                return;
+            }
+        }
         const body = {key: this.props.roomKey};
         const hands = await post("/api/start_game", body);
         this.setUpGame(hands[this.state.index]);
@@ -80,7 +86,7 @@ class WaitingRoom extends Component {
         const areYouReady = this.state.players.filter(player => player.name === this.props.name)[0].ready;
         return (
             <div>
-                Hi, your name is {this.props.name} and you are {areYouReady}. <br/>
+                Hi, your name is {this.props.name} and you are {areYouReady+""}. <br/>
                 You are player number {this.state.index.toString()} <br/>
                 Are you creator? {this.props.isCreator + ""} <br/>
                 Room Key: {this.props.roomKey} <br/>

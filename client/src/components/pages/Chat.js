@@ -48,7 +48,7 @@ class Chat extends Component {
     socket.on("ready", (readyInfo) => {
       const readyMessage = {
         sender_name: "server",
-        content: `${readyInfo.readyPlayer} is ${readyInfo.readyState}`,
+        content: `${readyInfo.readyPlayer} is ${readyInfo.readyState ? "ready" : "not ready"}`,
       };
       this.setState({
         allMessages: this.state.allMessages.concat(readyMessage),
