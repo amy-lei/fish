@@ -98,7 +98,7 @@ class Chat extends Component {
         }
         return (
           <div className="message" key={k}>
-            <div className={"sender"}>{mes.sender_name}</div>
+            <div className={"sender"}>{mes.sender_name !== this.props.name ? mes.sender_name : "YOU"}</div>
             <div className={"content"}>{mes.content}</div>
           </div>
         );

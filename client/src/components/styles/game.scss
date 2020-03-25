@@ -104,6 +104,7 @@
     font-family: 'Secular One', sans-serif;
     font-size: 20px;
     padding: 0.5em 1em;
+    margin-bottom: 20px;
     text-decoration: none;
     width: 100%
 }
@@ -115,28 +116,103 @@
 }
 
 // For WaitingRoom.js
-
+.container,
 .waiting-container {
     display: flex;
-    padding: 60px 50px 0;
+    height: 90vh;
 }
 
 .chat-container {
-    width: 30%;
+    width: 35%;
+    height: 100%;
+    padding: 0 0 0 10px;
 }
 
 .waiting-key-container {
-    width: 60%;
+    padding: 1.5em 0 0 6em;
+    width: 65%;
 }
 
 .chat-label {
     border-bottom: 1px solid #808080;
     color: #D68033;
     font-family: 'Secular One', sans-serif;
+    font-size: 24px;
+    margin: 0 30px 10px 30px;
+    height: 7.5%;
+}
+
+.friends-label {
+    font-family: 'Secular One', sans-serif;
+    font-size: 18px;
+
+}
+
+.waiting-key {
+    font-family: 'Secular One', sans-serif;
+    font-size: 100px;
+    line-height: 100%;
+
+}
+
+.waiting-button {
+    @include main-btn($primary);
+    width: 12em;
+    padding: 15px 32px;
+    margin-top: 1em;
+    font-size: 20px;
+}
+
+.players-container {
+    display: flex;
+    flex-flow: row wrap;
+    padding-top: 20px;
+    margin-left: -8%;
+    margin-top: 1em;
+}
+
+.player {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 33%;
+    margin-bottom: 2em;
+}
+
+.waiting-player-name {
+    background-color: #F3F3F3;
+    font-family: 'Secular One', sans-serif;
+    font-size: 17px;
+    padding: 0.25em 1em;
+    width: 60%;
+    text-align: center;
+}
+
+.circle {
+    border-radius: 100%;
+    color: #FFF;
+    font-family: 'Secular One', sans-serif;
+    font-size: 18px;
+    margin-bottom: 1em;
+    padding: 20px 0 0 13px;
+    height: 70px;
+    width: 70px;
+}
+
+.ready {
+    border: 4px solid #685C5D;
+}
+
+.team-odd {
+    background-color: #CA5164;
+}
+
+.team-even {
+    background-color: #9BD0BF;
+}
+
+.placeholder {
+    background-color: #C4C4C4;
     font-size: 40px;
 }
 
-.container {
-    display: flex;
-    height: 90vh;
-}

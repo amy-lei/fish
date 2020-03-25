@@ -13,10 +13,13 @@ const FAKE_PP = [
     {name: "A6", active: false, ready: true, index: 5},
 ];
 
+
+
 class WaitingRoom extends Component {
     constructor(props) {
         super(props);
         this.state = {
+            // players: this.props.isCreator ? {name:this.props.name, index: 0, ready: true, active: true} : this.props.roomInfo.players,
             players: this.props.isCreator ? [{name:this.props.name, index: 0, ready: true, active: true}].concat(FAKE_PP) : FAKE_PP,
             index: this.props.index,
         };
@@ -91,7 +94,13 @@ class WaitingRoom extends Component {
 
     render() {
         const areYouReady = this.state.players.filter(player => player.name === this.props.name)[0].ready;
+        const placeholderPlayers = [...Array(6 - this.state.players.length).keys()].map((num) => (
+            {name: `placeholder${num}`, index: -1, ready: false, active: false}
+        ));
+        console.log(placeholderPlayers);
         return (
+        <>
+            <div className="header"></div>
             <div className={"waiting-container"}>
                 <div className={"chat-container"}>
                     <div className={"chat-label"}>Chat Room</div>
@@ -119,16 +128,25 @@ class WaitingRoom extends Component {
                             </button>
                     }
                     <div className={"players-container"}>
-                        {this.state.players.map((player, k) => (
+                        {this.state.players.concat(placeholderPlayers).map((player, k) => (
                             <div key={k} className={"player"}>
-                                {/*<div className={"circle"}/> force width and height to be the same border if ready    */}
-                                <div className={"waiting-player-name"}>{player.name}</div>
+                                <div className={`circle ${player.index === -1 ?
+                                                'placeholder' : player.index % 2 === 0 ?
+                                                    'team-even' : 'team-odd'} 
+                                                 ${player.ready && 'ready'}`}
+                                >
+                                    {player.name === this.props.name && "YOU"}
+                                </div>
+                                <div className={"waiting-player-name"}>
+                                    {player.index === -1 ? "" : player.name}
+                                </div>
                             </div>
                         ))}
                     </div>
 
                 </div>
             </div>
+        </>
         )
     }
 }

@@ -33,7 +33,9 @@
     .respond-btn,
     .ask-btn{
         @include main-btn($alert);
+        margin-left: 15px;
     }
+
 }
 
 .popup {

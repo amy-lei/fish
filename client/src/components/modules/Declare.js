@@ -114,6 +114,12 @@ class Declare extends Component {
 
         const confirmation = (
             <>
+                <button
+                    className="close-btn"
+                    onClick={this.props.reset}
+                >
+                    X
+                </button>
                 <div className="declare-confirm">
                     Are you certain? 
                     You cannot back out in the middle of a declare.
@@ -121,7 +127,6 @@ class Declare extends Component {
                 </div>
                 <div className="declare-btns">
                     <button className="btn primary-btn"onClick={this.declaring}>Yes</button>
-                    <button className="btn second-btn"onClick={this.props.reset}>No</button>
                 </div>
             </>
             );

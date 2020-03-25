@@ -1,11 +1,15 @@
+@import "./base.scss";
 // For Chat.js
 .chat {
-  width:35%;
+  height: 90%;
+  width:100%;
+  padding: 0 20px;
 }
 
 .message-container {
   padding: 10px 0;
-  height: 80%;
+  height: 80.5%;
+  width: 100%;
   overflow-y: auto;
 }
 
@@ -20,9 +24,10 @@
   font-family: 'Secular One', sans-serif;
   font-size: 20px;
   font-weight: bold;
-  margin-right: 5px;
+  // margin-right: 5px;
   text-align: center;
-  width: 40%;
+  width: 25%;
+  padding: 0.8rem 0.75rem;
   word-wrap: break-word;
 }
 
@@ -34,7 +39,10 @@
   font-size: 18px;
   padding: 5px 10px;
   word-wrap: break-word;
-  // width: 60%;
+  max-width: 70%;
+  min-height: 25px;
+  border-radius: 25px;
+  padding: 0.8rem 2rem;
 }
 
 .server-message {
@@ -44,6 +52,11 @@
   text-align: center;
 }
 
+.chat-input-wrapper {
+  display: flex;
+  justify-content: space-between;
+  align-self: flex-end;
+}
 .chat-input {
     border-width: 1px;
     border-color: #BFBFBF;
@@ -52,21 +65,19 @@
     text-align: left;
     font-family: "Source Sans Pro", sans-serif;
     font-size: 20px;
-    padding: 0.5em 0 0.5em 1em;
-    margin-right: 20px;
+    padding: 0.5em 0 0.5em 1em  ;
+    // margin-right: 20px;
     text-decoration: none;
-    width: 80%;
+    width: 85%;
 }
 
 .chat-submit {
-    background-color: #FFF;
-    border: solid 1px #D68033;
-    border-radius: 50px;
-    color: #D68033;
-    font-family: 'Source Sans Pro', sans-serif;
-    font-size: 20px;
-    padding: 0.5em 0;
+    @include inverted-btn($primary);
+
+    padding-left: 1.5em;
+    padding-right: 1.5em;
     text-align: center;
-    text-decoration: none;
-    width: 10%;
+    border-radius: 50px;
+    transform: rotate(180deg);
+
 }

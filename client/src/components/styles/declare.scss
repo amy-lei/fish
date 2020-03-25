@@ -9,7 +9,7 @@
 
 .declare-btns {
     display: flex;
-    justify-content: center;
+    justify-content: space-around;
     margin-bottom: 20px;
 
     .second-btn {
@@ -33,7 +33,7 @@
     flex-direction: column;
     justify-content: center;
     align-items: center;
-
+    z-index: 100;
     .declare-name {
         @include main-font();
         font-size: 5rem;

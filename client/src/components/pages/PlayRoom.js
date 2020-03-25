@@ -260,7 +260,13 @@ class PlayRoom extends Component {
                         <div className={`overlay ${this.state.showDeclare || this.state.asking || this.state.responding ? "" : "hidden"}`}></div>
                 </div>
                 <div className="container">
-                    <Chat name={this.props.name} roomKey={this.props.roomKey}/>
+                    <div className="chat-container">
+                        <div className="chat-label">Chat Room</div>
+                        <Chat
+                            name={this.props.name}
+                            roomKey={this.props.roomKey}
+                        />
+                    </div>
                     <div className="playroom-container">                            
                         {this.props.history &&
                             <GameHistory
