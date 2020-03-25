@@ -38,6 +38,12 @@ class Ask extends Component {
     render() {
         return (
             <div className="popup">
+                <button
+                    className="close-btn"
+                    onClick={this.props.reset}
+                >
+                    X
+                </button>
                 <GuessInput
                     players={this.props.otherTeam.filter(player => player.active)}
                     who={this.state.recipient}
@@ -48,9 +54,13 @@ class Ask extends Component {
                     updateSuit={(val) => this.setState({suit: val})}
                     validate={() => true}
                     column={true}
+                    reset={this.props.reset}
                 />
                 {this.state.recipient && this.state.rank && this.state.suit &&
-                    (<button onClick={this.ask}>Ask</button>)}
+                    (<button 
+                        className="btn primary-btn"
+                        onClick={this.ask}
+                        >Ask</button>)}
 
                 {this.state.invalid && 
                     <span className="warning">("You do not have a card in this half suit")</span>

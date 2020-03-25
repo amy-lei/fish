@@ -1,15 +1,8 @@
-@import url('https://fonts.googleapis.com/css?family=Secular+One|Source+Sans+Pro&display=swap');
-$team-blue: #9BD0BF;
-$team-red: #CA5164;
-$primary: #D68033;
-$out: #858585;
-$alert: #BC0202;
-* {
-    box-sizing: border-box;
-}
+@import "./base.scss";
+
 
 @mixin main-font {
-    font-size: 16px;
+    // font-size: 16px;
     font-family: 'Secular One', sans-serif;
 }
 @mixin second-font {
@@ -33,23 +26,13 @@ $alert: #BC0202;
     width:100%;
     justify-content:flex-end;        
 
-    .btn {
-        padding: 15px 30px;
-        margin-left: 0.5rem;
-        border-radius: 3rem;
-        background-color: none;
-        @include main-font();
-    }
-
     .declare-btn{
-        color: $primary;
-        border-color: $primary;
+        @include inverted-btn($primary);
     }
     
+    .respond-btn,
     .ask-btn{
-        color: white;
-        background-color: $alert;
-        border-color: $alert;
+        @include main-btn($alert);
     }
 }
 
@@ -57,50 +40,89 @@ $alert: #BC0202;
     position: absolute;
     top: 50vh;
     left: 50vw;
-    height: 250px;
-    width: 450px;
-    margin-top: -125px;
-    margin-left: -225px;
+    height: 350px;
+    width: 550px;
+    margin-top: -175px;
+    margin-left: -275px;
     background: white;
     z-index: 1000;
     border-radius: 1rem;
-    padding: 30px 40px;
+    padding: 30px 20px;
 
+    display:flex;
+    flex-direction: column;
+    justify-content: space-between;
+    .close-btn {
+        position: absolute;
+        right:0;
+        top:0;
+        border: none;
+        background: none;
+        font-size: 25px;
+        font-weight: 300;
+        cursor: pointer;
+        padding: 20px;
+        &:hover {
+            color: $primary;
+        }
+    }
+    
     .guess-input_field {
         -webkit-appearance: none;
         -moz-appearance: none;
         appearance: none;       /* Remove default arrow */
         // background-image: url(...);   /* Add custom arrow */
+        background-color: white;
+        // font-size: 12px;
+        cursor: pointer;
+        @include second-font();
+
     }
 
     .guess-input {
         width: 100%;
-        display: flex;           
-        select {
-            width: 20%;
-        }  
+        display: flex;  
+        justify-content: center;         
+        
+        .guess-input_q {
+            display: flex;
+            justify-content: center;
+            margin-top: 10px;
+            padding: 0 5px;
+            width: 30%;
+
+            .guess-input_field {
+                width: 70%;
+                padding: 0 0 0 20px;
+                text-align: center;
+            }
+        
+            .guess-input_label {
+                @include main-font();
+                text-align: center;
+                padding: 0 10px 5px 0;
+            }
+        }
     }
     
-    .guess-input_q {
-        display: flex;
-        justify-content: space-around;
-        margin-bottom: 10px;
-    }
 
     .guess-input-stack {
         flex-direction: column;
-        .guess-input_field {
-            width: 85%;
-            padding: 5px;
-            border-radius: 20px;
-        }
-        .guess-input_label {
-            width: 15%;
+        .guess-input_q {
+            width: 100%;
             padding: 10px 0;
+            .guess-input_field {
+                padding: 10px 0 10px 20px;
+            }
+            .guess-input_label {
+                padding: 10px 10px 10px 0;
+            }
         }
     }
 
-
+}
+.primary-btn {
+    @include main-btn($primary);
 }
 .overlay {
     position: absolute;
@@ -168,4 +190,9 @@ $alert: #BC0202;
 
 }
 
-
+.game-over{
+    width: 100%;
+    text-align: center;
+    @include main-font();
+    
+}

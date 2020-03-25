@@ -12,9 +12,11 @@ import { card_svgs } from "../card_svgs.js";
 import "../styles/game.scss";
 import "../styles/App.scss";
 import "../styles/cards.scss";
-import "../styles/playroom.scss"
+import "../styles/playroom.scss";
+import "../styles/base.scss";
 
-const PARITY_TO_TEAM = { "even": "BLUE", "odd": "RED" }
+const PARITY_TO_TEAM = { "even": "BLUE", "odd": "RED" };
+
 class GameStats extends Component {
     constructor(props){
         super(props);
@@ -89,6 +91,7 @@ class GameHistory extends Component {
                 );
             else {
                 const result = move.success ? "did" : "did not";
+                console.log(move);
                 return (
                     <>
                         <div className="message history_move">
@@ -222,7 +225,7 @@ class PlayRoom extends Component {
                                 minVotes={this.props.yourTeam.length + this.props.otherTeam.length - 1}
                             />}
                         {
-                            this.props.whoseTurn === this.props.name ?
+                            this.props.whoseTurn === this.props.name && !this.state.declaring ?
                                 this.props.turnType === "ask" ?
                                     (<><button
                                         className="btn ask-btn"
@@ -247,13 +250,13 @@ class PlayRoom extends Component {
                                     {!this.state.declaring && this.state.responding && 
                                     <Respond
                                         submitResponse={this.props.submitResponse}
-                                        asker={this.props.asker}
+                                        asker={asker}
                                         reset={()=> this.setState({responding: false})}
                                     />}</>)
                                 : ""
                         }
                         </>)
-                        : (<span>Game Over! {`Team ${this.state.winner} won!`}</span>) }
+                        : (<div className="game-over">Game Over! {`Team ${this.state.winner} won!`}</div>) }
                         <div className={`overlay ${this.state.showDeclare || this.state.asking || this.state.responding ? "" : "hidden"}`}></div>
                 </div>
                 <div className="container">

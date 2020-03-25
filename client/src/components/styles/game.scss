@@ -1,4 +1,5 @@
 @import './App.scss';
+@import './base.scss';
 
 .hidden {
     display:none;
@@ -6,34 +7,28 @@
 
 // For Game.js
 .game-container{
-    margin: 1em 1em;
+    width: 100vw;
+    height: 100vh;
 }
 
 // For Home.js
 .home-container {
     text-align: center;
-    padding-top: 50px;
+    padding-top: 15vh;
 }
 
 //focus go away border
 .home-button {
-    background-color: #D68033;
-    border: none;
-    border-radius: 60px;
-    color: white;
-    font-family: 'Secular One', sans-serif;
+    @include main-btn($primary);
     width: 12em;
     padding: 15px 32px;
     margin-bottom: 20px;
-    text-align: center;
-    text-decoration: none;
-    display: inline-block;
-    font-size: 20px;
+    font-size: 18px;
 }
 
 .title {
     font-family: 'Secular One', sans-serif;
-    font-size: 12em;
+    font-size: 150px;
 }
 
 .room-key-wrapper {
@@ -64,6 +59,8 @@
 }
 
 .room-key-submit {
+    @include inverted-btn($primary);
+    display:inline;
     background-color: #FFF;
     border: solid 1px #D68033;
     border-radius: 0 50px 50px 0;
@@ -88,7 +85,7 @@
 .nameform-container {
     margin: 0 auto;
     text-align: left;
-    padding-top: 20em;
+    padding-top: 35vh;
     width: 30%;
 }
 
@@ -112,16 +109,8 @@
 }
 
 .name-submit {
-    background-color: #D68033;
-    border: none;
-    border-radius: 60px;
-    color: white;
-    font-family: 'Secular One', sans-serif;
-    width: 9em;
-    padding: 15px 32px;
+    @include main-btn($primary);
     margin-top: 20px;
-    text-decoration: none;
-    display: inline-block;
     font-size: 20px;
 }
 

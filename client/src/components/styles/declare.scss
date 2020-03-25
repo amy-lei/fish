@@ -1,0 +1,96 @@
+@import "./playroom.scss";
+@import "./base.scss";
+
+.declare-confirm {
+    @include main-font();
+    padding: 50px;
+    height:50%
+}
+
+.declare-btns {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 20px;
+
+    .second-btn {
+        @include inverted-btn($primary);
+    }
+}
+
+.declare-inputs {
+    margin-bottom: 10px;
+}
+
+.declare {
+    position: absolute;
+    top:0;
+    left:0;
+    width: 35%;
+    height: 100%;
+    background-color: white;
+    
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+
+    .declare-name {
+        @include main-font();
+        font-size: 5rem;
+        line-height: 5rem;
+        padding: 1rem;
+        // margin-top: 20vh;
+    }
+    .declare-guesses {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        padding: 0 20px;
+        .declare-guess {
+            background-color: #F3F3F3;
+            border-radius: 20px;
+            display: inline;
+            font-family: 'Source Sans Pro', sans-serif;
+            font-size: 18px;
+            padding: 10px 20px;
+            word-wrap: break-word;
+    
+            margin: 0.2em;
+        }
+    }
+
+    .declare-vote_instruction {
+        padding: 20px 2vw;
+        @include second-font();
+        color: #808080;
+        font-size: 16px;
+        text-align: center;
+    
+        .declare-vote_btns {
+            display: flex;
+            justify-content: space-evenly;
+            padding: 20px 10px 10px 10px;
+
+            .object-btn {
+                @include main-btn($object);
+            }
+            .accept-btn {
+                @include main-btn($accept);
+            }
+            .warning {
+                text-align: right;
+            }
+        }
+    }
+    
+    .declare-votes-container {
+        padding: 10px;
+        .declare-votes {
+            color: #808080;
+            font-size: 16px;
+            text-align: left;
+        }
+    }
+    
+}
+
