@@ -33,24 +33,43 @@ class Home extends Component {
 
     render() {
         return (
-            <>
-                <h1>Online Fish</h1>
-                <button onClick={() => this.props.changePage("create_room")}>Create a Room</button>
-                <button onClick={() => {this.setState({wantToJoinRoom: true})}}>Join a Room</button>
+            <div className={"home-container"}>
+                <p className={"title"}>fish</p>
+                <button
+                    onClick={() => this.props.changePage("create_room")}
+                    className={"home-button"}
+                >
+                    Create a Room
+                </button>
+                <br/>
                 {
-                    this.state.wantToJoinRoom &&
-                    <>
-                        Key:
-                        <input
-                            type="text"
-                            value={this.state.roomKey}
-                            onChange={(e) => this.keyChange(e)}
-                        />
-                        {this.state.roomKeyError && <span>The key you entered does not exist. Please try again</span>}
-                        <button onClick={this.checkRoom}>Join Game!</button>
-                    </>
+                    !this.state.wantToJoinRoom ?
+                        <button
+                            onClick={() => {this.setState({wantToJoinRoom: true})}}
+                            className={"home-button"}
+                        >
+                            Join a Room
+                        </button>
+                        :
+                        <div className={"room-key-wrapper"}>
+                            <div className={"room-key-label"}>Enter room key:</div>
+                            <input
+                                type="text"
+                                value={this.state.roomKey}
+                                onChange={(e) => this.keyChange(e)}
+                                className={"room-key-input"}
+                                maxLength={4}
+                            />
+                            <button onClick={this.checkRoom} className={"room-key-submit"}>ENTER</button>
+                            {
+                                this.state.roomKeyError &&
+                                <div className={"room-key-error"}>
+                                    The key you entered does not exist. Please try again
+                                </div>
+                            }
+                        </div>
                 }
-            </>
+            </div>
         )
     }
 

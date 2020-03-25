@@ -17,15 +17,17 @@ class NameForm extends Component {
 
     render() {
         return (
-            <div>
-                Name:
+            <div className={"nameform-container"}>
+                <div className={"name-label"}>Enter your name:</div>
                 <input
                     type="text"
                     onChange={this.nameChange}
                     value={this.state.name}
+                    className={"name-input"}
+                    maxLength={10}
                 />
                 <br/>
-                <button onClick={() => this.props.submitName(this.state.name)}>
+                <button onClick={() => this.props.submitName(this.state.name)} className={"name-submit"}>
                     Enter Room
                 </button>
             </div>

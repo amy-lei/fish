@@ -85,39 +85,42 @@ class WaitingRoom extends Component {
     render() {
         const areYouReady = this.state.players.filter(player => player.name === this.props.name)[0].ready;
         return (
-            <div>
-                Hi, your name is {this.props.name} and you are {areYouReady+""}. <br/>
-                You are player number {this.state.index.toString()} <br/>
-                Are you creator? {this.props.isCreator + ""} <br/>
-                Room Key: {this.props.roomKey} <br/>
-                Here are the players in the room and their indices: <br/>
-                <ul>
-                    {this.state.players.map((player, k) => (
-                        <li key={k}>
-                            {player.index} {player.name} Am I ready? {player.ready+""}
-                        </li>
-                    ))}
-                </ul>
-                {
-                    this.props.isCreator ?
-                    <button onClick={this.start}>
-                        Start Game
-                    </button>
-                    :
-                     areYouReady ?
-                        <button onClick={() => this.ready(false)}>
-                            Not Ready
+            <div className={"waiting-container"}>
+                <div className={"chat-container"}>
+                    <div className={"chat-label"}>Chat Room</div>
+                    <Chat
+                        name={this.props.name}
+                        roomKey={this.props.roomKey}
+                    />
+                </div>
+                <div className={"waiting-key-container"}>
+                    <div className={"friends-label"}>Share this key with five friends:</div>
+                    <div className={"waiting-key"}>{this.props.roomKey}</div>
+                    {
+                        this.props.isCreator ?
+                        <button onClick={this.start} className={"waiting-button"}>
+                            Start Game
                         </button>
                         :
-                        <button onClick={() => this.ready(true)}>
-                            Ready
-                        </button>
-                }
+                         areYouReady ?
+                            <button onClick={() => this.ready(false)} className={"waiting-button"}>
+                                Not Ready
+                            </button>
+                            :
+                            <button onClick={() => this.ready(true)} className={"waiting-button"}>
+                                Ready
+                            </button>
+                    }
+                    <div className={"players-container"}>
+                        {this.state.players.map((player, k) => (
+                            <div key={k} className={"player"}>
+                                {/*<div className={"circle"}/> force width and height to be the same border if ready    */}
+                                <div className={"waiting-player-name"}>{player.name}</div>
+                            </div>
+                        ))}
+                    </div>
 
-                <Chat
-                    name={this.props.name}
-                    roomKey={this.props.roomKey}
-                />
+                </div>
             </div>
         )
     }

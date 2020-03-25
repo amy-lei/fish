@@ -202,17 +202,24 @@ class Game extends Component {
     render() {
         let history = this.state.history.map(move => {
             if (move.type === "ask")
-                return (<div>
-                    {move.asker.name} asked {move.recipient} for {move.rank} {move.suit}
-                </div>);
+                return (
+                    <div>
+                        {move.asker.name} asked {move.recipient} for {move.rank} {move.suit}
+                    </div>
+                );
             else {
                 const result = move.success ? "did" : "did not";
-                return (<><div>
-                    {move.responder.name} responded with {move.response}
-                </div>
-                <div>
-                    {move.responder.name} {result} have the {move.rank} {move.suit}
-                </div><br/></>);
+                return (
+                    <>
+                        <div>
+                            {move.responder.name} responded with {move.response}
+                        </div>
+                        <div>
+                            {move.responder.name} {result} have the {move.rank} {move.suit}
+                        </div>
+                        <br/>
+                    </>
+                );
             }
         });
         
