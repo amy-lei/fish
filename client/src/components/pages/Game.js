@@ -259,6 +259,8 @@ class Game extends Component {
                             updateScore={this.updateScore}
                             updateHand={this.updateHand}
                             checkIfActive={this.checkIfActive}
+                            yourTeamScore={this.state.yourTeamScore}
+                            otherTeamScore={this.state.otherTeamScore}
                         />
                     </>)}
             </div>

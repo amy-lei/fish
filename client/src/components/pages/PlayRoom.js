@@ -11,6 +11,61 @@ import { card_svgs } from "../card_svgs.js";
 
 import "../styles/game.scss";
 import "../styles/cards.scss";
+import "../styles/playroom.scss"
+
+const PARITY_TO_TEAM = { "even": "BLUE", "odd": "RED" }
+class GameStats extends Component {
+    constructor(props){
+        super(props);
+        this.state = {
+        };
+    }
+
+    componentDidMount() {
+        socket.on("playerOut", info => {
+            this.setState({counter: this.state.counter + 1});
+        })
+    }
+
+    generatePlayer = (parity) => {
+        let team;
+        if (this.props.parity === parity) team = this.props.yourTeam;
+        else team = this.props.otherTeam;
+
+        if (team) {
+            return team.map(player => {
+                console.log("active", player.active);
+                return(
+                <div className={`team-${parity} ${player.active ? "" : "out"}`}>
+                    {player.name} {player.active ? "": " (OUT)"}
+                </div>
+            )});
+        }
+    }
+
+    render() {
+
+        return (
+        <div className="stats">
+            <div className="stats_team-name">
+                {Object.keys(PARITY_TO_TEAM).map(parity => (
+                    <span> 
+                        TEAM {PARITY_TO_TEAM[parity]} 
+                        {this.props.parity === parity 
+                            ? `(YOU): ${this.props.yourTeamScore}`
+                            : `: ${this.props.otherTeamScore}`}
+                    </span>                
+                ))}
+            </div>
+            <div className="stats_players">
+                {Object.keys(PARITY_TO_TEAM).map(parity => this.generatePlayer(parity))}
+            </div>
+        </div>
+        
+        )
+    }
+}
+
 
 class PlayRoom extends Component {
     constructor(props) {
@@ -92,6 +147,13 @@ class PlayRoom extends Component {
 
         return (
             <div>
+                <GameStats
+                    yourTeam={this.props.yourTeam}
+                    otherTeam={this.props.otherTeam}
+                    yourTeamScore={this.props.yourTeamScore}
+                    otherTeamScore={this.props.otherTeamScore}
+                    parity={this.props.index % 2 === 0 ? "even" : "odd"}
+                />
                 Your name: {this.props.name} <br/>
                 Player's {this.props.whoseTurn} turn. <br/>
                 Turn type: {this.props.turnType}. <br/>
