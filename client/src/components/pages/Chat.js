@@ -144,7 +144,7 @@ class Chat extends Component {
             placeholder="Send a message"
           />
           <button onClick={this.sendMessage} className="btn chat-submit">
-            >
+            &lt;
           </button>
         </div>
       </div>
