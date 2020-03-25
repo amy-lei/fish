@@ -1,7 +1,88 @@
+@import './App.scss';
+
 .hidden {
     display:none;
 }
 
 .popup{
     border: 1px solid black;
+}
+
+// For Game.js
+.game-container{
+    margin: 1em 1em;
+}
+
+// For Home.js
+.home-container {
+    text-align: center;
+    padding-top: 50px;
+}
+
+//focus go away border
+.home-button {
+    background-color: #D68033;
+    border: none;
+    border-radius: 60px;
+    color: white;
+    font-family: 'Secular One', sans-serif;
+    width: 12em;
+    padding: 15px 32px;
+    margin-bottom: 20px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 20px;
+}
+
+.title {
+    font-family: 'Secular One', sans-serif;
+    font-size: 12em;
+}
+
+.room-key-wrapper {
+    width: 20em;
+    margin: 0 auto;
+}
+
+.room-key-label {
+    font-family: 'Secular One', sans-serif;
+    font-size: 17px;
+    text-align: left;
+    display: block;
+    padding-left: 0.5em;
+}
+
+.room-key-input {
+    border-width: 1px;
+    border-color: #BFBFBF;
+    border-style: solid;
+    border-right: none;
+    border-radius: 50px 0 0 50px;
+    text-align: center;
+    font-family: 'Secular One', sans-serif;
+    font-size: 20px;
+    padding: 0.5em 0;
+    text-decoration: none;
+    width: 60%;
+}
+
+.room-key-submit {
+    background-color: #FFF;
+    border: solid 1px #D68033;
+    border-radius: 0 50px 50px 0;
+    color: #D68033;
+    font-family: 'Secular One', sans-serif;
+    font-size: 20px;
+    padding: 0.5em 0;
+    text-align: center;
+    text-decoration: none;
+    width: 39%;
+}
+
+.room-key-error {
+    color: #808080;
+    font-family: 'Source Sans Pro', sans-serif;
+    font-size: 14px;
+    font-style: italic;
 }
