@@ -1,5 +1,4 @@
 import React, { Component } from "react";
-import "../../utilities.css";
 import { post } from "../../utilities";
 import { 
     isValidAsk, 
@@ -10,36 +9,12 @@ import {
 import { socket } from "../../client-socket";
 import Chat from "./Chat.js";
 import GuessInput from "../modules/GuessInput.js";
+import Ask from "../modules/Ask.js";
+import Respond from "../modules/Respond.js";
 import { card_svgs } from "../card_svgs.js";
 
 import "../styles/game.scss";
 import "../styles/cards.scss";
-const SUITS = [
-    'heart', 
-    'diamond', 
-    'spade', 
-    'club',
-  ];
-const JOKER_SUITS = [
-    'red',
-    'black',
-];
-const RANKS = [
-    'ace',
-    'two',
-    'three',
-    'four',
-    'five',
-    'six',
-    'seven',
-    'eight',
-    'nine',
-    'ten',
-    'jack',
-    'queen',
-    'king',
-    'joker',
-];
 
 class Declare extends Component {
     constructor(props){
@@ -69,10 +44,6 @@ class Declare extends Component {
         this.setState({guess});
     }
 
-    updateGuess = (index, val) => {
-
-    }
-    
     render() {
         let inputs;
         if (this.state.guess) {
@@ -105,10 +76,10 @@ class Declare extends Component {
         return(            
             <div className="popup">
                 {inputs}
-            <button onClick={this.confirm}>
-                Declare
-            </button>
-            {this.state.invalid && "invalid declare!!!"}
+                <button onClick={this.confirm}>
+                    Declare
+                </button>
+                {this.state.invalid && "invalid declare!!!"}
             </div>);
 
     }
@@ -123,10 +94,6 @@ class PlayRoom extends Component {
             declaring: false,
             showDeclare: false, 
             invalid: false,
-            recipient: "",
-            rank: "",
-            suit: "",
-            response: "",
             declarer: "",
             guess: null,
             lie: false,
@@ -142,43 +109,11 @@ class PlayRoom extends Component {
      */
     createCards = (hand) => {
         return hand.map(card => (
-            <div className="test-card">
-                {card.rank} {card.suit}
+            <div className={`card card-${this.props.hand.length}`}>
+                <img src={card_svgs[`${card.rank}-${card.suit}.svg`]}/>
             </div>
-            // <div className={`card card-${this.props.hand.length}`}>
-            //     <img src={card_svgs[`${card.rank}-${card.suit}.svg`]}/>
-            // </div>
         ));
     };
-
-    /*  
-        Validate ask before posting,
-        and reset states related to ask
-    */
-    ask = () => {
-        if (isValidAsk(this.props.hand, {rank: this.state.rank, suit: this.state.suit})) {
-            this.props.submitAsk(this.state.recipient, this.state.rank, this.state.suit)
-            this.setState({
-                invalid: false,
-                asking: false,
-                recipient: "",
-                rank: "",
-                suit: "",
-            });
-        } else this.setState({invalid: true});
-    }
-
-    /*
-        Submit response
-        and reset states related to respond
-     */
-    respond = () => {
-        this.props.submitResponse(this.state.response);
-        this.setState({
-            responding: false,
-            response: "",
-        });
-    }
 
     /*
         STEP 0 of declaring: 
@@ -295,50 +230,8 @@ class PlayRoom extends Component {
             // Use fake cards for now–too distracting 
             cards = this.createCards(this.props.hand);
         }
-        
-        const askFunc = (
-            <>
-                <button
-                    className="btn"
-                    onClick={() => this.setState({asking: true})}
-                >
-                    ASK!!!!
-                </button>
-                {this.state.asking &&
-                <GuessInput
-                    players={this.props.otherTeam.filter(player => player.active)}
-                    who={this.state.recipient}
-                    rank={this.state.rank}
-                    suit={this.state.suit}
-                    updateWho={(val) => this.setState({recipient: val})}
-                    updateRank={(val) => this.setState({rank: val})}
-                    updateSuit={(val) => this.setState({suit: val})}
-                    validate={() => false}
-                />}
-                    {(this.state.recipient && this.state.rank && this.state.suit) &&
-                        (<button onClick={this.ask}>Ask</button>)}
-                    {this.state.invalid && "You do not have a card in this half suit"}
-            </>
-        );
-
         let asker;
         this.props.history.length !== 0 ? asker = this.props.history[this.props.history.length - 1].asker.name : asker = "";
-        const respondFunc = (
-            <>
-                <button onClick={()=>this.setState({responding:true})}>Respond</button>
-                <div className={`popup ${(!this.state.declaring && this.state.responding)?"": "hidden"}`}>
-                    Respond to {asker}:
-                    <input 
-                        type="text"
-                        onChange={(e) => this.setState({response: e.target.value})}
-                        value={this.state.response}
-                    />
-                    <button onClick={this.respond}>
-                        Send
-                    </button>
-                </div>
-            </>
-            );
 
         const decBtn = (<button onClick={()=>this.setState({showDeclare: true})}>Declare</button>);
         const confirmation = (
@@ -412,8 +305,27 @@ class PlayRoom extends Component {
                         {
                             this.props.whoseTurn === this.props.name ?
                                 this.props.turnType === "ask" ?
-                                    askFunc
-                                    : respondFunc
+                                    (<><button
+                                        className="btn"
+                                        onClick={() => this.setState({asking: true})}
+                                    >
+                                        ASK!!!!
+                                    </button>
+                                    {this.state.asking &&      
+                                    <Ask
+                                        submitAsk={this.props.submitAsk}
+                                        otherTeam={this.props.otherTeam}
+                                        hand={this.props.hand}
+                                        reset={()=>this.setState({asking:false})}
+                                    />}
+                                    </>)
+                                    : (<><button onClick={()=>this.setState({responding:true})}>Respond</button>
+                                    {this.state.responding && 
+                                    <Respond
+                                        submitResponse={this.props.submitResponse}
+                                        asker={this.props.asker}
+                                        reset={()=> this.setState({responding: false})}
+                                    />}</>)
                                 : ""
                         }
                         </>)

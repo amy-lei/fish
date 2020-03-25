@@ -1,30 +1,5 @@
 import React, { Component } from "react";
-const SUITS = [
-    'heart', 
-    'diamond', 
-    'spade', 
-    'club',
-  ];
-const JOKER_SUITS = [
-    'red',
-    'black',
-];
-const RANKS = [
-    'ace',
-    'two',
-    'three',
-    'four',
-    'five',
-    'six',
-    'seven',
-    'eight',
-    'nine',
-    'ten',
-    'jack',
-    'queen',
-    'king',
-    'joker',
-];
+import { SUITS, RANKS, JOKER_SUITS } from "../../game-utilities.js";
 
 class GuessInput extends Component {
     constructor(props) {

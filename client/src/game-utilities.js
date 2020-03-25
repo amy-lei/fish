@@ -107,3 +107,30 @@ const sameHalfSuit = (base, card) => {
         return rankToVal[card.rank] > 8 === upper && card.suit === base.suit
     }
 }
+
+export const SUITS = [
+    'heart', 
+    'diamond', 
+    'spade', 
+    'club',
+  ];
+export const JOKER_SUITS = [
+    'red',
+    'black',
+];
+export const RANKS = [
+    'ace',
+    'two',
+    'three',
+    'four',
+    'five',
+    'six',
+    'seven',
+    'eight',
+    'nine',
+    'ten',
+    'jack',
+    'queen',
+    'king',
+    'joker',
+];
