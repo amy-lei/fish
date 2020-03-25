@@ -1,11 +1,9 @@
 import React, { Component } from "react";
 
-
 import { get, post } from "../../utilities";
 import { socket } from "../../client-socket.js";
 
-import "../../utilities.css";
-import "./Chat.css";
+import "../styles/Chat.scss";
 
 class Chat extends Component {
   constructor(props) {
@@ -92,32 +90,38 @@ class Chat extends Component {
       messages = this.state.allMessages.map( (mes, k) => {
         if (mes.sender_name === "server") {
           return (
-            <div className="server_message" key={k}>
+            <div className="server-message" key={k}>
               {mes.content}
             </div>
           )
         }
         return (
           <div className="message" key={k}>
-            {mes.sender_name} : {mes.content}
+            <div className={"sender"}>{mes.sender_name}</div>
+            <div className={"content"}>{mes.content}</div>
           </div>
         );
       });
     }
 
     return (
-      <>
-        <h1>Chat</h1>
-        {messages}
-        <input 
-          type="text"
-          value={this.state.curMessage}
-          onChange={this.handleOnChange}
-        />
-        <button onClick={this.sendMessage}>
-          Send
-        </button>
-      </>
+      <div>
+        <div className={"message-container"}>
+          {messages}
+        </div>
+        <div className={"chat-input-wrapper"}>
+          <input
+            type="text"
+            value={this.state.curMessage}
+            onChange={this.handleOnChange}
+            className={"chat-input"}
+            placeholder={"Send a message"}
+          />
+          <button onClick={this.sendMessage} className={"chat-submit"}>
+            >
+          </button>
+        </div>
+      </div>
     );
   }
 }

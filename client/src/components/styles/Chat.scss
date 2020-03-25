@@ -1,0 +1,69 @@
+// For Chat.js
+
+.message-container {
+  padding: 10px 0;
+  height: 60vh;
+  overflow-y: auto;
+}
+
+.message {
+  display: flex;
+  align-content: center;
+  margin: 20px 10px 20px 0;
+}
+
+.sender {
+  display: inline-block;
+  font-family: 'Secular One', sans-serif;
+  font-size: 20px;
+  font-weight: bold;
+  margin-right: 5px;
+  text-align: center;
+  width: 40%;
+  word-wrap: break-word;
+}
+
+.content {
+  background-color: #F3F3F3;
+  border-radius: 20px;
+  display: inline;
+  font-family: 'Source Sans Pro', sans-serif;
+  font-size: 18px;
+  padding: 5px 10px;
+  word-wrap: break-word;
+  width: 60%;
+}
+
+.server-message {
+  color: #808080;
+  font-family: 'Source Sans Pro', sans-serif;
+  font-size: 18px;
+  text-align: center;
+}
+
+.chat-input {
+    border-width: 1px;
+    border-color: #BFBFBF;
+    border-style: solid;
+    border-radius: 50px;
+    text-align: left;
+    font-family: "Source Sans Pro", sans-serif;
+    font-size: 20px;
+    padding: 0.5em 0 0.5em 1em;
+    margin-right: 20px;
+    text-decoration: none;
+    width: 80%;
+}
+
+.chat-submit {
+    background-color: #FFF;
+    border: solid 1px #D68033;
+    border-radius: 50px;
+    color: #D68033;
+    font-family: 'Source Sans Pro', sans-serif;
+    font-size: 20px;
+    padding: 0.5em 0;
+    text-align: center;
+    text-decoration: none;
+    width: 10%;
+}

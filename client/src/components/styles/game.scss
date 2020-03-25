@@ -86,3 +86,67 @@
     font-size: 14px;
     font-style: italic;
 }
+
+// For NameForm.js
+
+.nameform-container {
+    margin: 0 auto;
+    text-align: left;
+    padding-top: 20em;
+    width: 30%;
+}
+
+.name-label {
+    font-family: 'Secular One', sans-serif;
+    font-size: 20px;
+    display: block;
+    margin-bottom: 10px;
+}
+
+.name-input {
+    border-width: 1px;
+    border-color: #BFBFBF;
+    border-style: solid;
+    border-radius: 50px;
+    font-family: 'Secular One', sans-serif;
+    font-size: 20px;
+    padding: 0.5em 1em;
+    text-decoration: none;
+    width: 100%
+}
+
+.name-submit {
+    background-color: #D68033;
+    border: none;
+    border-radius: 60px;
+    color: white;
+    font-family: 'Secular One', sans-serif;
+    width: 9em;
+    padding: 15px 32px;
+    margin-top: 20px;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 20px;
+}
+
+// For WaitingRoom.js
+
+.waiting-container {
+    display: flex;
+    padding: 60px 50px 0;
+}
+
+.chat-container {
+    width: 30%;
+}
+
+.waiting-key-container {
+    width: 60%;
+}
+
+.chat-label {
+    border-bottom: 1px solid #808080;
+    color: #D68033;
+    font-family: 'Secular One', sans-serif;
+    font-size: 40px;
+}
