@@ -16,8 +16,6 @@ class WaitingRoom extends Component {
           {name:"CRYSTAL", index: 1, ready: false, active: true},
           {name:"AMY", index: 2, ready: false, active: true},
           {name:"IVY", index: 3, ready: false, active: true},
-          {name:"HUI MIN", index: 4, ready: true, active: true},
-          {name:"HANS", index: 5, ready: true, active: true}
         ];
         this.state = {
             players: this.props.isCreator ? fakePlayers : this.props.roomInfo.players,
@@ -94,6 +92,10 @@ class WaitingRoom extends Component {
 
     render() {
         const areYouReady = this.state.players.filter(player => player.name === this.props.name)[0].ready;
+        const placeholderPlayers = [...Array(6 - this.state.players.length).keys()].map((num) => (
+            {name: `placeholder${num}`, index: -1, ready: false, active: false}
+        ));
+        console.log(placeholderPlayers);
         return (
             <div className={"waiting-container"}>
                 <div className={"chat-container"}>
@@ -122,13 +124,18 @@ class WaitingRoom extends Component {
                             </button>
                     }
                     <div className={"players-container"}>
-                        {this.state.players.map((player, k) => (
+                        {this.state.players.concat(placeholderPlayers).map((player, k) => (
                             <div key={k} className={"player"}>
-                                {/* force width and height to be the same border if ready    */}
-                                <div className={`circle ${player.index % 2 === 0 ? 'team-even' : 'team-odd'} ${player.ready && 'ready'}`}>
+                                <div className={`circle ${player.index === -1 ?
+                                                'placeholder' : player.index % 2 === 0 ?
+                                                    'team-even' : 'team-odd'} 
+                                                 ${player.ready && 'ready'}`}
+                                >
                                     {player.name === this.props.name && "YOU"}
                                 </div>
-                                <div className={"waiting-player-name"}>{player.name}</div>
+                                <div className={"waiting-player-name"}>
+                                    {player.index === -1 ? "" : player.name}
+                                </div>
                             </div>
                         ))}
                     </div>
