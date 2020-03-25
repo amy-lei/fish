@@ -142,11 +142,11 @@ $alert: #BC0202;
         }
     }
 
+}
 .primary-btn {
     background-color: $primary;
     border-color: $primary;
     color: white;
-}
 }
 .overlay {
     position: absolute;
@@ -214,4 +214,9 @@ $alert: #BC0202;
 
 }
 
-
+.game-over{
+    width: 100%;
+    text-align: center;
+    @include main-font();
+    
+}

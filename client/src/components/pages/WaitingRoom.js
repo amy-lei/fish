@@ -17,7 +17,7 @@ class WaitingRoom extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            players: this.props.isCreator ? [{name:this.props.name, index: 0, ready: true, active: true}].concat(FAKE_PP) : FAKE_PP,
+            players: this.props.isCreator ? [{name:this.props.name, index: 0, ready: true, active: true}] : [],
             index: this.props.index,
         };
     };

@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import { post } from "../../utilities";
 import { canObject } from "../../game-utilities";
 import { socket } from "../../client-socket";
+import "../styles/declare.scss";
 
 
 class DecResponse extends Component {
@@ -74,7 +75,7 @@ class DecResponse extends Component {
     render() {
         const declaration = (
             <div className="declare-name">
-                {this.props.declarer} is declaring!!
+                {this.props.declarer} declared!
             </div>);
 
         const guess = this.props.guess.map(combo => (
@@ -98,17 +99,19 @@ class DecResponse extends Component {
                     {guess}
                 </div>
                 {!this.props.isDeclarer && this.props.guess.length !== 0 && !this.state.voted && 
-                (<div className="declare-vote_btn">
+                (<div className="declare-vote_instruction">
                     Press OBJECT if you see a contradiction. ACCEPT otherwise.
-                    <button onClick={()=> this.resToDeclare(true)}>
-                        Accept
-                    </button>
-                    <button onClick={() => this.resToDeclare(false)}>
-                        Object
-                    </button>
-                    {this.state.lie && "Dont lie!!!!"}
-                </div>)
-                }
+                    <div className="declare-vote_btns">
+                        <button className="btn accept-btn"onClick={()=> this.resToDeclare(true)}>
+                            Accept
+                        </button>
+                        <button className="btn object-btn"onClick={() => this.resToDeclare(false)}>
+                            Object
+                        </button>
+                    </div>
+                    <span className="warning">{this.state.lie && "Dont lie!!!!"}</span>
+                </div>
+                )}
                 <div className="declare-votes-container">
                     {votes}
                 </div>

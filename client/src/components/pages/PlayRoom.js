@@ -255,7 +255,7 @@ class PlayRoom extends Component {
                                 : ""
                         }
                         </>)
-                        : (<span>Game Over! {`Team ${this.state.winner} won!`}</span>) }
+                        : (<div className="game-over">Game Over! {`Team ${this.state.winner} won!`}</div>) }
                         <div className={`overlay ${this.state.showDeclare || this.state.asking || this.state.responding ? "" : "hidden"}`}></div>
                 </div>
                 <div className="container">
