@@ -13,41 +13,7 @@ import { card_svgs } from "../card_svgs.js";
 import "../styles/game.scss";
 import "../styles/cards.scss";
 
-const WIN = 1;
-const FAKE_HISTORY = [
-    {
-        type: "ask",
-        asker:  {name: "A2", index: 1},
-        recipient: {name: "A3", index: 2},
-        rank: "ace",
-        suit: "diamond",
-      },
-      {
-        type: "respond",
-        responder: {name: "A2", index: 1},
-        asker: {name: "A3", index: 2},
-        response: ":(((((((((( rip",
-        success: true,
-        rank: "ace",
-        suit: "diamond",
-      },
-    {
-        type: "ask",
-        asker:  {name: "A2", index: 1},
-        recipient: {name: "A3", index: 2},
-        rank: "king",
-        suit: "diamond",
-      },
-      {
-        type: "respond",
-        responder:  {name: "A2", index: 1},
-        asker:  {name: "A3", index: 2},
-        response: ":)))))))))))) no",
-        success: false,
-        rank: "king",
-        suit: "diamond",
-      },
-];
+const WIN = 1; // FIX WHEN LAUNCH!!!
 class Game extends Component {
     constructor(props) {
         super(props);
@@ -60,9 +26,9 @@ class Game extends Component {
             hand: null,
             yourTeam: null,
             otherTeam: null,
-            turnType: "respond",
-            history: FAKE_HISTORY,
-            whoseTurn: "A2",
+            turnType: "ask",
+            history: [],
+            whoseTurn: "",
             yourTeamScore: 0,
             otherTeamScore: 0,
         };

@@ -132,7 +132,8 @@
     left:0;
     height:100vh;
     width:100vw;
-    background: rgba(0,0,0,0.1)
+    background: rgba(0,0,0,0.1);
+    z-index: 999;
 }
 .stats {
     width: 100%;
@@ -169,29 +170,78 @@
 .history {
     display: flex;
     flex-direction: column;
-    justify-content: center;
+    justify-content: flex-start;
     align-content: center;
     margin-bottom: 2rem;
     min-height: 10%;
+    padding: 10px 20px;
     .history_move {
         justify-content: center;
         margin: 0 0 0.5rem 0;
+
+        &:not(:first-child) {
+            margin: 0 0 1rem 0;
+        }
     
         .history_move-what{
             min-height: 25px;
             border-radius: 25px;
-            padding: 0.75rem 2rem;
+            padding: 0.75rem 1.5rem;
         }
     
         .history_move-who {
             min-width: 25px;
-            padding: 0.75rem 0;
-            width: 10%;
+            padding: 0.75rem 0.25rem;
+            width: 15%;
         }
     }
+    .left {
+        justify-content: flex-start;
+    }
+    .history_move-result {
+        padding: 0.5rem 0 .5rem 0;
+    }
+}
+
+.more-space {
+    width: 20% !important;
+}
+
+.sidebar-container {
+    width: 35%;
+    height: 100%;
+    padding: 0 0 0 10px;
+}
+
+.playroom-container {
+    width: 60%;
+}
+
+.active-sidebar {
+    color: #D68033;
+    font-family: 'Secular One', sans-serif;
+    font-size: 24px;
+    transition: color 0.25s;
 
 }
 
+.inactive-sidebar {
+    color: black;
+    font-family: 'Secular One', sans-serif;
+    font-size: 24px;
+    transition: color 0.25s;
+
+    &:hover {
+        color: $primary;
+    }
+}
+
+.divider {
+    color: black;
+    font-family: "Source Sans Pro", sans-serif;
+    font-size: 24px;
+    margin: 0 10px;
+}
 .game-over{
     width: 100%;
     text-align: center;

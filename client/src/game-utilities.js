@@ -34,8 +34,10 @@ export const hasCard = (hand, target) => {
     @target (object): a card in the desired halfsuit
  */
 export const isValidAsk = (hand, target) => {
-    for (let card of hand) 
-        if (sameHalfSuit(target, card)) return true;
+    if (!hasCard(hand, target)) {
+        for (let card of hand) 
+            if (sameHalfSuit(target, card)) return true;
+    }
     return false;
 }
 

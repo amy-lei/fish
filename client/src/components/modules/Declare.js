@@ -6,43 +6,12 @@ import { post } from "../../utilities";
 import "../styles/game.scss";
 import "../styles/cards.scss";
 import "../styles/declare.scss";
-const FAKE_DECLARE = [
-    {
-        player: "A",
-        rank: "seven",
-        suit: "heart",
-    },
-    {
-        player: "A",
-        rank: "two",
-        suit: "heart",
-    },
-    {
-        player: "A",
-        rank: "three",
-        suit: "heart",
-    },
-    {
-        player: "A",
-        rank: "four",
-        suit: "heart",
-    },
-    {
-        player: "A",
-        rank: "five",
-        suit: "heart",
-    },
-    {
-        player: "A",
-        rank: "six",
-        suit: "heart",
-    },
-]
+
 class Declare extends Component {
     constructor(props){
         super(props);
         this.state = {
-            guess: FAKE_DECLARE,
+            guess: [],
             showInput: false,
             invalid: false,
         };
@@ -79,7 +48,7 @@ class Declare extends Component {
         for (let i = 0; i< 6; i++) {
             guess.push({player: "", rank: "", suit: ""});
         }
-        this.setState({guess: FAKE_DECLARE});
+        this.setState({guess});
     }
 
     render() {

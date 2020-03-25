@@ -63,7 +63,7 @@ class Ask extends Component {
                         >Ask</button>)}
 
                 {this.state.invalid && 
-                    <span className="warning">("You do not have a card in this half suit")</span>
+                    <span className="warning">Invalid Ask</span>
                 }
             </div>
 

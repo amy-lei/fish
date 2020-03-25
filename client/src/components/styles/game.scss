@@ -132,14 +132,25 @@
     padding: 1.5em 0 0 6em;
     width: 65%;
 }
-
-.chat-label {
+.sidebar-label {
     border-bottom: 1px solid #808080;
-    color: #D68033;
-    font-family: 'Secular One', sans-serif;
     font-size: 24px;
     margin: 0 30px 10px 30px;
     height: 7.5%;
+}
+
+.chat-label {
+    color: #D68033;
+    font-family: 'Secular One', sans-serif;
+    font-size: 24px;
+    // margin: 0 30px 10px 30px;
+    height: 7.5%;
+}
+.sidebar-label{
+    cursor: pointer;
+    &:hover {
+        color: $primary;
+    }
 }
 
 .friends-label {
@@ -186,6 +197,7 @@
     padding: 0.25em 1em;
     width: 60%;
     text-align: center;
+    // min-height: 30px;
 }
 
 .circle {
@@ -197,6 +209,7 @@
     padding: 20px 0 0 13px;
     height: 70px;
     width: 70px;
+    border: 4px solid rgba(0,0,0,0);
 }
 
 .ready {
