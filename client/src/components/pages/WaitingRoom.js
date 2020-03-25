@@ -6,11 +6,21 @@ import Chat from "./Chat.js";
 import "../styles/game.scss";
 import "../styles/cards.scss";
 
+
+
 class WaitingRoom extends Component {
     constructor(props) {
         super(props);
+        const fakePlayers = [
+          {name:this.props.name, index: 0, ready: true, active: true},
+          {name:"CRYSTAL", index: 1, ready: false, active: true},
+          {name:"AMY", index: 2, ready: false, active: true},
+          {name:"IVY", index: 3, ready: false, active: true},
+          {name:"HUI MIN", index: 4, ready: true, active: true},
+          {name:"HANS", index: 5, ready: true, active: true}
+        ];
         this.state = {
-            players: this.props.isCreator ? [{name:this.props.name, index: 0, ready: true, active: true}] : this.props.roomInfo.players,
+            players: this.props.isCreator ? fakePlayers : this.props.roomInfo.players,
             index: this.props.index,
         };
     };
@@ -114,7 +124,10 @@ class WaitingRoom extends Component {
                     <div className={"players-container"}>
                         {this.state.players.map((player, k) => (
                             <div key={k} className={"player"}>
-                                {/*<div className={"circle"}/> force width and height to be the same border if ready    */}
+                                {/* force width and height to be the same border if ready    */}
+                                <div className={`circle ${player.index % 2 === 0 ? 'team-even' : 'team-odd'} ${player.ready && 'ready'}`}>
+                                    {player.name === this.props.name && "YOU"}
+                                </div>
                                 <div className={"waiting-player-name"}>{player.name}</div>
                             </div>
                         ))}
