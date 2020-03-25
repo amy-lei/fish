@@ -5,6 +5,7 @@ import { post } from "../../utilities";
 
 import "../styles/game.scss";
 import "../styles/cards.scss";
+import "../styles/declare.scss";
 
 class Declare extends Component {
     constructor(props){
@@ -81,20 +82,29 @@ class Declare extends Component {
         }
 
         const confirmation = (
-            <div className="popup">
-                Are you certain? 
-                You cannot back out in the middle of a declare.
-                This will pause the game.
-                <button onClick={this.declaring}>Yes</button>
-                <button onClick={this.props.reset}>No</button>
-            </div>
+            <>
+                <button
+                    className="close-btn"
+                    onClick={this.props.reset}
+                >
+                    X
+                </button>
+                <div className="declare-confirm">
+                    Are you certain? 
+                    You cannot back out in the middle of a declare.
+                    This will pause the game.
+                </div>
+                <div className="declare-btns">
+                    <button className="btn primary-btn"onClick={this.declaring}>Yes</button>
+                </div>
+            </>
             );
         console.log('showinp', this.state.showInput);
         return(            
             <div className="popup">
-                {!this.state.showInput ? confirmation : inputs}
+                {!this.state.showInput ? confirmation : <div className="declare-inputs">{inputs}</div>}
                 {this.state.showInput && 
-                    <button onClick={this.confirm}>
+                    <button className="btn primary-btn" onClick={this.confirm}>
                         Declare
                     </button>}
                 {this.state.invalid && "invalid declare!!!"}

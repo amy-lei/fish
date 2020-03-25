@@ -14,7 +14,6 @@ import "../styles/game.scss";
 import "../styles/cards.scss";
 
 const WIN = 1;
-
 class Game extends Component {
     constructor(props) {
         super(props);

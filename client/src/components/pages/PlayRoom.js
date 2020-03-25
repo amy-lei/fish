@@ -12,9 +12,11 @@ import { card_svgs } from "../card_svgs.js";
 import "../styles/game.scss";
 import "../styles/App.scss";
 import "../styles/cards.scss";
-import "../styles/playroom.scss"
+import "../styles/playroom.scss";
+import "../styles/base.scss";
 
-const PARITY_TO_TEAM = { "even": "BLUE", "odd": "RED" }
+const PARITY_TO_TEAM = { "even": "BLUE", "odd": "RED" };
+
 class GameStats extends Component {
     constructor(props){
         super(props);
@@ -78,8 +80,8 @@ class GameHistory extends Component {
         const history = this.props.history.map(move => {
             if (move.type === "ask")
                 return (
-                    <div className="message history_move">
-                        <div className="sender history_move-who">
+                    <div className={`message history_move ${this.props.all?"left":""}`}>
+                        <div className={`sender history_move-who ${this.props.all ? "more-space": ""}`}>
                             {move.asker.name} asked 
                         </div>
                         <div className="content history_move-what">
@@ -89,10 +91,11 @@ class GameHistory extends Component {
                 );
             else {
                 const result = move.success ? "did" : "did not";
+                console.log(move);
                 return (
                     <>
-                        <div className="message history_move">
-                            <div className="sender history_move-who">
+                        <div className={`message history_move ${this.props.all?"left":""}`}>
+                            <div className={`sender history_move-who ${this.props.all ? "more-space": ""}`}>
                                 {move.responder.name} said
                             </div>
                             <div className="content history_move-what">
@@ -227,7 +230,7 @@ class PlayRoom extends Component {
                                 minVotes={this.props.yourTeam.length + this.props.otherTeam.length - 1}
                             />}
                         {
-                            this.props.whoseTurn === this.props.name ?
+                            this.props.whoseTurn === this.props.name && !this.state.declaring ?
                                 this.props.turnType === "ask" ?
                                     (<><button
                                         className="btn ask-btn"
@@ -252,30 +255,33 @@ class PlayRoom extends Component {
                                     {!this.state.declaring && this.state.responding && 
                                     <Respond
                                         submitResponse={this.props.submitResponse}
-                                        asker={this.props.asker}
+                                        asker={asker}
                                         reset={()=> this.setState({responding: false})}
                                     />}</>)
                                 : ""
                         }
                         </>)
-                        : (<span>Game Over! {`Team ${this.state.winner} won!`}</span>) }
-                        <div className={`overlay ${this.state.showDeclare || this.state.asking || this.state.responding ? "hidden" : ""}`}></div>
+                        : (<div className="game-over">Game Over! {`Team ${this.state.winner} won!`}</div>) }
+                        <div className={`overlay ${this.state.showDeclare || this.state.asking || this.state.responding ? "" : "hidden"}`}></div>
                 </div>
                 <div className="container">
                     <div className={"sidebar-container"}>
-                        <span
-                            className={this.state.sidebar === "chat" ? "active-sidebar" : "inactive-sidebar"}
-                            onClick={() => this.changeSidebar("chat")}
-                        >
-                            Chat Room
-                        </span>
-                        <span className={"divider"}>|</span>
-                        <span
-                            className={this.state.sidebar === "ask" ? "active-sidebar" : "inactive-sidebar"}
-                            onClick={() => this.changeSidebar("ask")}
-                        >
-                            Ask History
-                        </span>
+                        <div className="sidebar-label">
+                            <span
+                                className={`chat-label side-label ${this.state.sidebar === "chat" ? "active-sidebar" : "inactive-sidebar"}`}
+                                onClick={() => this.changeSidebar("chat")}
+                            >
+                                Chat Room
+                            </span>
+                            <span className={"divider"}>|</span>
+                            <span
+                                className={`ask-label side-label ${this.state.sidebar === "ask" ? "active-sidebar" : "inactive-sidebar"}`}
+                                onClick={() => this.changeSidebar("ask")}
+                            >
+                                Ask History
+                            </span>
+                        </div>
+
                         {
                             this.state.sidebar === "chat" ?
                                 <Chat name={this.props.name} roomKey={this.props.roomKey}/>
@@ -285,8 +291,8 @@ class PlayRoom extends Component {
                                     all={true}
                                 />
                         }
+                        
                     </div>
-
                     <div className="playroom-container">                            
                         {this.props.history &&
                             <GameHistory

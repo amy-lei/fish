@@ -53,6 +53,31 @@ class Chat extends Component {
         allMessages: this.state.allMessages.concat(readyMessage),
       });
     });
+
+    socket.on("ask", update => {
+      const turnUpdate = {
+        sender_name: "server",
+        content: `It is ${update.move.recipient}'s turn to respond`,
+      };
+      this.setState({
+        allMessages: this.state.allMessages.concat(turnUpdate),
+      });
+  });
+
+  // update turn and hand if successful
+  socket.on("respond", update => {
+      if (!update.move.success) {
+        const turnUpdate = {
+          sender_name: "server",
+          content: `It is ${update.move.responder.name}'s turn to ask.`,
+        };
+        this.setState({
+          allMessages: this.state.allMessages.concat(turnUpdate),
+        });
+      }
+
+  });
+
   }
 
   loadMessages = async () => {
@@ -98,7 +123,7 @@ class Chat extends Component {
         }
         return (
           <div className="message" key={k}>
-            <div className={"sender"}>{mes.sender_name}</div>
+            <div className={"sender"}>{mes.sender_name !== this.props.name ? mes.sender_name : "YOU"}</div>
             <div className={"content"}>{mes.content}</div>
           </div>
         );

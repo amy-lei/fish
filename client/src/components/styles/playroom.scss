@@ -1,15 +1,8 @@
-@import url('https://fonts.googleapis.com/css?family=Secular+One|Source+Sans+Pro&display=swap');
-$team-blue: #9BD0BF;
-$team-red: #CA5164;
-$primary: #D68033;
-$out: #858585;
-$alert: #BC0202;
-* {
-    box-sizing: border-box;
-}
+@import "./base.scss";
+
 
 @mixin main-font {
-    font-size: 16px;
+    // font-size: 16px;
     font-family: 'Secular One', sans-serif;
 }
 @mixin second-font {
@@ -18,7 +11,7 @@ $alert: #BC0202;
 
 .playroom-container {
     width: 65%;
-    height: 80vh;
+    height: 100%;
     align-self: end;
     padding: 1rem;  
     display: flex;
@@ -27,30 +20,120 @@ $alert: #BC0202;
 }
 
 .header {
-    height: 20vh;
-    padding: 15px;
+    height: 10vh;
+    padding: 15px 10px 0 0;
     display: flex;
     width:100%;
     justify-content:flex-end;        
 
-    // .btn {
-    //     padding: 1rem 2rem;
-    //     margin-left: 0.5rem;
-    //     border-radius: 3rem;
-    //     background-color: none;
-    //     @include main-font();
-    // }
-
-    // .declare-btn{
-    //     color: $primary;
-    //     border-color: $primary;
-    // }
+    .declare-btn{
+        @include inverted-btn($primary);
+    }
     
-    // .ask-btn{
-    //     color: white;
-    //     background-color: $alert;
-    //     border-color: $alert;
-    // }
+    .respond-btn,
+    .ask-btn{
+        @include main-btn($alert);
+        margin-left: 15px;
+    }
+
+}
+
+.popup {
+    position: absolute;
+    top: 50vh;
+    left: 50vw;
+    height: 350px;
+    width: 550px;
+    margin-top: -175px;
+    margin-left: -275px;
+    background: white;
+    z-index: 1000;
+    border-radius: 1rem;
+    padding: 30px 20px;
+
+    display:flex;
+    flex-direction: column;
+    justify-content: space-between;
+    .close-btn {
+        position: absolute;
+        right:0;
+        top:0;
+        border: none;
+        background: none;
+        font-size: 25px;
+        font-weight: 300;
+        cursor: pointer;
+        padding: 20px;
+        &:hover {
+            color: $primary;
+        }
+    }
+    
+    .guess-input_field {
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        appearance: none;       /* Remove default arrow */
+        // background-image: url(...);   /* Add custom arrow */
+        background-color: white;
+        // font-size: 12px;
+        cursor: pointer;
+        @include second-font();
+
+    }
+
+    .guess-input {
+        width: 100%;
+        display: flex;  
+        justify-content: center;         
+        
+        .guess-input_q {
+            display: flex;
+            justify-content: center;
+            margin-top: 10px;
+            padding: 0 5px;
+            width: 30%;
+
+            .guess-input_field {
+                width: 70%;
+                padding: 0 0 0 20px;
+                text-align: center;
+            }
+        
+            .guess-input_label {
+                @include main-font();
+                text-align: center;
+                padding: 0 10px 5px 0;
+            }
+        }
+    }
+    
+
+    .guess-input-stack {
+        flex-direction: column;
+        .guess-input_q {
+            width: 100%;
+            padding: 10px 0;
+            .guess-input_field {
+                padding: 10px 0 10px 20px;
+            }
+            .guess-input_label {
+                padding: 10px 10px 10px 0;
+            }
+        }
+    }
+
+}
+.primary-btn {
+    @include main-btn($primary);
+}
+.overlay {
+    position: absolute;
+    top:0;
+    left:0;
+    height:100vh;
+    width:100vw;
+    background: rgba(0,0,0,0.1);
+    z-index: 999;
 }
 .stats {
     width: 100%;
@@ -87,31 +170,47 @@ $alert: #BC0202;
 .history {
     display: flex;
     flex-direction: column;
-    justify-content: center;
+    justify-content: flex-start;
     align-content: center;
     margin-bottom: 2rem;
-    min-height: 20%;
+    min-height: 10%;
+    padding: 10px 20px;
     .history_move {
         justify-content: center;
         margin: 0 0 0.5rem 0;
+
+        &:not(:first-child) {
+            margin: 0 0 1rem 0;
+        }
     
         .history_move-what{
             min-height: 25px;
             border-radius: 25px;
-            padding: 0.75rem 2rem;
+            padding: 0.75rem 1.5rem;
         }
     
         .history_move-who {
             min-width: 25px;
-            padding: 0.75rem 0;
-            width: 10%;
+            padding: 0.75rem 0.25rem;
+            width: 15%;
         }
     }
+    .left {
+        justify-content: flex-start;
+    }
+    .history_move-result {
+        padding: 0.5rem 0 .5rem 0;
+    }
+}
 
+.more-space {
+    width: 20% !important;
 }
 
 .sidebar-container {
     width: 35%;
+    height: 100%;
+    padding: 0 0 0 10px;
 }
 
 .playroom-container {
@@ -121,18 +220,31 @@ $alert: #BC0202;
 .active-sidebar {
     color: #D68033;
     font-family: 'Secular One', sans-serif;
-    font-size: 18px;
+    font-size: 24px;
+    transition: color 0.25s;
+
 }
 
 .inactive-sidebar {
     color: black;
     font-family: 'Secular One', sans-serif;
-    font-size: 18px;
+    font-size: 24px;
+    transition: color 0.25s;
+
+    &:hover {
+        color: $primary;
+    }
 }
 
 .divider {
     color: black;
     font-family: "Source Sans Pro", sans-serif;
-    font-size: 18px;
-    margin: 0 5px;
+    font-size: 24px;
+    margin: 0 10px;
+}
+.game-over{
+    width: 100%;
+    text-align: center;
+    @include main-font();
+    
 }
