@@ -1,0 +1,22 @@
+@import "./playroom.scss";
+
+.respond {
+    padding: 20px 30px; 
+    margin-top:20px;
+    .respond-label {
+        @include main-font();
+    }
+    .respond-input {
+        width: 100%;
+        border-width: 1px;
+        border-color: #BFBFBF;
+        border-style: solid;
+        // border-radius: 30px;
+        min-height: 5em;
+        @include second-font();
+        font-size: 16px;
+        padding: 10px 30px;
+        text-decoration: none;
+        margin-top:5px;
+    }
+}

@@ -1,0 +1,75 @@
+$team-blue: #9BD0BF;
+$team-red: #CA5164;
+$primary: #D68033;
+$out: #858585;
+$alert: #BC0202;
+$team-blue: #9BD0BF;
+$team-red: #CA5164;
+$primary: #D68033;
+$out: #858585;
+$alert: #BC0202;
+$accept: #50A385;
+$object: #BF150B;
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    transition: opacity 0.2s;
+    &:focus {
+        outline:none;
+    }
+}
+
+@mixin btn {
+    padding: 15px 30px;
+    border-radius: 3rem;
+    background-color: none;
+    font-family: 'Secular One', sans-serif;
+    font-size: 14px;
+    cursor: pointer,
+}
+
+@mixin main-btn($color) {
+    @include btn;
+    background-color: $color;
+    border-color: $color;
+    color: white;
+    transition: 0.25s;
+
+    &:hover{
+        color: $color;
+        border-color: $color;
+        background-color: white;
+    }
+
+    &:focus{
+        box-shadow: 0 0 5px $color,
+    }
+    
+}
+
+@mixin inverted-btn($color) {
+    @include btn;
+    color: $color;
+    border-color: $color;
+    background-color: white;
+    transition: 0.25s;
+
+
+    &:hover{
+        background-color: $color;
+        border-color: $color;
+        color: white;
+    }
+
+    &:focus{
+        box-shadow: 0 0 5px $color,
+    }
+}
+
+input {
+    &:focus{
+        box-shadow: 0 0 5px $primary,
+    }
+}

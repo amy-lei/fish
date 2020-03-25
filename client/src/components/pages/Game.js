@@ -13,8 +13,41 @@ import { card_svgs } from "../card_svgs.js";
 import "../styles/game.scss";
 import "../styles/cards.scss";
 
-const WIN = 5;
-
+const WIN = 1;
+const FAKE_HISTORY = [
+    {
+        type: "ask",
+        asker:  {name: "A2", index: 1},
+        recipient: {name: "A3", index: 2},
+        rank: "ace",
+        suit: "diamond",
+      },
+      {
+        type: "respond",
+        responder: {name: "A2", index: 1},
+        asker: {name: "A3", index: 2},
+        response: ":(((((((((( rip",
+        success: true,
+        rank: "ace",
+        suit: "diamond",
+      },
+    {
+        type: "ask",
+        asker:  {name: "A2", index: 1},
+        recipient: {name: "A3", index: 2},
+        rank: "king",
+        suit: "diamond",
+      },
+      {
+        type: "respond",
+        responder:  {name: "A2", index: 1},
+        asker:  {name: "A3", index: 2},
+        response: ":)))))))))))) no",
+        success: false,
+        rank: "king",
+        suit: "diamond",
+      },
+];
 class Game extends Component {
     constructor(props) {
         super(props);
@@ -27,9 +60,9 @@ class Game extends Component {
             hand: null,
             yourTeam: null,
             otherTeam: null,
-            turnType: "ask",
-            history: [],
-            whoseTurn: "",
+            turnType: "respond",
+            history: FAKE_HISTORY,
+            whoseTurn: "A2",
             yourTeamScore: 0,
             otherTeamScore: 0,
         };
@@ -162,11 +195,13 @@ class Game extends Component {
                 if (update.move.responder.name === this.state.name) {
                     let hand = this.state.hand.filter(card => 
                         !(card.rank === update.move.rank && card.suit === update.move.suit)); 
+                    this.setState({hand});
+                    this.checkIfActive(hand);
                 } else if (update.move.asker.name === this.state.name) {
                     let hand = this.state.hand.concat({rank:update.move.rank, suit: update.move.suit})
+                    this.setState({hand});
+                    this.checkIfActive(hand);
                 }
-                this.setState({hand});
-                this.checkIfActive(hand);
             }
             // update history
             this.setState({
@@ -243,12 +278,6 @@ class Game extends Component {
                 {this.state.page === "play_room"
                     && (
                     <>
-                        Game History: <br/>
-                        {history}<br/>
-                        {this.state.index % 2 === 0 ? (
-                            <>Team Even (YOU): {this.state.yourTeamScore} Team Odd: {this.state.otherTeamScore}</>
-                        ) : (<>Team Even:{this.state.otherTeamScore} Team Odd (YOU): {this.state.yourTeamScore}</>)}
-                        <br/>
                         <PlayRoom
                             roomKey={this.state.key}
                             name={this.state.name}
@@ -264,6 +293,8 @@ class Game extends Component {
                             updateScore={this.updateScore}
                             updateHand={this.updateHand}
                             checkIfActive={this.checkIfActive}
+                            yourTeamScore={this.state.yourTeamScore}
+                            otherTeamScore={this.state.otherTeamScore}
                         />
                     </>)}
             </div>

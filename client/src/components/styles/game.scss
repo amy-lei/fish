@@ -1,43 +1,34 @@
 @import './App.scss';
+@import './base.scss';
 
 .hidden {
     display:none;
 }
 
-.popup{
-    border: 1px solid black;
-}
-
 // For Game.js
 .game-container{
-    margin: 1em 1em;
+    width: 100vw;
+    height: 100vh;
 }
 
 // For Home.js
 .home-container {
     text-align: center;
-    padding-top: 50px;
+    padding-top: 15vh;
 }
 
 //focus go away border
 .home-button {
-    background-color: #D68033;
-    border: none;
-    border-radius: 60px;
-    color: white;
-    font-family: 'Secular One', sans-serif;
+    @include main-btn($primary);
     width: 12em;
     padding: 15px 32px;
     margin-bottom: 20px;
-    text-align: center;
-    text-decoration: none;
-    display: inline-block;
-    font-size: 20px;
+    font-size: 18px;
 }
 
 .title {
     font-family: 'Secular One', sans-serif;
-    font-size: 12em;
+    font-size: 150px;
 }
 
 .room-key-wrapper {
@@ -68,6 +59,8 @@
 }
 
 .room-key-submit {
+    @include inverted-btn($primary);
+    display:inline;
     background-color: #FFF;
     border: solid 1px #D68033;
     border-radius: 0 50px 50px 0;
@@ -92,7 +85,7 @@
 .nameform-container {
     margin: 0 auto;
     text-align: left;
-    padding-top: 20em;
+    padding-top: 35vh;
     width: 30%;
 }
 
@@ -117,31 +110,26 @@
 }
 
 .name-submit {
-    background-color: #D68033;
-    border: none;
-    border-radius: 60px;
-    color: white;
-    font-family: 'Secular One', sans-serif;
-    width: 9em;
-    padding: 15px 32px;
-    text-decoration: none;
-    display: inline-block;
+    @include main-btn($primary);
+    margin-top: 20px;
     font-size: 20px;
 }
 
 // For WaitingRoom.js
-
+.container,
 .waiting-container {
     display: flex;
-    padding: 60px 50px 0;
+    height: 90vh;
 }
 
 .chat-container {
     width: 35%;
+    height: 100%;
+    padding: 0 0 0 10px;
 }
 
 .waiting-key-container {
-    padding: 2em 0 0 6em;
+    padding: 1.5em 0 0 6em;
     width: 65%;
 }
 
@@ -150,32 +138,28 @@
     color: #D68033;
     font-family: 'Secular One', sans-serif;
     font-size: 24px;
-    padding-bottom: 10px;
+    margin: 0 30px 10px 30px;
+    height: 7.5%;
 }
 
 .friends-label {
     font-family: 'Secular One', sans-serif;
-    font-size: 20px;
+    font-size: 18px;
 
 }
 
 .waiting-key {
     font-family: 'Secular One', sans-serif;
     font-size: 100px;
+    line-height: 100%;
 
 }
 
 .waiting-button {
-    background-color: #D68033;
-    border: none;
-    border-radius: 60px;
-    color: white;
-    font-family: 'Secular One', sans-serif;
+    @include main-btn($primary);
     width: 12em;
     padding: 15px 32px;
-    margin-top: -1em;
-    text-decoration: none;
-    display: inline-block;
+    margin-top: 1em;
     font-size: 20px;
 }
 
@@ -199,8 +183,8 @@
     background-color: #F3F3F3;
     font-family: 'Secular One', sans-serif;
     font-size: 17px;
-    padding:0.5em 1em;
-    width: 40%;
+    padding: 0.25em 1em;
+    width: 60%;
     text-align: center;
 }
 
@@ -209,10 +193,10 @@
     color: #FFF;
     font-family: 'Secular One', sans-serif;
     font-size: 18px;
-    height: 50px;
     margin-bottom: 1em;
-    padding: 25px 5px 0 20px;
-    width: 50px;
+    padding: 20px 0 0 13px;
+    height: 70px;
+    width: 70px;
 }
 
 .ready {
@@ -229,5 +213,6 @@
 
 .placeholder {
     background-color: #C4C4C4;
+    font-size: 40px;
 }
 

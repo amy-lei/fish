@@ -1,0 +1,200 @@
+@import "./base.scss";
+
+
+@mixin main-font {
+    // font-size: 16px;
+    font-family: 'Secular One', sans-serif;
+}
+@mixin second-font {
+    font-family: 'Source Sans Pro', sans-serif;
+}
+
+.playroom-container {
+    width: 65%;
+    height: 100%;
+    align-self: end;
+    padding: 1rem;  
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;  
+}
+
+.header {
+    height: 10vh;
+    padding: 15px 10px 0 0;
+    display: flex;
+    width:100%;
+    justify-content:flex-end;        
+
+    .declare-btn{
+        @include inverted-btn($primary);
+    }
+    
+    .respond-btn,
+    .ask-btn{
+        @include main-btn($alert);
+        margin-left: 15px;
+    }
+
+}
+
+.popup {
+    position: absolute;
+    top: 50vh;
+    left: 50vw;
+    height: 350px;
+    width: 550px;
+    margin-top: -175px;
+    margin-left: -275px;
+    background: white;
+    z-index: 1000;
+    border-radius: 1rem;
+    padding: 30px 20px;
+
+    display:flex;
+    flex-direction: column;
+    justify-content: space-between;
+    .close-btn {
+        position: absolute;
+        right:0;
+        top:0;
+        border: none;
+        background: none;
+        font-size: 25px;
+        font-weight: 300;
+        cursor: pointer;
+        padding: 20px;
+        &:hover {
+            color: $primary;
+        }
+    }
+    
+    .guess-input_field {
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        appearance: none;       /* Remove default arrow */
+        // background-image: url(...);   /* Add custom arrow */
+        background-color: white;
+        // font-size: 12px;
+        cursor: pointer;
+        @include second-font();
+
+    }
+
+    .guess-input {
+        width: 100%;
+        display: flex;  
+        justify-content: center;         
+        
+        .guess-input_q {
+            display: flex;
+            justify-content: center;
+            margin-top: 10px;
+            padding: 0 5px;
+            width: 30%;
+
+            .guess-input_field {
+                width: 70%;
+                padding: 0 0 0 20px;
+                text-align: center;
+            }
+        
+            .guess-input_label {
+                @include main-font();
+                text-align: center;
+                padding: 0 10px 5px 0;
+            }
+        }
+    }
+    
+
+    .guess-input-stack {
+        flex-direction: column;
+        .guess-input_q {
+            width: 100%;
+            padding: 10px 0;
+            .guess-input_field {
+                padding: 10px 0 10px 20px;
+            }
+            .guess-input_label {
+                padding: 10px 10px 10px 0;
+            }
+        }
+    }
+
+}
+.primary-btn {
+    @include main-btn($primary);
+}
+.overlay {
+    position: absolute;
+    top:0;
+    left:0;
+    height:100vh;
+    width:100vw;
+    background: rgba(0,0,0,0.1)
+}
+.stats {
+    width: 100%;
+    margin: 2.5rem 0;
+    .stats_team-name,
+    .stats_players {
+        display: flex;
+        justify-content: space-between;
+    }
+    .stats_team-name {
+        margin-bottom: .75rem;
+        @include second-font();
+    }
+    .stats_players {
+        @include main-font();        
+        .stats_player {
+            width: 15.5%;
+            text-align: center;
+            color:white;
+            padding: 0.2rem 0;
+        
+        }
+        .team-even {
+            background-color: $team-blue;
+        }
+        .team-odd {
+            background-color: $team-red;
+        }
+        .out {
+            background-color: $out;
+        }
+    }
+}
+.history {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-content: center;
+    margin-bottom: 2rem;
+    min-height: 10%;
+    .history_move {
+        justify-content: center;
+        margin: 0 0 0.5rem 0;
+    
+        .history_move-what{
+            min-height: 25px;
+            border-radius: 25px;
+            padding: 0.75rem 2rem;
+        }
+    
+        .history_move-who {
+            min-width: 25px;
+            padding: 0.75rem 0;
+            width: 10%;
+        }
+    }
+
+}
+
+.game-over{
+    width: 100%;
+    text-align: center;
+    @include main-font();
+    
+}

@@ -5,6 +5,13 @@ import Chat from "./Chat.js";
 
 import "../styles/game.scss";
 import "../styles/cards.scss";
+const FAKE_PP = [
+    {name: "A2", active: true, ready: true, index: 1},
+    {name: "A3", active: true, ready: true, index: 2},
+    {name: "A4", active: false, ready: true, index: 3},
+    {name: "A5", active: true, ready: true, index: 4},
+    {name: "A6", active: false, ready: true, index: 5},
+];
 
 
 
@@ -12,7 +19,8 @@ class WaitingRoom extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            players: this.props.isCreator ? {name:this.props.name, index: 0, ready: true, active: true} : this.props.roomInfo.players,
+            // players: this.props.isCreator ? {name:this.props.name, index: 0, ready: true, active: true} : this.props.roomInfo.players,
+            players: this.props.isCreator ? [{name:this.props.name, index: 0, ready: true, active: true}].concat(FAKE_PP) : FAKE_PP,
             index: this.props.index,
         };
     };
@@ -91,6 +99,8 @@ class WaitingRoom extends Component {
         ));
         console.log(placeholderPlayers);
         return (
+        <>
+            <div className="header"></div>
             <div className={"waiting-container"}>
                 <div className={"chat-container"}>
                     <div className={"chat-label"}>Chat Room</div>
@@ -136,6 +146,7 @@ class WaitingRoom extends Component {
 
                 </div>
             </div>
+        </>
         )
     }
 }
