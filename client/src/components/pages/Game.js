@@ -13,7 +13,7 @@ import { card_svgs } from "../card_svgs.js";
 import "../styles/game.scss";
 import "../styles/cards.scss";
 
-const WIN = 1;
+const WIN = 1; // FIX WHEN LAUNCH!!!
 class Game extends Component {
     constructor(props) {
         super(props);
