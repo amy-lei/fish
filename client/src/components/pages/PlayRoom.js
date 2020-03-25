@@ -254,7 +254,7 @@ class PlayRoom extends Component {
                         }
                         </>)
                         : (<span>Game Over! {`Team ${this.state.winner} won!`}</span>) }
-                        <div className={`overlay ${this.state.showDeclare || this.state.asking || this.state.responding ? "hidden" : ""}`}></div>
+                        <div className={`overlay ${this.state.showDeclare || this.state.asking || this.state.responding ? "" : "hidden"}`}></div>
                 </div>
                 <div className="container">
                     <Chat name={this.props.name} roomKey={this.props.roomKey}/>

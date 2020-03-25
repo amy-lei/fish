@@ -4,10 +4,6 @@
     display:none;
 }
 
-.popup{
-    border: 1px solid black;
-}
-
 // For Game.js
 .game-container{
     margin: 1em 1em;
@@ -153,4 +149,5 @@
 
 .container {
     display: flex;
+    height: 90vh;
 }

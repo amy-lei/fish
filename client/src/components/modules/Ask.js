@@ -47,6 +47,7 @@ class Ask extends Component {
                     updateRank={(val) => this.setState({rank: val})}
                     updateSuit={(val) => this.setState({suit: val})}
                     validate={() => true}
+                    column={true}
                 />
                 {this.state.recipient && this.state.rank && this.state.suit &&
                     (<button onClick={this.ask}>Ask</button>)}
