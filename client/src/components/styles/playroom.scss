@@ -1,0 +1,113 @@
+@import url('https://fonts.googleapis.com/css?family=Secular+One|Source+Sans+Pro&display=swap');
+$team-blue: #9BD0BF;
+$team-red: #CA5164;
+$primary: #D68033;
+$out: #858585;
+$alert: #BC0202;
+* {
+    box-sizing: border-box;
+}
+
+@mixin main-font {
+    font-size: 16px;
+    font-family: 'Secular One', sans-serif;
+}
+@mixin second-font {
+    font-family: 'Source Sans Pro', sans-serif;
+}
+
+.playroom-container {
+    width: 65%;
+    height: 80vh;
+    align-self: end;
+    padding: 1rem;  
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;  
+}
+
+.header {
+    height: 20vh;
+    padding: 15px;
+    display: flex;
+    width:100%;
+    justify-content:flex-end;        
+
+    // .btn {
+    //     padding: 1rem 2rem;
+    //     margin-left: 0.5rem;
+    //     border-radius: 3rem;
+    //     background-color: none;
+    //     @include main-font();
+    // }
+
+    // .declare-btn{
+    //     color: $primary;
+    //     border-color: $primary;
+    // }
+    
+    // .ask-btn{
+    //     color: white;
+    //     background-color: $alert;
+    //     border-color: $alert;
+    // }
+}
+.stats {
+    width: 100%;
+    margin: 2.5rem 0;
+    .stats_team-name,
+    .stats_players {
+        display: flex;
+        justify-content: space-between;
+    }
+    .stats_team-name {
+        margin-bottom: .75rem;
+        @include second-font();
+    }
+    .stats_players {
+        @include main-font();        
+        .stats_player {
+            width: 15.5%;
+            text-align: center;
+            color:white;
+            padding: 0.2rem 0;
+        
+        }
+        .team-even {
+            background-color: $team-blue;
+        }
+        .team-odd {
+            background-color: $team-red;
+        }
+        .out {
+            background-color: $out;
+        }
+    }
+}
+.history {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-content: center;
+    margin-bottom: 2rem;
+    min-height: 20%;
+    .history_move {
+        justify-content: center;
+        margin: 0 0 0.5rem 0;
+    
+        .history_move-what{
+            min-height: 25px;
+            border-radius: 25px;
+            padding: 0.75rem 2rem;
+        }
+    
+        .history_move-who {
+            min-width: 25px;
+            padding: 0.75rem 0;
+            width: 10%;
+        }
+    }
+
+}
+
+

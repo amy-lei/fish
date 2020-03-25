@@ -245,12 +245,6 @@ class Game extends Component {
                 {this.state.page === "play_room"
                     && (
                     <>
-                        Game History: <br/>
-                        {history}<br/>
-                        {this.state.index % 2 === 0 ? (
-                            <>Team Even (YOU): {this.state.yourTeamScore} Team Odd: {this.state.otherTeamScore}</>
-                        ) : (<>Team Even:{this.state.otherTeamScore} Team Odd (YOU): {this.state.yourTeamScore}</>)}
-                        <br/>
                         <PlayRoom
                             roomKey={this.state.key}
                             name={this.state.name}

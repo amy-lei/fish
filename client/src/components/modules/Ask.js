@@ -46,12 +46,14 @@ class Ask extends Component {
                     updateWho={(val) => this.setState({recipient: val})}
                     updateRank={(val) => this.setState({rank: val})}
                     updateSuit={(val) => this.setState({suit: val})}
-                    validate={() => false}
+                    validate={() => true}
                 />
                 {this.state.recipient && this.state.rank && this.state.suit &&
                     (<button onClick={this.ask}>Ask</button>)}
 
-                {this.state.invalid && "You do not have a card in this half suit"}
+                {this.state.invalid && 
+                    <span className="warning">("You do not have a card in this half suit")</span>
+                }
             </div>
 
         );

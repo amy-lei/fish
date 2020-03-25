@@ -10,7 +10,7 @@ class GuessInput extends Component {
     
     render() {
         return (
-            <div className={`guess-input`}>
+            <div className={`guess-input ${this.props.column ? "guess-input-stack" : ""}`}>
                 Who
                 <select 
                     value={this.props.who} 

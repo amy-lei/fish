@@ -1,13 +1,7 @@
-.test-card {
-    border: 1px solid black;
-    border-radius: 1rem;
-    padding: 1em;
-}
-
 .cards {
     display: flex;
     flex-wrap: wrap;
-    width: 70%;
+    width: 100%;
 }
 .card{
     transition: 0.5s;

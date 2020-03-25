@@ -4,6 +4,7 @@ import { get, post } from "../../utilities";
 import { socket } from "../../client-socket.js";
 
 import "../styles/Chat.scss";
+import "../styles/App.scss";
 
 class Chat extends Component {
   constructor(props) {
@@ -105,19 +106,19 @@ class Chat extends Component {
     }
 
     return (
-      <div>
-        <div className={"message-container"}>
+      <div className="chat">
+        <div className="message-container">
           {messages}
         </div>
-        <div className={"chat-input-wrapper"}>
+        <div className="chat-input-wrapper">
           <input
             type="text"
             value={this.state.curMessage}
             onChange={this.handleOnChange}
-            className={"chat-input"}
-            placeholder={"Send a message"}
+            className="chat-input"
+            placeholder="Send a message"
           />
-          <button onClick={this.sendMessage} className={"chat-submit"}>
+          <button onClick={this.sendMessage} className="btn chat-submit">
             >
           </button>
         </div>

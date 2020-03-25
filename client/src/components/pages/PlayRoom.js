@@ -10,6 +10,7 @@ import DecResponse from "../modules/DecResponse.js";
 import { card_svgs } from "../card_svgs.js";
 
 import "../styles/game.scss";
+import "../styles/App.scss";
 import "../styles/cards.scss";
 import "../styles/playroom.scss"
 
@@ -34,9 +35,8 @@ class GameStats extends Component {
 
         if (team) {
             return team.map(player => {
-                console.log("active", player.active);
                 return(
-                <div className={`team-${parity} ${player.active ? "" : "out"}`}>
+                <div className={`stats_player team-${parity} ${player.active ? "" : "out"}`}>
                     {player.name} {player.active ? "": " (OUT)"}
                 </div>
             )});
@@ -63,6 +63,58 @@ class GameStats extends Component {
         </div>
         
         )
+    }
+}
+
+class GameHistory extends Component {
+    constructor(props){
+        super(props);
+        this.state = {
+
+        };
+    }
+
+    render() {
+        const history = this.props.history.map(move => {
+            if (move.type === "ask")
+                return (
+                    <div className="message history_move">
+                        <div className="sender history_move-who">
+                            {move.asker.name} asked 
+                        </div>
+                        <div className="content history_move-what">
+                            {move.recipient} do you have the {move.rank} {move.suit}?
+                        </div>
+                    </div>
+                );
+            else {
+                const result = move.success ? "did" : "did not";
+                return (
+                    <>
+                        <div className="message history_move">
+                            <div className="sender history_move-who">
+                                {move.responder.name} said
+                            </div>
+                            <div className="content history_move-what">
+                                {move.response}
+                            </div>
+                        </div>
+                        <div className="server-message history_move-result">
+                            {move.responder.name} {result} have the {move.rank} {move.suit}
+                        </div>
+                    </>
+                );
+            }
+        })
+        console.log(history);
+        console.log(this.props.history);
+        return (
+            <div className="history">
+                {this.props.all 
+                    ? history
+                    : history[history.length - 1]}
+            </div>
+        );
     }
 }
 
@@ -143,31 +195,13 @@ class PlayRoom extends Component {
         let asker;
         this.props.history.length !== 0 ? asker = this.props.history[this.props.history.length - 1].asker.name : asker = "";
 
-        const decBtn = (<button onClick={()=>this.setState({showDeclare: true})}>Declare</button>);
+        const decBtn = (<button className="btn declare-btn" onClick={()=>this.setState({showDeclare: true})}>Declare</button>);
 
         return (
-            <div>
-                <GameStats
-                    yourTeam={this.props.yourTeam}
-                    otherTeam={this.props.otherTeam}
-                    yourTeamScore={this.props.yourTeamScore}
-                    otherTeamScore={this.props.otherTeamScore}
-                    parity={this.props.index % 2 === 0 ? "even" : "odd"}
-                />
-                Your name: {this.props.name} <br/>
-                Player's {this.props.whoseTurn} turn. <br/>
-                Turn type: {this.props.turnType}. <br/>
-                Your teammates: {
-                    this.props.yourTeam.map((player) => 
-                    (<><span>{player.name}{player.active? "": "OUT"}</span><br/></>))
-                } <br/>
-                Opposing team: {
-                    this.props.otherTeam.map((player) => 
-                    (<span>{player.name}{player.active? "": "OUT"}</span>))
-                } <br/>
-                <div className="game">
-                    { this.state.ongoing ? 
-                    (<>{decBtn} 
+            <>
+                <div className="header">
+                { this.state.ongoing ? 
+                    (<>{this.state.declarer ? "": decBtn} 
                         { this.state.showDeclare && 
                             <Declare 
                                 name={this.props.name}
@@ -191,7 +225,7 @@ class PlayRoom extends Component {
                             this.props.whoseTurn === this.props.name ?
                                 this.props.turnType === "ask" ?
                                     (<><button
-                                        className="btn"
+                                        className="btn ask-btn"
                                         onClick={() => this.setState({asking: true})}
                                     >
                                         ASK!!!!
@@ -204,7 +238,12 @@ class PlayRoom extends Component {
                                         reset={()=>this.setState({asking:false})}
                                     />}
                                     </>)
-                                    : (<><button onClick={()=>this.setState({responding:true})}>Respond</button>
+                                    : (<><button 
+                                            className="btn respond-btn"
+                                            onClick={()=>this.setState({responding:true})}
+                                        >
+                                            Respond
+                                        </button>
                                     {!this.state.declaring && this.state.responding && 
                                     <Respond
                                         submitResponse={this.props.submitResponse}
@@ -215,10 +254,28 @@ class PlayRoom extends Component {
                         }
                         </>)
                         : (<span>Game Over! {`Team ${this.state.winner} won!`}</span>) }
-                        </div>
-                <div className="cards">{cards}</div>
-                <Chat name={this.props.name} roomKey={this.props.roomKey}/>
-            </div>
+                        <div className={`overlay ${this.state.showDeclare || this.state.asking || this.state.responding ? "hidden" : ""}`}></div>
+                </div>
+                <div className="container">
+                    <Chat name={this.props.name} roomKey={this.props.roomKey}/>
+                    <div className="playroom-container">                            
+                        {this.props.history &&
+                            <GameHistory
+                                history={this.props.history}
+                                all={false}
+                            />
+                        }
+                        <div className="cards">{cards}</div>
+                        <GameStats
+                            yourTeam={this.props.yourTeam}
+                            otherTeam={this.props.otherTeam}
+                            yourTeamScore={this.props.yourTeamScore}
+                            otherTeamScore={this.props.otherTeamScore}
+                            parity={this.props.index % 2 === 0 ? "even" : "odd"}
+                        />
+                    </div>
+                </div>
+            </>
         );
     }
 }

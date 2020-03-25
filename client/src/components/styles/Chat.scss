@@ -1,8 +1,11 @@
 // For Chat.js
+.chat {
+  width:35%;
+}
 
 .message-container {
   padding: 10px 0;
-  height: 60vh;
+  height: 80vh;
   overflow-y: auto;
 }
 
@@ -31,7 +34,7 @@
   font-size: 18px;
   padding: 5px 10px;
   word-wrap: break-word;
-  width: 60%;
+  // width: 60%;
 }
 
 .server-message {
