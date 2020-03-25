@@ -14,7 +14,8 @@ import "../styles/App.scss";
 import "../styles/cards.scss";
 import "../styles/playroom.scss"
 
-const PARITY_TO_TEAM = { "even": "BLUE", "odd": "RED" }
+const PARITY_TO_TEAM = { "even": "BLUE", "odd": "RED" };
+
 class GameStats extends Component {
     constructor(props){
         super(props);
@@ -89,6 +90,7 @@ class GameHistory extends Component {
                 );
             else {
                 const result = move.success ? "did" : "did not";
+                console.log(move);
                 return (
                     <>
                         <div className="message history_move">
@@ -222,7 +224,7 @@ class PlayRoom extends Component {
                                 minVotes={this.props.yourTeam.length + this.props.otherTeam.length - 1}
                             />}
                         {
-                            this.props.whoseTurn === this.props.name ?
+                            this.props.whoseTurn === this.props.name && !this.state.declaring ?
                                 this.props.turnType === "ask" ?
                                     (<><button
                                         className="btn ask-btn"
@@ -247,7 +249,7 @@ class PlayRoom extends Component {
                                     {!this.state.declaring && this.state.responding && 
                                     <Respond
                                         submitResponse={this.props.submitResponse}
-                                        asker={this.props.asker}
+                                        asker={asker}
                                         reset={()=> this.setState({responding: false})}
                                     />}</>)
                                 : ""

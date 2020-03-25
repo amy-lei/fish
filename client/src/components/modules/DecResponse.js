@@ -73,36 +73,32 @@ class DecResponse extends Component {
 
     render() {
         const declaration = (
-            <div className="popup">
+            <div className="declare-name">
                 {this.props.declarer} is declaring!!
             </div>);
 
         const guess = this.props.guess.map(combo => (
-            <div>
+            <div className="declare-guess">
                 {combo.player} has the {combo.rank} {combo.suit}
             </div>
         ));
         
         const votes = this.state.votes.map(vote => 
-            <div>{vote.name} {vote.agree ? "agees": "OBJECTED"}</div>)
+            <div className="declare-votes">{vote.name} {vote.agree ? "agees": "OBJECTED"}</div>)
 
-        console.log("cur votes",this.state.votes.length)
-        console.log("min votes",this.props.minVotes)
-        console.log("truth",this.state.votes.length === this.props.minVotes)
-        console.log("is declarer",this.props.declarer)
-        console.log("is declarer",this.props.isDeclarer)
-        console.log("hence",this.props.isDeclarer && this.state.votes.length === this.props.minVotes)
         let finish;
             if (this.props.isDeclarer && this.state.votes.length === this.props.minVotes) {
-                finish = (<button onClick={this.endDeclare}>Finish</button>);
+                finish = (<button className="btn primary-btn" onClick={this.endDeclare}>Finish</button>);
             }
     
         return (
-            <div className="popup">
+            <div className="declare">
                 {declaration}
-                {guess}
+                <div className="declare-guesses">
+                    {guess}
+                </div>
                 {!this.props.isDeclarer && this.props.guess.length !== 0 && !this.state.voted && 
-                (<>
+                (<div className="declare-vote_btn">
                     Press OBJECT if you see a contradiction. ACCEPT otherwise.
                     <button onClick={()=> this.resToDeclare(true)}>
                         Accept
@@ -111,9 +107,11 @@ class DecResponse extends Component {
                         Object
                     </button>
                     {this.state.lie && "Dont lie!!!!"}
-                </>)
+                </div>)
                 }
-                {votes}
+                <div className="declare-votes-container">
+                    {votes}
+                </div>
                 {finish}
             </div>
         )

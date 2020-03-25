@@ -1,0 +1,23 @@
+@import "./playroom.scss";
+
+.declare-confirm {
+    @include main-font();
+    padding: 50px;
+    height:50%
+}
+
+.declare-btns {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 20px;
+
+    .second-btn {
+        background-color: white;
+        border-color: $primary;
+        color: $primary;
+    }
+}
+
+.declare-inputs {
+    margin-bottom: 10px;
+}
