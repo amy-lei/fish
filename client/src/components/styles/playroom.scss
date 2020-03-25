@@ -1,15 +1,5 @@
-@import url('https://fonts.googleapis.com/css?family=Secular+One|Source+Sans+Pro&display=swap');
-$team-blue: #9BD0BF;
-$team-red: #CA5164;
-$primary: #D68033;
-$out: #858585;
-$alert: #BC0202;
-* {
-    box-sizing: border-box;
-    &:focus {
-        outline:none;
-    }
-}
+@import "./base.scss";
+
 
 @mixin main-font {
     // font-size: 16px;
@@ -36,25 +26,13 @@ $alert: #BC0202;
     width:100%;
     justify-content:flex-end;        
 
-    .btn {
-        padding: 15px 30px;
-        margin-left: 0.5rem;
-        border-radius: 3rem;
-        background-color: none;
-        @include main-font();
-        font-size: 14px;
-    }
-
     .declare-btn{
-        color: $primary;
-        border-color: $primary;
+        @include inverted-btn($primary);
     }
     
     .respond-btn,
     .ask-btn{
-        color: white;
-        background-color: $alert;
-        border-color: $alert;
+        @include main-btn($alert);
     }
 }
 
@@ -144,9 +122,7 @@ $alert: #BC0202;
 
 }
 .primary-btn {
-    background-color: $primary;
-    border-color: $primary;
-    color: white;
+    @include main-btn($primary);
 }
 .overlay {
     position: absolute;

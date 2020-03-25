@@ -12,7 +12,8 @@ import { card_svgs } from "../card_svgs.js";
 import "../styles/game.scss";
 import "../styles/App.scss";
 import "../styles/cards.scss";
-import "../styles/playroom.scss"
+import "../styles/playroom.scss";
+import "../styles/base.scss";
 
 const PARITY_TO_TEAM = { "even": "BLUE", "odd": "RED" };
 

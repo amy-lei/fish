@@ -1,7 +1,5 @@
 @import "./playroom.scss";
-
-$accept: #50A385;
-$object: #BF150B;
+@import "./base.scss";
 
 .declare-confirm {
     @include main-font();
@@ -15,9 +13,7 @@ $object: #BF150B;
     margin-bottom: 20px;
 
     .second-btn {
-        background-color: white;
-        border-color: $primary;
-        color: $primary;
+        @include inverted-btn($primary);
     }
 }
 
@@ -76,14 +72,10 @@ $object: #BF150B;
             padding: 20px 10px 10px 10px;
 
             .object-btn {
-                border-color: $object;
-                background-color: $object;
-                color: white;
+                @include main-btn($object);
             }
             .accept-btn {
-                border-color: $accept;
-                background-color: $accept;
-                color: white;
+                @include main-btn($accept);
             }
             .warning {
                 text-align: right;
