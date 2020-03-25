@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import { isValidDeclare } from "../../game-utilities";
 import GuessInput from "./GuessInput.js";
+import { post } from "../../utilities";
 
 import "../styles/game.scss";
 import "../styles/cards.scss";
@@ -10,8 +11,24 @@ class Declare extends Component {
         super(props);
         this.state = {
             guess: [],
+            showInput: false,
             invalid: false,
         };
+    }
+    /*
+        STEP 0 of declaring: 
+
+        Alert other players that you are declaring
+        to pause them from asking/responding
+     */
+    declaring = () => {
+        this.setState({
+            showInput: true,
+            declarer: this.props.name,
+        });
+        
+        this.props.pause();
+        const res = post("/api/pause", {key: this.props.roomKey, player: this.props.name});
     }
 
     // validate the declare before announcing 
@@ -19,7 +36,7 @@ class Declare extends Component {
         if (isValidDeclare(this.state.guess)) {
             this.setState({invalid: false,});
             await post("/api/declare", {guess: this.state.guess, key: this.props.roomKey});
-
+            this.props.reset();
         } else {
             this.setState({invalid: true,});
         }
@@ -62,12 +79,24 @@ class Declare extends Component {
                 
             />)
         }
+
+        const confirmation = (
+            <div className="popup">
+                Are you certain? 
+                You cannot back out in the middle of a declare.
+                This will pause the game.
+                <button onClick={this.declaring}>Yes</button>
+                <button onClick={this.props.reset}>No</button>
+            </div>
+            );
+        console.log('showinp', this.state.showInput);
         return(            
             <div className="popup">
-                {inputs}
-                <button onClick={this.confirm}>
-                    Declare
-                </button>
+                {!this.state.showInput ? confirmation : inputs}
+                {this.state.showInput && 
+                    <button onClick={this.confirm}>
+                        Declare
+                    </button>}
                 {this.state.invalid && "invalid declare!!!"}
             </div>);
 

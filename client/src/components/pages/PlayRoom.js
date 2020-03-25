@@ -1,89 +1,18 @@
 import React, { Component } from "react";
 import { post } from "../../utilities";
 import { 
-    isValidAsk, 
-    isValidDeclare, 
     canObject, 
     removeHalfSuit, 
 } from "../../game-utilities";
 import { socket } from "../../client-socket";
 import Chat from "./Chat.js";
-import GuessInput from "../modules/GuessInput.js";
 import Ask from "../modules/Ask.js";
 import Respond from "../modules/Respond.js";
+import Declare from "../modules/Declare.js";
 import { card_svgs } from "../card_svgs.js";
 
 import "../styles/game.scss";
 import "../styles/cards.scss";
-
-class Declare extends Component {
-    constructor(props){
-        super(props);
-        this.state = {
-            guess: [],
-            invalid: false,
-        };
-    }
-
-    // validate the declare before announcing 
-    confirm = async () => {
-        if (isValidDeclare(this.state.guess)) {
-            this.setState({invalid: false,});
-            await post("/api/declare", {guess: this.state.guess, key: this.props.roomKey});
-
-        } else {
-            this.setState({invalid: true,});
-        }
-    }
-
-    componentDidMount() {
-        let guess = [];
-        for (let i = 0; i< 6; i++) {
-            guess.push({player: "", rank: "", suit: ""});
-        }
-        this.setState({guess});
-    }
-
-    render() {
-        let inputs;
-        if (this.state.guess) {
-            inputs = this.state.guess.map((info, i) => 
-            <GuessInput
-                key={i}
-                players={this.props.yourTeam.filter(player => player.active)}
-                who={this.state.guess[i].player}
-                rank={this.state.guess[i].rank}
-                suit={this.state.guess[i].suit}
-                updateWho={(val) => {
-                    let cur = this.state.guess;
-                    cur[i].player = val;
-                    this.setState({guess: cur});
-                }}
-                updateRank={(val) => {
-                    let cur = this.state.guess;
-                    cur[i].rank = val;
-                    this.setState({guess: cur});
-                }}
-                updateSuit={(val) => {
-                    let cur = this.state.guess;
-                    cur[i].suit = val;
-                    this.setState({guess: cur});
-                }}
-                validate={() => true}
-                
-            />)
-        }
-        return(            
-            <div className="popup">
-                {inputs}
-                <button onClick={this.confirm}>
-                    Declare
-                </button>
-                {this.state.invalid && "invalid declare!!!"}
-            </div>);
-
-    }
- }
 
 class PlayRoom extends Component {
     constructor(props) {
@@ -93,7 +22,6 @@ class PlayRoom extends Component {
             responding: false,
             declaring: false,
             showDeclare: false, 
-            invalid: false,
             declarer: "",
             guess: null,
             lie: false,
@@ -114,22 +42,6 @@ class PlayRoom extends Component {
             </div>
         ));
     };
-
-    /*
-        STEP 0 of declaring: 
-
-        Alert other players that you are declaring
-        to pause them from asking/responding
-     */
-    declaring = () => {
-        this.setState({
-            declaring: true,
-            showDeclare: false,
-            declarer: this.props.name,
-        });
-
-        const res = post("/api/pause", {key: this.props.roomKey, player: this.props.name});
-    }
 
     /*
         STEP 1 of declaring: 
@@ -234,14 +146,6 @@ class PlayRoom extends Component {
         this.props.history.length !== 0 ? asker = this.props.history[this.props.history.length - 1].asker.name : asker = "";
 
         const decBtn = (<button onClick={()=>this.setState({showDeclare: true})}>Declare</button>);
-        const confirmation = (
-            <div className="popup">
-                Are you certain? You cannot back out in the middle of a declare.
-                This will pause the game.
-                <button onClick={this.declaring}>Yes</button>
-                <button onClick={()=>this.setState({showDeclare:false})}>No</button>
-            </div>
-            );
 
         let declaration;
         if (this.state.declarer) {
@@ -297,9 +201,15 @@ class PlayRoom extends Component {
                 <div className="game">
                     { this.state.ongoing ? 
                     (<>{decBtn} 
-                        { this.state.showDeclare && confirmation }
-                        { this.state.declaring && declaration }
-                        { (this.state.declarer === this.props.name && !this.state.guess)&& <Declare yourTeam={this.props.yourTeam} roomKey={this.props.roomKey}/>}
+                        {/* { this.state.showDeclare && confirmation } */}
+                        { this.state.showDeclare && 
+                            <Declare 
+                                name={this.props.name}
+                                yourTeam={this.props.yourTeam} 
+                                roomKey={this.props.roomKey}
+                                pause={() => this.setState({declaring: true, declarer: this.props.name})}
+                                reset={() => this.setState({showDeclare: false,})}
+                            />}
                         { guess }
                         { finish }
                         {
@@ -311,7 +221,7 @@ class PlayRoom extends Component {
                                     >
                                         ASK!!!!
                                     </button>
-                                    {this.state.asking &&      
+                                    {!this.state.declaring && this.state.asking && 
                                     <Ask
                                         submitAsk={this.props.submitAsk}
                                         otherTeam={this.props.otherTeam}
@@ -320,7 +230,7 @@ class PlayRoom extends Component {
                                     />}
                                     </>)
                                     : (<><button onClick={()=>this.setState({responding:true})}>Respond</button>
-                                    {this.state.responding && 
+                                    {!this.state.declaring && this.state.responding && 
                                     <Respond
                                         submitResponse={this.props.submitResponse}
                                         asker={this.props.asker}
