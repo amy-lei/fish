@@ -11,14 +11,8 @@ import "../styles/cards.scss";
 class WaitingRoom extends Component {
     constructor(props) {
         super(props);
-        const fakePlayers = [
-          {name:this.props.name, index: 0, ready: true, active: true},
-          {name:"CRYSTAL", index: 1, ready: false, active: true},
-          {name:"AMY", index: 2, ready: false, active: true},
-          {name:"IVY", index: 3, ready: false, active: true},
-        ];
         this.state = {
-            players: this.props.isCreator ? fakePlayers : this.props.roomInfo.players,
+            players: this.props.isCreator ? {name:this.props.name, index: 0, ready: true, active: true} : this.props.roomInfo.players,
             index: this.props.index,
         };
     };
