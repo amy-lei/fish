@@ -110,4 +110,29 @@ $alert: #BC0202;
 
 }
 
+.sidebar-container {
+    width: 35%;
+}
 
+.playroom-container {
+    width: 60%;
+}
+
+.active-sidebar {
+    color: #D68033;
+    font-family: 'Secular One', sans-serif;
+    font-size: 18px;
+}
+
+.inactive-sidebar {
+    color: black;
+    font-family: 'Secular One', sans-serif;
+    font-size: 18px;
+}
+
+.divider {
+    color: black;
+    font-family: "Source Sans Pro", sans-serif;
+    font-size: 18px;
+    margin: 0 5px;
+}

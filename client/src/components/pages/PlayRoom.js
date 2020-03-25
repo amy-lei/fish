@@ -105,11 +105,11 @@ class GameHistory extends Component {
                     </>
                 );
             }
-        })
+        });
         console.log(history);
         console.log(this.props.history);
         return (
-            <div className="history">
+            <div className={'history'}>
                 {this.props.all 
                     ? history
                     : history[history.length - 1]}
@@ -131,6 +131,7 @@ class PlayRoom extends Component {
             guess: [],
             ongoing: true,
             winner: null,
+            sidebar: "chat",
         };
     }
 
@@ -186,6 +187,10 @@ class PlayRoom extends Component {
             });
         });
     }
+
+    changeSidebar = (type) => {
+        this.setState({sidebar: type})
+    };
 
     render() {
         let cards = "Loading cards";
@@ -257,7 +262,31 @@ class PlayRoom extends Component {
                         <div className={`overlay ${this.state.showDeclare || this.state.asking || this.state.responding ? "hidden" : ""}`}></div>
                 </div>
                 <div className="container">
-                    <Chat name={this.props.name} roomKey={this.props.roomKey}/>
+                    <div className={"sidebar-container"}>
+                        <span
+                            className={this.state.sidebar === "chat" ? "active-sidebar" : "inactive-sidebar"}
+                            onClick={() => this.changeSidebar("chat")}
+                        >
+                            Chat Room
+                        </span>
+                        <span className={"divider"}>|</span>
+                        <span
+                            className={this.state.sidebar === "ask" ? "active-sidebar" : "inactive-sidebar"}
+                            onClick={() => this.changeSidebar("ask")}
+                        >
+                            Ask History
+                        </span>
+                        {
+                            this.state.sidebar === "chat" ?
+                                <Chat name={this.props.name} roomKey={this.props.roomKey}/>
+                                :
+                                <GameHistory
+                                    history={this.props.history}
+                                    all={true}
+                                />
+                        }
+                    </div>
+
                     <div className="playroom-container">                            
                         {this.props.history &&
                             <GameHistory
