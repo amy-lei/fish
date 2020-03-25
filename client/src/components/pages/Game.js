@@ -13,7 +13,7 @@ import { card_svgs } from "../card_svgs.js";
 import "../styles/game.scss";
 import "../styles/cards.scss";
 
-const WIN = 5;
+const WIN = 1;
 
 class Game extends Component {
     constructor(props) {
@@ -162,11 +162,13 @@ class Game extends Component {
                 if (update.move.responder.name === this.state.name) {
                     let hand = this.state.hand.filter(card => 
                         !(card.rank === update.move.rank && card.suit === update.move.suit)); 
+                    this.setState({hand});
+                    this.checkIfActive(hand);
                 } else if (update.move.asker.name === this.state.name) {
                     let hand = this.state.hand.concat({rank:update.move.rank, suit: update.move.suit})
+                    this.setState({hand});
+                    this.checkIfActive(hand);
                 }
-                this.setState({hand});
-                this.checkIfActive(hand);
             }
             // update history
             this.setState({

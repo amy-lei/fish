@@ -2,7 +2,6 @@ import React, { Component } from "react";
 import "../../utilities.css";
 import { post } from "../../utilities";
 import { 
-    hasCard, 
     isValidAsk, 
     isValidDeclare, 
     canObject, 
@@ -10,6 +9,7 @@ import {
 } from "../../game-utilities";
 import { socket } from "../../client-socket";
 import Chat from "./Chat.js";
+import GuessInput from "../modules/GuessInput.js";
 import { card_svgs } from "../card_svgs.js";
 
 import "../styles/game.scss";
@@ -69,62 +69,42 @@ class Declare extends Component {
         this.setState({guess});
     }
 
+    updateGuess = (index, val) => {
+
+    }
+    
     render() {
+        let inputs;
+        if (this.state.guess) {
+            inputs = this.state.guess.map((info, i) => 
+            <GuessInput
+                key={i}
+                players={this.props.yourTeam.filter(player => player.active)}
+                who={this.state.guess[i].player}
+                rank={this.state.guess[i].rank}
+                suit={this.state.guess[i].suit}
+                updateWho={(val) => {
+                    let cur = this.state.guess;
+                    cur[i].player = val;
+                    this.setState({guess: cur});
+                }}
+                updateRank={(val) => {
+                    let cur = this.state.guess;
+                    cur[i].rank = val;
+                    this.setState({guess: cur});
+                }}
+                updateSuit={(val) => {
+                    let cur = this.state.guess;
+                    cur[i].suit = val;
+                    this.setState({guess: cur});
+                }}
+                validate={() => true}
+                
+            />)
+        }
         return(            
             <div className="popup">
-                {this.state.guess.map( (info, i) => (
-                    <>
-                        Who
-                        <select 
-                            value={this.state.guess[i].player} 
-                            onChange={(e) => {
-                                let cur = this.state.guess;
-                                cur[i].player = e.target.value
-                                this.setState({recipient: cur});
-                            }}
-                            >
-                            <option value=""></option>
-                            {this.props.yourTeam.map(player => (
-                                <option value={player.name}>{player.name}</option>    
-                                ))}
-                        </select>
-            
-                        Rank
-                        <select 
-                            value={this.state.guess[i].rank} 
-                            onChange={(e) => {
-                                let cur = this.state.guess;
-                                cur[i].rank = e.target.value
-                                this.setState({recipient: cur});
-                            }}
-                            >
-                            <option value=""></option>
-                            {RANKS.map(rank => (
-                                <option value={rank}>{rank}</option>
-                                ))}
-                        </select>
-                            Suit
-                        <select
-                            value={this.state.guess[i].suit}
-                            onChange={(e) => {
-                                let cur = this.state.guess;
-                                cur[i].suit = e.target.value
-                                this.setState({recipient: cur});
-                            }}
-                            >
-                            <option value=""></option>
-                            { this.state.guess[i].rank === "joker" ?
-                                JOKER_SUITS.map(suit => (
-                                    <option value={suit}>{suit}</option>
-                                    ))
-                                    : SUITS.map(suit => (
-                                        <option value={suit}>{suit}</option>
-                                    ))
-                            }
-                        </select>
-                        <br/>
-                    </>
-                ))}
+                {inputs}
             <button onClick={this.confirm}>
                 Declare
             </button>
@@ -324,52 +304,20 @@ class PlayRoom extends Component {
                 >
                     ASK!!!!
                 </button>
-                <div className={`popup ${(!this.state.declaring && this.state.asking) ? "" : "hidden"}`}>
-                    Who
-                    <select 
-                        value={this.state.recipient} 
-                        onChange={(e) => this.setState({recipient: e.target.value})}
-                        >
-                        <option value=""></option>
-                        {this.props.otherTeam.map(player => (
-                            <option value={player.name}>{player.name}</option>    
-                            ))}
-                    </select>
-
-                    Rank
-                    <select 
-                        value={this.state.rank} 
-                        onChange={(e) => this.setState({rank: e.target.value})}
-                        >
-                        <option value=""></option>
-                        {RANKS.map(rank => (
-                            <option value={rank}>{rank}</option>
-                            ))}
-                    </select>
-
-                    {this.state.rank && (
-                        <>
-                            Suit
-                            <select
-                                value={this.state.suit}
-                                onChange={(e) => this.setState({suit: e.target.value})}
-                                >
-                                <option value=""></option>
-                                { this.state.rank === "joker" ?
-                                    JOKER_SUITS.map(suit => (
-                                        <option value={suit}>{suit}</option>
-                                        ))
-                                        : SUITS.map(suit => (
-                                            <option value={suit}>{suit}</option>
-                                        ))
-                                }
-                            </select>
-                        </>
-                    )}
+                {this.state.asking &&
+                <GuessInput
+                    players={this.props.otherTeam.filter(player => player.active)}
+                    who={this.state.recipient}
+                    rank={this.state.rank}
+                    suit={this.state.suit}
+                    updateWho={(val) => this.setState({recipient: val})}
+                    updateRank={(val) => this.setState({rank: val})}
+                    updateSuit={(val) => this.setState({suit: val})}
+                    validate={() => false}
+                />}
                     {(this.state.recipient && this.state.rank && this.state.suit) &&
                         (<button onClick={this.ask}>Ask</button>)}
                     {this.state.invalid && "You do not have a card in this half suit"}
-                </div>
             </>
         );
 
