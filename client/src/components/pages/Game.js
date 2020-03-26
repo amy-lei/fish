@@ -73,15 +73,46 @@ class Game extends Component {
             socketid: socket.id,
         };
         const info = await post('/api/join_room', body);
-        this.setState({
-            page: "waiting_room",
-            name: info.self.name,
-            isCreator: false,
-            index: info.self.index,
-            info: info.info,
-            whoseTurn: info.info.whoseTurn,
-            turnType: info.info.turnType,
-        });
+        if (info.return) {
+            let otherTeam = [];
+            let yourTeam = [];
+            let yourScore;
+            let otherScore;
+            const parity = info.self.index % 2;
+            info.info.players.forEach((player) => {
+                if (player.index % 2 === parity) yourTeam.push(player);
+                else otherTeam.push(player);
+            });
+            if (parity) {
+                yourScore = info.info.even;
+                otherScore = info.info.odd;
+            } else {
+                yourScore = info.info.odd;
+                otherScore = info.info.even;
+            }
+            this.updateGame(info.info.hands[info.self.index], yourTeam, otherTeam);
+            this.changePage("play_room");
+            this.setState({
+                name:info.self.name,
+                index: info.self.index,
+                turnType: info.info.turnType,
+                history: info.info.history,
+                whoseTurn: info.info.whoseTurn,
+                yourTeamScore: yourScore,
+                otherTeamScore: otherScore,
+            })
+        } else {
+            this.setState({
+                page: "waiting_room",
+                name: info.self.name,
+                isCreator: false,
+                index: info.self.index,
+                info: info.info,
+                whoseTurn: info.info.whoseTurn,
+                turnType: info.info.turnType,
+            });
+        }
+        
     };
     
     updateGame = (hand, yourTeam, otherTeam) => {

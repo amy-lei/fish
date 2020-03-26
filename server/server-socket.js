@@ -80,10 +80,17 @@ module.exports = {
         }
         // When there are still users in the room, remove the one that disconnected from database
         else {
-          updateGamePlayerList(user, roomKey);
-          otherUserSockets.forEach(client => {
-            client.emit("disconnected", user);
-          })
+          Game
+            .findOne({key: roomKey})
+            .then(g => {
+              if (!g.start) {
+                updateGamePlayerList(user, roomKey);
+                otherUserSockets.forEach(client => {
+                  client.emit("disconnected", user);
+                });
+              }
+              else {console.log("disconnected mid game, dont delete")}
+            })
         }
       });
     });

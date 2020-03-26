@@ -54,6 +54,21 @@ router.post("/join_room", (req, res) => {
     const playerName = req.body.playerName;
     Game.findOne({key: requestedRoomKey})
         .then((foundGame) => {
+          if (foundGame.start) {
+            let targetPlayer;
+            for (let player of foundGame.players){
+              if (player.name === playerName) {
+                targetPlayer = player;
+                player.active = true;
+                break;
+              }
+            }
+            
+            foundGame.save().then(g => {
+              console.log(g); 
+              res.send({self: targetPlayer, info: g, return: true});
+            });
+          } else {
             socket.addUser(foundGame.key, socket.getSocketFromSocketID(req.body.socketid), playerName);
             const allPlayerNames = foundGame.players.map((player) => player.name);
             let newPlayerName = playerName;
@@ -71,7 +86,8 @@ router.post("/join_room", (req, res) => {
             });
             foundGame.players.push(newPlayer);
             foundGame.save()
-                     .then(() => res.send({self: newPlayer, info: foundGame}));
+                     .then(() => res.send({self: newPlayer, info: foundGame, return: false}));
+          }
         });
 });
 
@@ -96,6 +112,7 @@ router.post("/create_room", (req, res) => {
                 key: roomKey,
                 players: [{name: creatorName, index: 0, ready: true}],
                 hands: [],
+                start: false,
             });
             game.save().then((game) => {
                 socket.addUser(roomKey, socket.getSocketFromSocketID(req.body.socketid), creatorName);
@@ -131,6 +148,7 @@ router.post("/start_game", (req, res) => {
     .then((game) => {
       cards = gen_cards(game.players.length);
       game.hands = cards;
+      game.start = true;
       socket.getAllSocketsFromGame(game.key).forEach(client => {
         client.emit("startGame", {cards: cards});
       });
