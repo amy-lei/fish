@@ -15,6 +15,7 @@ class WaitingRoom extends Component {
             players: this.props.isCreator ? [{name:this.props.name, index: 0, ready: true, active: true}] : this.props.roomInfo.players,
             index: this.props.index,
         };
+        this.key_ref = React.createRef();
     };
 
     componentDidMount() {
@@ -84,6 +85,17 @@ class WaitingRoom extends Component {
 
     };
 
+    copyKey = () => {
+        // Got this from W3 schools
+        const keyText = this.key_ref.current;
+        /* Select the text field */
+        keyText.select();
+        keyText.setSelectionRange(0, 99999); /*For mobile devices*/
+
+        /* Copy the text inside the text field */
+        document.execCommand("copy");
+    };
+
     render() {
         const areYouReady = this.state.players.filter(player => player.name === this.props.name)[0].ready;
         const placeholderPlayers = [...Array(6 - this.state.players.length).keys()].map((num) => (
@@ -104,7 +116,8 @@ class WaitingRoom extends Component {
                 </div>
                 <div className={"waiting-key-container"}>
                     <div className={"friends-label"}>Share this key with five friends:</div>
-                    <div className={"waiting-key"}>{this.props.roomKey}</div>
+                    <div className={"waiting-key"} onClick={this.copyKey} >{this.props.roomKey}</div>
+                    <input type="text" ref={this.key_ref} value={this.props.roomKey} hidden={true} readOnly/>
                     {
                         this.props.isCreator ?
                         <button
