@@ -17,7 +17,10 @@ class Home extends Component {
         });
     };
 
-    checkRoom = async () => {
+    checkRoom = async (e) => {
+        if ((e && e.key !== "Enter") || this.state.roomKey.trim() === "") {
+            return;
+        }
         const body = {
             roomKey: this.state.roomKey,
         };
@@ -59,12 +62,13 @@ class Home extends Component {
                                 onChange={(e) => this.keyChange(e)}
                                 className={"room-key-input"}
                                 maxLength={4}
+                                onKeyPress={(e) => this.checkRoom(e)}
                             />
-                            <button onClick={this.checkRoom} className={"room-key-submit"}>ENTER</button>
+                            <button onClick={() => this.checkRoom(null)} className={"room-key-submit"}>ENTER</button>
                             {
                                 this.state.roomKeyError &&
                                 <div className={"room-key-error"}>
-                                    The key you entered does not exist. Please try again
+                                    The key you entered does not exist. Please try again.
                                 </div>
                             }
                         </div>
