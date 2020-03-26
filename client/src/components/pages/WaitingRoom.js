@@ -6,7 +6,7 @@ import Chat from "./Chat.js";
 import "../styles/game.scss";
 import "../styles/cards.scss";
 
-const MAX_PLAYERS = 6;
+const MAX_PLAYERS = 3;
 
 class WaitingRoom extends Component {
     constructor(props) {
@@ -99,6 +99,7 @@ class WaitingRoom extends Component {
                     <Chat
                         name={this.props.name}
                         roomKey={this.props.roomKey}
+                        hidden={false}
                     />
                 </div>
                 <div className={"waiting-key-container"}>

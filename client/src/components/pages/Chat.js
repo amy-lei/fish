@@ -131,7 +131,7 @@ class Chat extends Component {
     }
 
     return (
-      <div className="chat">
+      <div className="chat" hidden={this.props.hidden}>
         <div className="message-container">
           {messages}
         </div>

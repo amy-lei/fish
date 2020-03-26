@@ -4,7 +4,8 @@ class NameForm extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            name:""
+            name: "",
+            clickedButton: false,
         };
     };
 
@@ -12,6 +13,10 @@ class NameForm extends Component {
         this.setState({
             name: e.target.value.toUpperCase(),
         });
+    };
+
+    submitName = () => {
+        this.setState({clickedButton: true}, () => this.props.submitName(this.state.name));
     };
 
 
@@ -27,7 +32,11 @@ class NameForm extends Component {
                     maxLength={10}
                 />
                 <br/>
-                <button onClick={() => this.props.submitName(this.state.name)} className={"name-submit"}>
+                <button
+                    onClick={this.submitName}
+                    className={this.state.clickedButton ? "disabled-name" : "name-submit"}
+                    disabled={this.state.clickedButton}
+                >
                     Enter Room
                 </button>
             </div>

@@ -115,6 +115,18 @@
     font-size: 20px;
 }
 
+.disabled-name {
+    @include main-btn($out);
+    margin-top: 20px;
+    font-size: 20px;
+    cursor: not-allowed;
+    &:hover {
+        background-color: $out;
+        border-color: $out;
+        color: white;
+    }
+}
+
 // For WaitingRoom.js
 .container,
 .waiting-container {
