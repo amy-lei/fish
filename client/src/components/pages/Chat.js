@@ -88,9 +88,9 @@ class Chat extends Component {
     this.setState({ allMessages: messages });
   };
 
-  sendMessage = async () => {
+  sendMessage = async (e) => {
     const trimmedMessage = this.state.curMessage.trim();
-    if (trimmedMessage === "") {
+    if ((e && e.key !== "Enter") || trimmedMessage === "") {
       return;
     }
     const body = { 
@@ -142,8 +142,9 @@ class Chat extends Component {
             onChange={this.handleOnChange}
             className="chat-input"
             placeholder="Send a message"
+            onKeyPress={(e) => this.sendMessage(e)}
           />
-          <button onClick={this.sendMessage} className="btn chat-submit">
+          <button onClick={() => this.sendMessage(null)} className="btn chat-submit">
             &lt;
           </button>
         </div>

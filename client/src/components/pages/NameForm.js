@@ -15,8 +15,13 @@ class NameForm extends Component {
         });
     };
 
-    submitName = () => {
-        this.setState({clickedButton: true}, () => this.props.submitName(this.state.name));
+    submitName = (e) => {
+        if (this.state.clickedButton || this.state.name.trim() === "") {
+            return;
+        }
+        if (!e || e.key === "Enter") {
+            this.setState({clickedButton: true}, () => this.props.submitName(this.state.name));
+        }
     };
 
 
@@ -30,10 +35,11 @@ class NameForm extends Component {
                     value={this.state.name}
                     className={"name-input"}
                     maxLength={10}
+                    onKeyPress={(e) => this.submitName(e)}
                 />
                 <br/>
                 <button
-                    onClick={this.submitName}
+                    onClick={() => this.submitName(null)}
                     className={this.state.clickedButton ? "disabled-name" : "name-submit"}
                     disabled={this.state.clickedButton}
                 >
