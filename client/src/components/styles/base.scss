@@ -80,3 +80,18 @@ input {
     color: #808080;
     font-size: 16px;
 }
+
+.close-btn {
+    position: absolute;
+    right:0;
+    top:0;
+    border: none;
+    background: none;
+    font-size: 25px;
+    font-weight: 300;
+    cursor: pointer;
+    padding: 20px;
+    &:hover {
+        color: $primary;
+    }
+}

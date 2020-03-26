@@ -1,6 +1,10 @@
 @import "./playroom.scss";
 @import "./base.scss";
 
+.hidden {
+    opacity: 0;
+}
+
 .declare-confirm {
     @include main-font();
     padding: 50px;
@@ -94,3 +98,11 @@
     
 }
 
+.show-cards-btn {
+    @include main-btn($primary);
+    position: fixed;
+    top:0;
+    right: 0;
+    margin: 10px;
+    z-index: 1000;
+}

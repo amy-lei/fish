@@ -14,6 +14,8 @@ class Declare extends Component {
             guess: [],
             showInput: false,
             invalid: false,
+            declaring: false,
+            hide: false,
         };
     }
     /*
@@ -25,6 +27,7 @@ class Declare extends Component {
     declaring = () => {
         this.setState({
             showInput: true,
+            declaring: true,
             declarer: this.props.name,
         });
         
@@ -35,7 +38,7 @@ class Declare extends Component {
     // validate the declare before announcing 
     confirm = async () => {
         if (isValidDeclare(this.state.guess)) {
-            this.setState({invalid: false,});
+            this.setState({invalid: false, declaring: false,});
             await post("/api/declare", {guess: this.state.guess, key: this.props.roomKey});
             this.props.reset();
         } else {
@@ -99,16 +102,24 @@ class Declare extends Component {
                 </div>
             </>
             );
-        console.log('showinp', this.state.showInput);
-        return(            
-            <div className="popup">
-                {!this.state.showInput ? confirmation : <div className="declare-inputs">{inputs}</div>}
+        return(
+            <>            
+                {this.state.declaring &&
+                    <button
+                        className="show-cards-btn"
+                        onClick={() => this.setState({hide: !this.state.hide})}
+                    >
+                        {!this.state.hide ? "View Cards" : "Resume Declare"}
+                    </button>
+                }
+            <div className={`popup ${this.state.hide ? "hidden" : ""}`}>
+                {!this.state.showInput && !this.state.declaring ? confirmation : <div className="declare-inputs">{inputs}</div>}
                 {this.state.showInput && 
                     <button className="btn primary-btn" onClick={this.confirm}>
                         Declare
                     </button>}
                 {this.state.invalid && "invalid declare!!!"}
-            </div>);
+            </div></>);
 
     }
  }
