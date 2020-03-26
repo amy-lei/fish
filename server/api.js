@@ -70,9 +70,8 @@ router.post("/join_room", (req, res) => {
                 client.emit("joinedWaitingRoom", newPlayer);
             });
             foundGame.players.push(newPlayer);
-            foundGame.save();
-            //send back new name in case of duplicates
-            res.send({self: newPlayer, info: foundGame});
+            foundGame.save()
+                     .then(() => res.send({self: newPlayer, info: foundGame}));
         });
 });
 
@@ -116,12 +115,13 @@ router.post("/ready", (req, res) => {
                 }
                 return player;
             });
-            game.save();
 
-            socket.getAllSocketsFromGame(req.body.key).forEach(client => {
+            socket.getAllSocketsFromGame(roomKey).forEach(client => {
                 client.emit("ready", {playerList: game.players, readyPlayer: name, readyState: req.body.isReady});
-                res.send(game.players);
-            })
+            });
+
+            game.save()
+                .then(() => res.send({}));
         });
 });
 
@@ -157,7 +157,7 @@ router.post("/ask", (req, res) => {
         client.emit("ask", {history: history, move: move});
       });
 
-      game.save().then(()=>res.send({}));
+      game.save().then(() => res.send({}));
     });
 });
 
