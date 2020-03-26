@@ -61,8 +61,7 @@ class WaitingRoom extends Component {
             playerName: this.props.name,
             isReady: isReady,
         };
-        const players = await post("/api/ready", body);
-        this.setState({players});
+        const _ = await post("/api/ready", body);
     };
 
     /*
@@ -87,7 +86,6 @@ class WaitingRoom extends Component {
         const placeholderPlayers = [...Array(6 - this.state.players.length).keys()].map((num) => (
             {name: `placeholder${num}`, index: -1, ready: false, active: false}
         ));
-        console.log(placeholderPlayers);
         return (
         <>
             <div className="header"></div>
