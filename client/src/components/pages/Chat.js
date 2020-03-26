@@ -13,6 +13,7 @@ class Chat extends Component {
       allMessages: [],
       curMessage: "",
     };
+    this.bottom_ref = React.createRef();
   }
 
   componentDidMount() {
@@ -62,23 +63,29 @@ class Chat extends Component {
       this.setState({
         allMessages: this.state.allMessages.concat(turnUpdate),
       });
-  });
+    });
 
-  // update turn and hand if successful
-  socket.on("respond", update => {
-      if (!update.move.success) {
-        const turnUpdate = {
-          sender_name: "server",
-          content: `It is ${update.move.responder.name}'s turn to ask.`,
-        };
-        this.setState({
-          allMessages: this.state.allMessages.concat(turnUpdate),
-        });
-      }
-
-  });
-
+    // update turn and hand if successful
+    socket.on("respond", update => {
+        if (!update.move.success) {
+          const turnUpdate = {
+            sender_name: "server",
+            content: `It is ${update.move.responder.name}'s turn to ask.`,
+          };
+          this.setState({
+            allMessages: this.state.allMessages.concat(turnUpdate),
+          });
+        }
+    });
   }
+
+  componentDidUpdate () {
+    this.scrollToBottom();
+  }
+
+  scrollToBottom = () => {
+    this.bottom_ref.current.scrollIntoView({behavior: "smooth"});
+  };
 
   loadMessages = async () => {
     const query = {
@@ -134,6 +141,8 @@ class Chat extends Component {
       <div className="chat" hidden={this.props.hidden}>
         <div className="message-container">
           {messages}
+          <div className={"thing-at-bottom"} ref={this.bottom_ref}>
+          </div>
         </div>
         <div className="chat-input-wrapper">
           <input
