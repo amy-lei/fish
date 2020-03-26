@@ -45,11 +45,11 @@ class GuessInput extends Component {
                             <div className="guess-input_label">Suit</div>
                             <select
                                 className="guess-input_field"
-                                value={this.props .suit}
+                                value={this.props.suit}
                                 onChange={(e) => this.props.updateSuit(e.target.value)}
                                 >
                                 <option value=""></option>
-                                { this.state.rank === "joker" ?
+                                { this.props.rank === "joker" ?
                                     JOKER_SUITS.map((suit, k) => (
                                         <option key={k} value={suit}>{suit}</option>
                                         ))
