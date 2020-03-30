@@ -171,18 +171,30 @@
 
 }
 
+.key-wrapper {
+    width: 26em;
+}
+
 .waiting-key {
+    border: none;
+    cursor: pointer;
+    clear: both;
+    display: block;
     font-family: 'Secular One', sans-serif;
     font-size: 100px;
     line-height: 100%;
-    cursor: pointer;
+    width: 100%;
+    &:focus {
+        box-shadow: none;
+        outline: none;
+    }
+
 }
 
 .waiting-button {
     @include main-btn($primary);
     width: 12em;
     padding: 15px 32px;
-    margin-top: 1em;
     font-size: 20px;
 }
 
@@ -190,7 +202,6 @@
     @include main-btn($out);
     width: 12em;
     padding: 15px 32px;
-    margin-top: 1em;
     font-size: 20px;
     cursor: not-allowed;
     &:hover {

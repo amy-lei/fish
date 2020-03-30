@@ -15,7 +15,6 @@ class WaitingRoom extends Component {
             players: this.props.isCreator ? [{name:this.props.name, index: 0, ready: true, active: true}] : this.props.roomInfo.players,
             index: this.props.index,
         };
-        this.key_ref = React.createRef();
     };
 
     componentDidMount() {
@@ -86,13 +85,7 @@ class WaitingRoom extends Component {
     };
 
     copyKey = () => {
-        // Got this from W3 schools
-        const keyText = this.key_ref.current;
-        /* Select the text field */
-        keyText.select();
-        keyText.setSelectionRange(0, 99999); /*For mobile devices*/
-
-        /* Copy the text inside the text field */
+        console.log(document.querySelector(".waiting-key").select());
         document.execCommand("copy");
     };
 
@@ -104,7 +97,7 @@ class WaitingRoom extends Component {
         const disableStart = !(this.state.players.every(player => player.ready) && this.state.players.length === MAX_PLAYERS);
         return (
         <>
-            <div className="header"></div>
+            <div className="header" />
             <div className={"waiting-container"}>
                 <div className={"chat-container"}>
                     <div style={{cursor: "default"}} className={"chat-label sidebar-label"}>Chat Room</div>
@@ -116,8 +109,9 @@ class WaitingRoom extends Component {
                 </div>
                 <div className={"waiting-key-container"}>
                     <div className={"friends-label"}>Share this key with five friends:</div>
-                    <div className={"waiting-key"} onClick={this.copyKey} >{this.props.roomKey}</div>
-                    <input type="text" ref={this.key_ref} value={this.props.roomKey} hidden={true} readOnly/>
+                    <div className={"key-wrapper"}>
+                        <input className={"waiting-key"} onClick={this.copyKey} value={this.props.roomKey} readOnly/>
+                    </div>
                     {
                         this.props.isCreator ?
                         <button
