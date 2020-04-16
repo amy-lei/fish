@@ -134,17 +134,6 @@
         }
     }
 }
-.sidebar-label {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    color: white;
-    height: 2.5em;
-    width: 100%;
-    background-color: $chat-label;
-    border-radius: 15px 15px 0 0;
-}
 
 .disabled-start {
     @include solid-btn($out, $out);

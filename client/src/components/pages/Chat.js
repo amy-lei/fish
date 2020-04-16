@@ -148,7 +148,7 @@ class Chat extends Component {
     }
 
     return (
-      <div className="chat" hidden={this.props.hidden}>
+      <div className={`chat ${this.props.hidden && "hidden"}`}>
         <div className="chat-messages messages">
           {messages}
           <div className="thing-at-bottom" ref={this.bottom_ref}>

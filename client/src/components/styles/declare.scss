@@ -27,47 +27,54 @@
 
 .declare {
     position: absolute;
-    top:0;
-    left:0;
-    width: 35%;
-    height: 100%;
+    top:14vh;
+    left:2vw;
+    width: 29%;
+    height: 82%;
     background-color: white;
-    
+    border-radius: 15px;
+    box-shadow: 0px 4px 40px rgba(0, 0, 0, 0.05);
+
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
     z-index: 100;
-    .declare-name {
-        @include main-font();
-        font-size: 5rem;
+    padding: 1em;
+    
+    &-name {
+        font-size: 4rem;
         line-height: 5rem;
         padding: 1rem;
-        // margin-top: 20vh;
+        font-weight: $bold-font-weight;
+        text-align: center;
     }
-    .declare-guesses {
+    
+    &-guesses {
         display: flex;
         flex-wrap: wrap;
         justify-content: center;
         padding: 0 20px;
         .declare-guess {
-            background-color: #F3F3F3;
+            font-size: $button-font-size;
+            background-color: $light-grey;
             border-radius: 20px;
             display: inline;
-            font-family: 'Source Sans Pro', sans-serif;
-            font-size: 18px;
             padding: 10px 20px;
             word-wrap: break-word;
     
             margin: 0.2em;
+            &_wait {
+                // color: $dark-grey !important;
+                font-weight: $label-font-weight;
+                text-align: center;
+            }
         }
     }
 
     .declare-vote_instruction {
         padding: 20px 2vw;
-        @include second-font();
-        color: #808080;
-        font-size: 16px;
+        color: $dark-grey;
         text-align: center;
     
         .declare-vote_btns {
@@ -76,10 +83,10 @@
             padding: 20px 10px 10px 10px;
 
             .object-btn {
-                @include main-btn($object);
+                @include solid-btn($object, $object-shadow);
             }
             .accept-btn {
-                @include main-btn($accept);
+                @include solid-btn($accept, $accept-shadow);
             }
             .warning {
                 text-align: right;
@@ -90,8 +97,10 @@
     .declare-votes-container {
         padding: 10px;
         .declare-votes {
-            color: #808080;
-            font-size: 16px;
+            display:inline;
+            color: $dark-grey;
+            font-size: $label-font-weight;
+            font-size: $button-font-size;
             text-align: left;
         }
     }
@@ -99,7 +108,6 @@
 }
 
 .show-cards-btn {
-    @include main-btn($primary);
     position: fixed;
     top:0;
     right: 0;

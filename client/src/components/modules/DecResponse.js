@@ -78,11 +78,18 @@ class DecResponse extends Component {
                 {this.props.declarer} declared!
             </div>);
 
-        const guess = this.props.guess.map(combo => (
-            <div className="declare-guess">
-                {combo.player} has the {combo.rank} {combo.suit}
-            </div>
-        ));
+        let guess;
+        if (this.props.guess.length === 0) {
+            guess = <p className="declare-guess_wait">
+            {`${this.props.declarer} is making their guess. Communication disabled in the meantime.`}
+            </p>
+        } else {
+            guess = this.props.guess.map(combo => (
+                <div className="declare-guess">
+                    {combo.player} has the {combo.rank} {combo.suit}
+                </div>
+            ));
+        }
         
         const votes = this.state.votes.map(vote => 
             <div className="declare-votes">{vote.name} {vote.agree ? "agees": "OBJECTED"}</div>)
@@ -93,7 +100,7 @@ class DecResponse extends Component {
             }
     
         return (
-            <div className="declare">
+            <div className="sidebar declare">
                 {declaration}
                 <div className="declare-guesses">
                     {guess}

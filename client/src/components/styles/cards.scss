@@ -1,7 +1,8 @@
 .cards {
     display: flex;
     flex-wrap: wrap;
-    width: 100%;
+    width: 90%;
+    margin:0 auto;
 }
 .card{
     transition: 0.5s;
@@ -12,7 +13,6 @@
     }
     
     &:hover {
-        transform: translateY(-1rem);
         ~ .card {
             transform: translateX(4rem);
         }

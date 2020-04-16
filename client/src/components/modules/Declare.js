@@ -106,7 +106,7 @@ class Declare extends Component {
             <>            
                 {this.state.declaring &&
                     <button
-                        className="show-cards-btn"
+                        className="btn primary-btn show-cards-btn"
                         onClick={() => this.setState({hide: !this.state.hide})}
                     >
                         {!this.state.hide ? "View Cards" : "Resume Declare"}

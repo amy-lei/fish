@@ -8,13 +8,16 @@ import Declare from "../modules/Declare.js";
 import DecResponse from "../modules/DecResponse.js";
 import { card_svgs } from "../card_svgs.js";
 
+import "../styles/Chat.scss";
 import "../styles/game.scss";
 import "../styles/App.scss";
 import "../styles/cards.scss";
 import "../styles/playroom.scss";
 import "../styles/base.scss";
 
+
 const PARITY_TO_TEAM = { "even": "BLUE", "odd": "RED" };
+const FACES = [':)', '•_•', '=U','°_o',':O','°Д°'];
 
 class GameStats extends Component {
     constructor(props){
@@ -80,11 +83,17 @@ class GameHistory extends Component {
             if (move.type === "ask")
                 return (
                     <div className={`message history_move ${this.props.all?"left":""}`}>
-                        <div className={`sender history_move-who ${this.props.all ? "more-space": ""}`}>
-                            {move.asker.name} asked 
+                        <div className={`message_img ${
+                            move.asker.index % 2 == 0? 'team-even' : 'team-odd'}`}>
+                            {FACES[move.asker.index]} 
                         </div>
-                        <div className="content history_move-what">
-                            {move.recipient} do you have the {move.rank} {move.suit}?
+                        <div className="message_info">
+                            <div className={`message_info-sender history_move-who ${this.props.all ? "more-space": ""}`}>
+                                {move.asker.name} asked 
+                            </div>
+                            <div className="message_info-content history_move-what">
+                                {move.recipient} do you have the {move.rank} {move.suit}?
+                            </div>
                         </div>
                     </div>
                 );
@@ -93,11 +102,17 @@ class GameHistory extends Component {
                 return (
                     <>
                         <div className={`message history_move ${this.props.all?"left":""}`}>
-                            <div className={`sender history_move-who ${this.props.all ? "more-space": ""}`}>
-                                {move.responder.name} said
+                            <div className={`message_img ${
+                                move.responder.index % 2 == 0? 'team-even' : 'team-odd'}`}>
+                                {FACES[move.responder.index]} 
                             </div>
-                            <div className="content history_move-what">
-                                {move.response}
+                            <div className="message_info">
+                                <div className={`message_info-sender history_move-who ${this.props.all ? "more-space": ""}`}>
+                                    {move.responder.name} said
+                                </div>
+                                <div className="message_info-content history_move-what">
+                                    {move.response}
+                                </div>
                             </div>
                         </div>
                         <div className="server-message history_move-result">
@@ -108,7 +123,7 @@ class GameHistory extends Component {
             }
         });
         return (
-            <div className={`history ${this.props.hidden ? "hidden" : ""}`} hidden={this.props.hidden}>
+            <div className={`messages history ${this.props.hidden ? "hidden" : ""}`} hidden={this.props.hidden}>
                 {this.props.all 
                     ? history
                     : history[history.length - 1]}
@@ -122,11 +137,6 @@ class PlayRoom extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            asking: false,
-            responding: false,
-            declaring: false,
-            showDeclare: false, 
-            declarer: "",
             guess: [],
             ongoing: true,
             winner: null,
@@ -146,17 +156,6 @@ class PlayRoom extends Component {
     };
 
     componentDidMount() {
-        // pause game and update whose declaring
-        socket.on("declaring", (info) => {
-            this.setState({
-                declaring: true,
-                declarer: info.player,
-                asking: false,
-                responding: false,
-                showDeclare: this.state.declarer === this.props.name,
-            });
-        });
-
         // update with the declarer's guess
         socket.on("declared", info => {
             this.setState({guess: info.guess});
@@ -164,24 +163,8 @@ class PlayRoom extends Component {
 
         // update game with results of the declare
         socket.on("updateScore", update => {
-            const hand = removeHalfSuit(this.props.hand, update.declare);
-            this.props.updateHand(hand);
-            this.props.checkIfActive(hand);
-
-            const even = this.props.index % 2 === 0;
-            const win = this.props.updateScore(update.even === even);
-           
-            if (win) {
-                this.setState({
-                    ongoing: false,
-                    winner: even ? "even" : "odd",
-                });
-            }
             // reset declaring states
             this.setState({
-                declaring: false,
-                showDeclare: false, 
-                declarer: "",
                 guess: [],
                 lie: false,
                 voted: false,
@@ -205,75 +188,51 @@ class PlayRoom extends Component {
         const decBtn = (<button className="btn declare-btn" onClick={()=>this.setState({showDeclare: true})}>Declare</button>);
         return (
             <>
-                <div className="header">
-                { this.state.ongoing ? 
-                    (<>{this.state.declarer ? "": decBtn} 
-                        { this.state.showDeclare && 
-                            <Declare 
-                                name={this.props.name}
-                                yourTeam={this.props.yourTeam} 
-                                roomKey={this.props.roomKey}
-                                pause={() => this.setState({declaring: true, declarer: this.props.name})}
-                                reset={() => this.setState({showDeclare: false,})}
-                            />}
-                        {this.state.declarer &&
-                            <DecResponse
-                                isDeclarer={this.state.declarer === this.props.name}
-                                name={this.props.name}
-                                guess={this.state.guess}
-                                declarer={this.state.declarer}
-                                roomKey={this.props.roomKey}
-                                hand={this.props.hand}
-                                index={this.props.index}
-                                minVotes={this.props.yourTeam.length + this.props.otherTeam.length - 1}
-                            />}
-                        {
-                            this.props.whoseTurn === this.props.name && !this.state.declaring ?
-                                this.props.turnType === "ask" ?
-                                    (<><button
-                                        className="btn ask-btn"
-                                        onClick={() => this.setState({asking: true})}
-                                    >
-                                        ASK!!!!
-                                    </button>
-                                    {!this.state.declaring && this.state.asking && 
-                                    <Ask
-                                        submitAsk={this.props.submitAsk}
-                                        otherTeam={this.props.otherTeam}
-                                        hand={this.props.hand}
-                                        reset={()=>this.setState({asking:false})}
-                                    />}
-                                    </>)
-                                    : (<><button 
-                                            className="btn respond-btn"
-                                            onClick={()=>this.setState({responding:true})}
-                                        >
-                                            Respond
-                                        </button>
-                                    {!this.state.declaring && this.state.responding && 
-                                    <Respond
-                                        submitResponse={this.props.submitResponse}
-                                        asker={asker}
-                                        reset={()=> this.setState({responding: false})}
-                                    />}</>)
-                                : ""
-                        }
-                        </>)
-                        : (<div className="game-over">Game Over! {`Team ${this.state.winner} won!`}</div>) }
-                        <div className={`overlay ${this.state.showDeclare || this.state.asking || this.state.responding ? "" : "hidden"}`}></div>
-                </div>
+                { !this.props.gameOver && this.props.showDeclare && 
+                    <Declare 
+                        name={this.props.name}
+                        yourTeam={this.props.yourTeam} 
+                        roomKey={this.props.roomKey}
+                        pause={this.props.pause}
+                        reset={this.props.resetDeclare}
+                    />}
+                {!this.props.gameOver && this.props.declarer &&
+                    <DecResponse
+                        isDeclarer={this.props.declarer === this.props.name}
+                        name={this.props.name}
+                        guess={this.state.guess}
+                        declarer={this.props.declarer}
+                        roomKey={this.props.roomKey}
+                        hand={this.props.hand}
+                        index={this.props.index}
+                        minVotes={this.props.yourTeam.length + this.props.otherTeam.length - 1}
+                    />}
+                {!this.props.gameOver && !this.props.declaring && this.props.asking && 
+                    <Ask
+                        submitAsk={this.props.submitAsk}
+                        otherTeam={this.props.otherTeam}
+                        hand={this.props.hand}
+                        reset={this.props.resetAsk}
+                    />}
+                {!this.props.gameOver && !this.props.declaring && this.props.responding && 
+                    <Respond
+                        submitResponse={this.props.submitResponse}
+                        asker={asker}
+                        reset={this.props.resetRespond}
+                    />}
+                <div className={`overlay ${this.props.showDeclare || this.props.asking || this.props.responding ? "" : "hidden"}`}></div>
                 <div className="container">
-                    <div className={"sidebar-container"}>
+                    <div className="sidebar">
                         <div className="sidebar-label">
                             <span
-                                className={`chat-label side-label ${this.state.sidebar === "chat" ? "active-sidebar" : "inactive-sidebar"}`}
+                                className={`sidebar-label_options ${this.state.sidebar === "chat" ? "active-sidebar" : "inactive-sidebar"}`}
                                 onClick={() => this.changeSidebar("chat")}
                             >
                                 Chat Room
                             </span>
                             <span className={"divider"}>|</span>
                             <span
-                                className={`ask-label side-label ${this.state.sidebar === "ask" ? "active-sidebar" : "inactive-sidebar"}`}
+                                className={`sidebar-label_options ${this.state.sidebar === "ask" ? "active-sidebar" : "inactive-sidebar"}`}
                                 onClick={() => this.changeSidebar("ask")}
                             >
                                 Ask History
@@ -292,7 +251,7 @@ class PlayRoom extends Component {
                             hidden={this.state.sidebar === "chat"}
                         />
                     </div>
-                    <div className="playroom-container">                            
+                    <div className="main-container playroom">                            
                         {this.props.history &&
                             <GameHistory
                                 history={this.props.history}

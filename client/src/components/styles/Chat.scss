@@ -12,6 +12,19 @@
   padding: 0 1em;
 }
 
+.sidebar-label {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  color: white;
+  height: 2.5em;
+  width: 100%;
+  background-color: $chat-label;
+  border-radius: 15px 15px 0 0;
+}
+
+
 .messages {
   padding: 20px 1.5em;
   height: 90%;

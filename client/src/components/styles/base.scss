@@ -12,11 +12,15 @@ $chat-label: #BDC4C1;
 
 $out: #858585;
 $alert: #BC0202;
+$alert-shadow: #C92C32;
 $accept: #50A385;
+$accept-shadow: #3F9475;
 $object: #BF150B;
+$object-shadow: #AD1209;
 
 $radius: 10px;
 $long: 250px;
+$short: 125px;
 
 $button-font-size: 14px;
 $main-font-size: 16px;
@@ -119,8 +123,15 @@ body {
     @include inverted-btn($primary);
 }
 
+.alert-btn {
+    @include solid-btn($alert, $alert-shadow);
+}
+
 .long-btn {
     width: $long;
+}
+.short-btn {
+    width: $short;
 }
 
 input {
