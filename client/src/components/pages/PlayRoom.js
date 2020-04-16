@@ -151,6 +151,9 @@ class PlayRoom extends Component {
             this.setState({
                 declaring: true,
                 declarer: info.player,
+                asking: false,
+                responding: false,
+                showDeclare: this.state.declarer === this.props.name,
             });
         });
 
@@ -200,7 +203,6 @@ class PlayRoom extends Component {
         this.props.history.length !== 0 ? asker = this.props.history[this.props.history.length - 1].asker.name : asker = "";
 
         const decBtn = (<button className="btn declare-btn" onClick={()=>this.setState({showDeclare: true})}>Declare</button>);
-
         return (
             <>
                 <div className="header">
