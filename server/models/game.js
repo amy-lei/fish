@@ -19,6 +19,7 @@ const GameSchema = new mongoose.Schema({
     turnType: {type: String, default: "ask"},
     even: {type: Number, default: 0},
     odd: {type: Number, default: 0},
+    start: {type: Boolean, default: false},
 });
 
 module.exports = mongoose.model("game", GameSchema);

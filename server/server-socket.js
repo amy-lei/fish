@@ -67,23 +67,31 @@ module.exports = {
       socket.on("disconnect", (reason) => {
         const user = socketToUserMap[socket.id];
         const roomKey = userSocketIdToGameKey[socket.id];
-        removeUser(socket, roomKey);
-
         const otherUserSockets = getAllSocketsFromGame(roomKey);
-        // When there are no more users left in a room, delete the room and all messages associated with the room.
-        if (otherUserSockets.length === 0) {
+        
+        if (otherUserSockets.length === 1) {
+          removeUser(socket, roomKey);
           delete gameToSocketsMap[roomKey];
           Game.deleteOne({key: roomKey})
-              .then((game) => console.log("deleted the game with key", roomKey));
+          .then((game) => console.log("deleted the game with key", roomKey));
           Message.deleteMany({key: roomKey})
-              .then((messages) => console.log("deleted messages with key", roomKey));
-        }
-        // When there are still users in the room, remove the one that disconnected from database
+          .then((messages) => console.log("deleted messages with key", roomKey));
+        }// When there are still users in the room, remove the one that disconnected from database
         else {
-          updateGamePlayerList(user, roomKey);
-          otherUserSockets.forEach(client => {
-            client.emit("disconnected", user);
-          })
+          Game
+          .findOne({key: roomKey})
+          .then(g => {
+            if (!g.start) {
+                removeUser(socket, roomKey);
+                updateGamePlayerList(user, roomKey);
+                otherUserSockets.forEach(client => {
+                  client.emit("disconnected", user);
+                });
+              }
+              else {
+                console.log("disconnected mid game, dont delete");
+              }
+            })
         }
       });
     });

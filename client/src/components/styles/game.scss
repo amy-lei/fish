@@ -1,9 +1,6 @@
 @import './App.scss';
 @import './base.scss';
 
-.hidden {
-    display:none;
-}
 
 // For Game.js
 .game-container{
@@ -255,3 +252,6 @@
     font-size: 40px;
 }
 
+.hidden {
+    display:none !important;
+}
