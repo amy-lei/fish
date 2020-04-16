@@ -13,6 +13,7 @@ class Chat extends Component {
       allMessages: [],
       curMessage: "",
     };
+    this.bottom_ref = React.createRef();
   }
 
   componentDidMount() {
@@ -62,23 +63,29 @@ class Chat extends Component {
       this.setState({
         allMessages: this.state.allMessages.concat(turnUpdate),
       });
-  });
+    });
 
-  // update turn and hand if successful
-  socket.on("respond", update => {
-      if (!update.move.success) {
-        const turnUpdate = {
-          sender_name: "server",
-          content: `It is ${update.move.responder.name}'s turn to ask.`,
-        };
-        this.setState({
-          allMessages: this.state.allMessages.concat(turnUpdate),
-        });
-      }
-
-  });
-
+    // update turn and hand if successful
+    socket.on("respond", update => {
+        if (!update.move.success) {
+          const turnUpdate = {
+            sender_name: "server",
+            content: `It is ${update.move.responder.name}'s turn to ask.`,
+          };
+          this.setState({
+            allMessages: this.state.allMessages.concat(turnUpdate),
+          });
+        }
+    });
   }
+
+  componentDidUpdate () {
+    this.scrollToBottom();
+  }
+
+  scrollToBottom = () => {
+    this.bottom_ref.current.scrollIntoView({behavior: "smooth"});
+  };
 
   loadMessages = async () => {
     const query = {
@@ -88,9 +95,9 @@ class Chat extends Component {
     this.setState({ allMessages: messages });
   };
 
-  sendMessage = async () => {
+  sendMessage = async (e) => {
     const trimmedMessage = this.state.curMessage.trim();
-    if (trimmedMessage === "") {
+    if ((e && e.key !== "Enter") || trimmedMessage === "") {
       return;
     }
     const body = { 
@@ -131,9 +138,11 @@ class Chat extends Component {
     }
 
     return (
-      <div className="chat">
+      <div className="chat" hidden={this.props.hidden}>
         <div className="message-container">
           {messages}
+          <div className={"thing-at-bottom"} ref={this.bottom_ref}>
+          </div>
         </div>
         <div className="chat-input-wrapper">
           <input
@@ -142,8 +151,9 @@ class Chat extends Component {
             onChange={this.handleOnChange}
             className="chat-input"
             placeholder="Send a message"
+            onKeyPress={(e) => this.sendMessage(e)}
           />
-          <button onClick={this.sendMessage} className="btn chat-submit">
+          <button onClick={() => this.sendMessage(null)} className="btn chat-submit">
             &lt;
           </button>
         </div>

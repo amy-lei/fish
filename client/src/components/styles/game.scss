@@ -115,6 +115,18 @@
     font-size: 20px;
 }
 
+.disabled-name {
+    @include main-btn($out);
+    margin-top: 20px;
+    font-size: 20px;
+    cursor: not-allowed;
+    &:hover {
+        background-color: $out;
+        border-color: $out;
+        color: white;
+    }
+}
+
 // For WaitingRoom.js
 .container,
 .waiting-container {
@@ -163,7 +175,7 @@
     font-family: 'Secular One', sans-serif;
     font-size: 100px;
     line-height: 100%;
-
+    cursor: pointer;
 }
 
 .waiting-button {
@@ -172,6 +184,20 @@
     padding: 15px 32px;
     margin-top: 1em;
     font-size: 20px;
+}
+
+.disabled-start {
+    @include main-btn($out);
+    width: 12em;
+    padding: 15px 32px;
+    margin-top: 1em;
+    font-size: 20px;
+    cursor: not-allowed;
+    &:hover {
+        background-color: $out;
+        border-color: $out;
+        color: white;
+    }
 }
 
 .players-container {

@@ -6,6 +6,8 @@ import Chat from "./Chat.js";
 import "../styles/game.scss";
 import "../styles/cards.scss";
 
+const MAX_PLAYERS = 3;
+
 class WaitingRoom extends Component {
     constructor(props) {
         super(props);
@@ -13,6 +15,7 @@ class WaitingRoom extends Component {
             players: this.props.isCreator ? [{name:this.props.name, index: 0, ready: true, active: true}] : this.props.roomInfo.players,
             index: this.props.index,
         };
+        this.key_ref = React.createRef();
     };
 
     componentDidMount() {
@@ -42,13 +45,14 @@ class WaitingRoom extends Component {
         });
     }
 
-    // TODO: add a ready button for non creators.
     start = async () => {
-        for (let player of this.state.players) {
-            if (!player.ready) {
-                alert("Not all players are ready!");
-                return;
-            }
+        if (!this.state.players.every(player => player.ready)) {
+            alert("Not all players are ready!");
+            return;
+        }
+        if (this.state.players.length < MAX_PLAYERS) {
+            alert(`You need ${MAX_PLAYERS} players to start!`);
+            return;
         }
         const body = {key: this.props.roomKey};
         const hands = await post("/api/start_game", body);
@@ -81,28 +85,46 @@ class WaitingRoom extends Component {
 
     };
 
+    copyKey = () => {
+        // Got this from W3 schools
+        const keyText = this.key_ref.current;
+        /* Select the text field */
+        keyText.select();
+        keyText.setSelectionRange(0, 99999); /*For mobile devices*/
+
+        /* Copy the text inside the text field */
+        document.execCommand("copy");
+    };
+
     render() {
         const areYouReady = this.state.players.filter(player => player.name === this.props.name)[0].ready;
         const placeholderPlayers = [...Array(6 - this.state.players.length).keys()].map((num) => (
             {name: `placeholder${num}`, index: -1, ready: false, active: false}
         ));
+        const disableStart = !(this.state.players.every(player => player.ready) && this.state.players.length === MAX_PLAYERS);
         return (
         <>
             <div className="header"></div>
             <div className={"waiting-container"}>
                 <div className={"chat-container"}>
-                    <div className={"chat-label sidebar-label"}>Chat Room</div>
+                    <div style={{cursor: "default"}} className={"chat-label sidebar-label"}>Chat Room</div>
                     <Chat
                         name={this.props.name}
                         roomKey={this.props.roomKey}
+                        hidden={false}
                     />
                 </div>
                 <div className={"waiting-key-container"}>
                     <div className={"friends-label"}>Share this key with five friends:</div>
-                    <div className={"waiting-key"}>{this.props.roomKey}</div>
+                    <div className={"waiting-key"} onClick={this.copyKey} >{this.props.roomKey}</div>
+                    <input type="text" ref={this.key_ref} value={this.props.roomKey} hidden={true} readOnly/>
                     {
                         this.props.isCreator ?
-                        <button onClick={this.start} className={"waiting-button"}>
+                        <button
+                            onClick={this.start}
+                            className={disableStart ? "disabled-start" : "waiting-button"}
+                            disabled={disableStart}
+                        >
                             Start Game
                         </button>
                         :

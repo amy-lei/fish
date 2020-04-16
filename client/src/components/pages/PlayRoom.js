@@ -91,7 +91,6 @@ class GameHistory extends Component {
                 );
             else {
                 const result = move.success ? "did" : "did not";
-                console.log(move);
                 return (
                     <>
                         <div className={`message history_move ${this.props.all?"left":""}`}>
@@ -109,10 +108,8 @@ class GameHistory extends Component {
                 );
             }
         });
-        console.log(history);
-        console.log(this.props.history);
         return (
-            <div className={'history'}>
+            <div className={'history'} hidden={this.props.hidden}>
                 {this.props.all 
                     ? history
                     : history[history.length - 1]}
@@ -282,16 +279,16 @@ class PlayRoom extends Component {
                             </span>
                         </div>
 
-                        {
-                            this.state.sidebar === "chat" ?
-                                <Chat name={this.props.name} roomKey={this.props.roomKey}/>
-                                :
-                                <GameHistory
-                                    history={this.props.history}
-                                    all={true}
-                                />
-                        }
-                        
+                        <Chat
+                            name={this.props.name}
+                            roomKey={this.props.roomKey}
+                            hidden={this.state.sidebar !== "chat"}
+                        />
+                        <GameHistory
+                            history={this.props.history}
+                            all={true}
+                            hidden={this.state.sidebar === "chat"}
+                        />
                     </div>
                     <div className="playroom-container">                            
                         {this.props.history &&
