@@ -1,4 +1,4 @@
-const SIZE = 2;
+const SIZE = 54;
 const SUITS = [
     'heart', 
     'diamond', 
