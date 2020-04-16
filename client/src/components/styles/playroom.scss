@@ -164,9 +164,9 @@
     }
     .left {
         justify-content: flex-start;
-    }
-    .history_move-result {
-        padding: 0.5rem 0 .5rem 0;
+        &:first-child {
+            padding-top:1em;
+        }
     }
 }
 

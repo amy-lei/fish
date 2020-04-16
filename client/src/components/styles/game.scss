@@ -143,3 +143,12 @@
 .hidden {
     display:none !important;
 }
+.playroom {
+    .history {
+        justify-content: center;
+        margin: auto;
+        .message {
+            max-width: 100%;
+        }
+    }
+}

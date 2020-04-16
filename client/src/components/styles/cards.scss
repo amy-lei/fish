@@ -1,12 +1,13 @@
 .cards {
     display: flex;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
     width: 90%;
     margin:0 auto;
+    justify-content: center;
 }
 .card{
     transition: 0.5s;
-    width: 13.5%;
+    // width: 13.5%;
     img {
         border-radius: 1rem;
         box-shadow: -2px 2px 5px 1px rgba(black, 0.1);
@@ -18,23 +19,23 @@
         }
     }
     &:not(:first-child) {
-        margin-left:-4rem;
+        margin-left:-7rem;
     }
 
 }
 
 @for $i from 1 through 20 {
-    @if $i < 7 {
-        .card-#{$i} {
-            width: 44% - $i * 4%;
+    @if $i < 10 {
+        .card-#{$i}:not(:first-child) {
+            margin-left: -.75rem * $i - 5.5rem;
         }
-    } @else if $i < 11 {
-        .card-#{$i} {
-            width: 29% - $i * 1.5%;
+    } @else if $i < 15 {
+        .card-#{$i}:not(:first-child) {
+            margin-left: -.25rem * $i - 9.5rem;
         }
     } @else {
-        .card-#{$i} {
-            width: 16.5% - floor($i / 2) * 0.5%;
+        .card-#{$i}:not(:first-child) {
+            margin-left: -.125rem * $i - 11.25rem;
         }
     }
 }

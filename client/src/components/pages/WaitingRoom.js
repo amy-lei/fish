@@ -6,7 +6,7 @@ import Chat from "./Chat.js";
 import "../styles/game.scss";
 import "../styles/cards.scss";
 
-const MAX_PLAYERS = 2;
+const MAX_PLAYERS = 1;
 const FACES = [':)', '•_•', '=U','°_o',':O','°Д°']
 
 class WaitingRoom extends Component {
