@@ -35,22 +35,22 @@ class GameStats extends Component {
         else team = this.props.otherTeam;
 
         if (team) {
-            return team.map(player => {
+            return team.map((player, k) => {
                 return(
-                <div className={`stats_player team-${parity} ${player.active ? "" : "out"}`}>
+                <div key={k} className={`stats_player team-${parity} ${player.active ? "" : "out"}`}>
                     {player.name} {player.active ? "": " (OUT)"}
                 </div>
             )});
         }
-    }
+    };
 
     render() {
 
         return (
         <div className="stats">
             <div className="stats_team-name">
-                {Object.keys(PARITY_TO_TEAM).map(parity => (
-                    <span> 
+                {Object.keys(PARITY_TO_TEAM).map((parity, k) => (
+                    <span key={k}>
                         TEAM {PARITY_TO_TEAM[parity]} 
                         {this.props.parity === parity 
                             ? `(YOU): ${this.props.yourTeamScore}`
@@ -134,13 +134,45 @@ class PlayRoom extends Component {
         };
     }
 
+    onDragStart = (e, index) => {
+        e.dataTransfer.setData("index", index);
+    };
+
+    onDragOver = (e) => {
+        e.preventDefault();
+    };
+
+    onDrop = (e, index) => {
+        let currentHand = this.props.hand.slice();
+        const prevIndex = e.dataTransfer.getData("index");
+        const droppedCard = currentHand[prevIndex];
+        currentHand.splice(prevIndex, 1);
+        console.log(this.props.hand, currentHand);
+        if (index >= prevIndex) {
+            index = index - 1;
+        }
+        currentHand.splice(index, 0, droppedCard);
+        console.log("added", currentHand);
+        this.props.updateHand(currentHand);
+    };
+
     /*
      visualize your current hand
      */
     createCards = (hand) => {
-        return hand.map(card => (
-            <div className={`card card-${this.props.hand.length}`}>
-                <img src={card_svgs[`${card.rank}-${card.suit}.svg`]}/>
+        return hand.map((card, k) => (
+            <div
+                className={`card card-${this.props.hand.length}`}
+                key={k}
+                draggable
+                onDragStart={(e) => this.onDragStart(e, k)}
+                onDragOver={(e) => this.onDragOver(e)}
+                onDrop={(e) => this.onDrop(e, k)}
+            >
+                <img
+                    src={card_svgs[`${card.rank}-${card.suit}.svg`]}
+                    draggable={false}
+                />
             </div>
         ));
     };
