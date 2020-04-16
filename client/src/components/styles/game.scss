@@ -1,257 +1,154 @@
 @import './App.scss';
 @import './base.scss';
 
-
-// For Game.js
 .game-container{
     width: 100vw;
     height: 100vh;
+    &.white {
+        background-color: white;
+    }
 }
 
 // For Home.js
-.home-container {
+.home {
     text-align: center;
     padding-top: 15vh;
-}
+    height:90vh;
 
-//focus go away border
-.home-button {
-    @include main-btn($primary);
-    width: 12em;
-    padding: 15px 32px;
-    margin-bottom: 20px;
-    font-size: 18px;
-}
-
-.title {
-    font-family: 'Secular One', sans-serif;
-    font-size: 150px;
-}
-
-.room-key-wrapper {
-    width: 20em;
-    margin: 0 auto;
-}
-
-.room-key-label {
-    font-family: 'Secular One', sans-serif;
-    font-size: 17px;
-    text-align: left;
-    display: block;
-    padding-left: 0.5em;
-}
-
-.room-key-input {
-    border-width: 1px;
-    border-color: #BFBFBF;
-    border-style: solid;
-    border-right: none;
-    border-radius: 50px 0 0 50px;
-    text-align: center;
-    font-family: 'Secular One', sans-serif;
-    font-size: 20px;
-    padding: 0.5em 0;
-    text-decoration: none;
-    width: 60%;
-}
-
-.room-key-submit {
-    @include inverted-btn($primary);
-    display:inline;
-    background-color: #FFF;
-    border: solid 1px #D68033;
-    border-radius: 0 50px 50px 0;
-    color: #D68033;
-    font-family: 'Secular One', sans-serif;
-    font-size: 20px;
-    padding: 0.5em 0;
-    text-align: center;
-    text-decoration: none;
-    width: 39%;
-}
-
-.room-key-error {
-    color: #808080;
-    font-family: 'Source Sans Pro', sans-serif;
-    font-size: 14px;
-    font-style: italic;
+    &-tagline {
+        font-weight: 500;
+        font-size: $main-font-size;
+        padding: 10px;
+    }
+    &-options {
+        display:flex;
+        flex-direction: column;
+        align-items: center;
+        margin-top: 20px;
+    }
+    div > button {
+        margin-bottom: 15px;
+    }
+    .room-key-field {
+        width: $long;
+        margin: 0 auto;
+    }
 }
 
 // For NameForm.js
-
-.nameform-container {
-    margin: 0 auto;
-    text-align: left;
-    padding-top: 35vh;
-    width: 30%;
-}
-
 .name-label {
-    font-family: 'Secular One', sans-serif;
-    font-size: 20px;
-    display: block;
-    margin-bottom: 10px;
-}
-
-.name-input {
-    border-width: 1px;
-    border-color: #BFBFBF;
-    border-style: solid;
-    border-radius: 50px;
-    font-family: 'Secular One', sans-serif;
-    font-size: 20px;
-    padding: 0.5em 1em;
-    margin-bottom: 20px;
-    text-decoration: none;
-    width: 100%
-}
-
-.name-submit {
-    @include main-btn($primary);
-    margin-top: 20px;
-    font-size: 20px;
+    font-size: $main-font-size;
+    font-weight: $label-font-weight;
+    margin-bottom: 5px;
 }
 
 .disabled-name {
-    @include main-btn($out);
-    margin-top: 20px;
-    font-size: 20px;
+    @include inverted-btn($out);
     cursor: not-allowed;
-    &:hover {
-        background-color: $out;
-        border-color: $out;
-        color: white;
-    }
+}
+
+.container {
+    display: flex;
+    justify-content: space-evenly;
+    align-items: center;
+    height: 90vh;
+
+}
+.main-container,
+.sidebar {
+    background-color: white;
+    height: 90%;
+    border-radius: 15px;
+    box-shadow: 0px 4px 40px rgba(0, 0, 0, 0.05);
+}
+.sidebar {
+    width: 28%;
+}
+.main-container {
+    width: 65%;
 }
 
 // For WaitingRoom.js
-.container,
-.waiting-container {
+.waiting-room {
     display: flex;
-    height: 90vh;
-}
+    flex-direction: column;
+    padding: 3em;
+    align-items: center;
+    justify-content: center;
 
-.chat-container {
-    width: 35%;
-    height: 100%;
-    padding: 0 0 0 10px;
-}
-
-.waiting-key-container {
-    padding: 1.5em 0 0 6em;
-    width: 65%;
-}
-.sidebar-label {
-    border-bottom: 1px solid #808080;
-    font-size: 24px;
-    margin: 0 30px 10px 30px;
-    height: 7.5%;
-}
-
-.chat-label {
-    color: #D68033;
-    font-family: 'Secular One', sans-serif;
-    font-size: 24px;
-    // margin: 0 30px 10px 30px;
-    height: 7.5%;
-}
-.sidebar-label{
-    cursor: pointer;
-    &:hover {
-        color: $primary;
+    &_top,
+    &_players {
+        width: 85%;
     }
-}
 
-.friends-label {
-    font-family: 'Secular One', sans-serif;
-    font-size: 18px;
+    &_label {
+        font-size: $main-font-size;
+    }
 
-}
+    &_key {
+        font-size: 100px;
+        font-weight: $bold-font-weight;
+        line-height: 100%;
+        margin-bottom: 10px;
+        cursor: pointer;
+    }
+    
+    &_players {
+        display: flex;
+        flex-flow: row wrap;
+        justify-content: space-between;
+        padding-top: 20px;
+        // margin-left: -8%;
+        margin-top: 1em;
+        .player {
+            display: flex;
+            flex-direction: row;
+            justify-content: space-evenly;
+            align-items: center;
+            width: 50%;
+            margin-bottom: 1em;
 
-.waiting-key {
-    font-family: 'Secular One', sans-serif;
-    font-size: 100px;
-    line-height: 100%;
-    cursor: pointer;
-}
+            &-name {
+                display: flex;
+                flex-direction: column;
+                justify-self: center;
+                align-items: center;
+                background-color: $light-grey;
+                font-size: $main-font-size;
+                padding: 0.25em 1em;
+                width: 60%;
+                min-height: 50%;
+            }
 
-.waiting-button {
-    @include main-btn($primary);
-    width: 12em;
-    padding: 15px 32px;
-    margin-top: 1em;
-    font-size: 20px;
+            &-img {
+                @include player-logo;
+                height: 60px;
+                width: 60px;
+            }
+            .YOU {
+                border: 5px solid #F4B700;
+            }
+            .placeholder {
+                background-color: $dark-grey;
+            }
+        }
+    }
 }
 
 .disabled-start {
-    @include main-btn($out);
-    width: 12em;
-    padding: 15px 32px;
-    margin-top: 1em;
-    font-size: 20px;
-    cursor: not-allowed;
-    &:hover {
-        background-color: $out;
-        border-color: $out;
-        color: white;
-    }
-}
-
-.players-container {
-    display: flex;
-    flex-flow: row wrap;
-    padding-top: 20px;
-    margin-left: -8%;
-    margin-top: 1em;
-}
-
-.player {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    width: 33%;
-    margin-bottom: 2em;
-}
-
-.waiting-player-name {
-    background-color: #F3F3F3;
-    font-family: 'Secular One', sans-serif;
-    font-size: 17px;
-    padding: 0.25em 1em;
-    width: 60%;
-    text-align: center;
-    // min-height: 30px;
-}
-
-.circle {
-    border-radius: 100%;
-    color: #FFF;
-    font-family: 'Secular One', sans-serif;
-    font-size: 18px;
-    margin-bottom: 1em;
-    padding: 20px 0 0 13px;
-    height: 70px;
-    width: 70px;
-    border: 4px solid rgba(0,0,0,0);
-}
-
-.ready {
-    border: 4px solid #685C5D;
-}
-
-.team-odd {
-    background-color: #CA5164;
-}
-
-.team-even {
-    background-color: #9BD0BF;
-}
-
-.placeholder {
-    background-color: #C4C4C4;
-    font-size: 40px;
+    @include solid-btn($out, $out);
+    cursor: not-allowed !important;
 }
 
 .hidden {
     display:none !important;
+}
+.playroom {
+    .history {
+        justify-content: center;
+        margin: auto;
+        .message {
+            max-width: 100%;
+        }
+    }
 }

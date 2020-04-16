@@ -1,14 +1,20 @@
 import React, { Component } from "react";
 import { post } from "../../utilities";
+import landing_illustration from "../../public/landing_illustration.svg";
 
-class Home extends Component {
+class RoomForm extends Component {
     constructor(props) {
         super(props);
         this.state = {
             roomKey: "",
             wantToJoinRoom: false,
             roomKeyError: false,
-        }
+        };
+    }
+
+    createRoom = () => {
+        this.props.changeView();
+        this.props.updateCreator();
     }
 
     keyChange = (e) => {
@@ -18,16 +24,14 @@ class Home extends Component {
     };
 
     checkRoom = async (e) => {
-        if ((e && e.key !== "Enter") || this.state.roomKey.trim() === "") {
-            return;
-        }
+        if ((e && e.key !== "Enter") || this.state.roomKey.trim() === "") { return; }
         const body = {
             roomKey: this.state.roomKey,
         };
         const canJoin = await post("/api/check_room", body);
         if (canJoin) {
             this.props.enterKey(this.state.roomKey);
-            this.props.changePage("join_room");
+            this.props.changeView();
         }
         else {
             this.setState({roomKeyError: true})
@@ -35,46 +39,130 @@ class Home extends Component {
     };
 
     render() {
-        return (
-            <div className={"home-container"}>
-                <p className={"title"}>fish</p>
+        return (<>
+            <button
+                onClick={this.createRoom}
+                className="btn primary-btn long-btn"
+            >
+                Create a Room
+            </button>
+            { !this.state.wantToJoinRoom ?
                 <button
-                    onClick={() => this.props.changePage("create_room")}
-                    className={"home-button"}
+                    onClick={() => {this.setState({wantToJoinRoom: true})}}
+                    className="btn primary-btn long-btn"
                 >
-                    Create a Room
+                    Join a Room
                 </button>
-                <br/>
-                {
-                    !this.state.wantToJoinRoom ?
-                        <button
-                            onClick={() => {this.setState({wantToJoinRoom: true})}}
-                            className={"home-button"}
-                        >
-                            Join a Room
-                        </button>
-                        :
-                        <div className={"room-key-wrapper"}>
-                            <div className={"room-key-label"}>Enter room key:</div>
-                            <input
-                                type="text"
-                                value={this.state.roomKey}
-                                onChange={(e) => this.keyChange(e)}
-                                className={"room-key-input"}
-                                maxLength={4}
-                                onKeyPress={(e) => this.checkRoom(e)}
-                            />
-                            <button onClick={() => this.checkRoom(null)} className={"room-key-submit"}>ENTER</button>
-                            {
-                                this.state.roomKeyError &&
-                                <div className={"room-key-error"}>
-                                    The key you entered does not exist. Please try again.
-                                </div>
-                            }
+                :
+                <div className="input-btn-wrapper room-key-field">
+                    <input
+                        className="input-btn-field room-key-input"
+                        type="text"
+                        value={this.state.roomKey}
+                        maxLength={4}
+                        placeholder="Enter room key"
+                        onChange={(e) => this.keyChange(e)}
+                        onKeyPress={(e) => this.checkRoom(e)}
+                    />
+                    <button 
+                        onClick={() => this.checkRoom(null)} 
+                        className={"btn primary-inverted-btn input-btn-submit"}
+                    >
+                        Enter
+                    </button>
+                    {
+                        this.state.roomKeyError &&
+                        <div className="warning">
+                            The key you entered does not exist
                         </div>
-                }
-            </div>
+                    }
+                </div>
+            }
+        </>)
+    }
+}
+
+class NameForm extends Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            name: "",
+            clickedButton: false,
+        };
+    };
+
+    nameChange = (e) => {
+        this.setState({
+            name: e.target.value.toUpperCase(),
+        });
+    };
+
+    submitName = (e) => {
+        if (this.state.clickedButton || this.state.name.trim() === "") {
+            return;
+        }
+        if (!e || e.key === "Enter") {
+            this.setState({clickedButton: true}, () => this.props.submitName(this.state.name));
+        }
+    };
+
+
+    render() {
+        return (
+            <>
+                <div className="name-label">Enter your name:</div>
+                <div className="input-btn-wrapper name">
+                    <input
+                        type="text"
+                        onChange={this.nameChange}
+                        value={this.state.name}
+                        className="input-btn-field"
+                        maxLength={10}
+                        onKeyPress={(e) => this.submitName(e)}
+                    />
+                    <button
+                        onClick={() => this.submitName(null)}
+                        className={`btn primary-inverted-btn input-btn-submit ${this.state.clickedButton ? "disabled-name" : ""}`}
+                        disabled={this.state.clickedButton}
+                    >
+                        Join
+                    </button>
+                </div>
+            </>
         )
+    }
+}
+
+
+class Home extends Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            view: "room",
+        }
+    }
+
+    render() {
+        return (<>
+            <div className="home">
+                <img className="home-illustration" src={landing_illustration}/>
+                <p className="home-tagline">Stay connected with your friends through fish!</p>
+                <div className="home-options">
+                    {
+                        this.state.view === "room"
+                        ? <RoomForm
+                            enterKey={this.props.enterKey}
+                            changeView={() => this.setState({view: "name"})}
+                            updateCreator={this.props.updateCreator}
+                            changePage={this.props.changePage}
+                        />
+                        : <NameForm
+                            submitName={this.props.submitName}
+                        />
+                    }
+                </div>
+            </div>
+        </>)
     }
 
 }

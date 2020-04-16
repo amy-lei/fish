@@ -1,0 +1,14 @@
+.header {
+    height: 10vh;
+    padding: 10px 20px 0!important;
+    display: flex;
+    width:100%;
+    justify-content: space-between; 
+    &-btns {
+        display:flex;
+        align-items: center;
+    }       
+    &-btn {
+        margin-left: 1em;
+    }
+}

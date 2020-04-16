@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import Home from "./Home.js";
-import NameForm from "./NameForm.js";
+import Header from "../modules/Header";
 import WaitingRoom from "./WaitingRoom.js";
 import PlayRoom from "./PlayRoom.js";
 import TestDrag from "./TestDrag.js";
@@ -32,6 +32,12 @@ class Game extends Component {
             whoseTurn: "",
             yourTeamScore: 0,
             otherTeamScore: 0,
+            asking: false,
+            responding: false,
+            declaring: false,
+            showDeclare: false, 
+            declarer: "",
+            winner: "",
         };
     };
 
@@ -175,6 +181,10 @@ class Game extends Component {
         }
     };
 
+    updateCreator = () => {
+        this.setState({isCreator: true});
+    }
+
     componentDidMount() {
         // update history and update turn after an ask
         socket.on("ask", update => {
@@ -225,6 +235,39 @@ class Game extends Component {
                 this.setState({otherTeam: updated});
             }
         });
+
+        socket.on("declaring", (info) => {
+            this.setState({
+                declaring: true,
+                declarer: info.player,
+                asking: false,
+                responding: false,
+                showDeclare: this.state.declarer === this.state.name,
+            });
+        });
+
+        // update game with results of the declare
+        socket.on("updateScore", update => {
+            const hand = removeHalfSuit(this.state.hand, update.declare);
+            this.updateHand(hand);
+            this.checkIfActive(hand);
+
+            const even = this.state.index % 2 === 0;
+            const win = this.updateScore(update.even === even);
+            
+            if (win) {
+                this.setState({
+                    winner: even ? "even" : "odd",
+                });
+            }
+            // reset declaring states
+            this.setState({
+                declaring: false,
+                showDeclare: false, 
+                declarer: "",
+            });
+        });
+
     }
 
     render() {
@@ -250,17 +293,33 @@ class Game extends Component {
                 );
             }
         });
-        
         return (
-            <div className="game-container">
+            <div className={`game-container ${this.state.page === "home" ? "white" : ""}`}>
+                <Header
+                    gameBegan={this.state.page === "play_room"}
+                    gameOver={this.state.winner !== ""}
+                    showAsk={!this.state.declaring 
+                            && this.state.turnType === "ask"    
+                            && this.state.whoseTurn === this.state.name
+                            }
+                    showRespond={!this.state.declaring 
+                            && this.state.turnType === "respond"    
+                            && this.state.whoseTurn === this.state.name
+                            }
+                    showDeclare={this.state.declarer === ""}
+                    onClickDeclare={() => this.setState({showDeclare: true})}
+                    onClickAsk={() => this.setState({asking: true})}
+                    onClickRespond={() => this.setState({responding: true})}
+                />
                 {this.state.page === "test"
                     && <TestDrag />}
                 {this.state.page === "home" 
-                    && <Home changePage={this.changePage} enterKey={this.updateKey}/>}
-                {this.state.page === "create_room"
-                    && <NameForm submitName={this.createRoom}/>}
-                {this.state.page === "join_room"
-                    && <NameForm submitName={this.enterRoom}/>}
+                    && <Home 
+                            changePage={this.changePage} 
+                            enterKey={this.updateKey}
+                            updateCreator={this.updateCreator}
+                            submitName={this.state.isCreator ? this.createRoom : this.enterRoom}
+                        />}
                 {this.state.page === "waiting_room"
                     &&                 
                     <WaitingRoom
@@ -292,6 +351,16 @@ class Game extends Component {
                             checkIfActive={this.checkIfActive}
                             yourTeamScore={this.state.yourTeamScore}
                             otherTeamScore={this.state.otherTeamScore}
+                            asking={this.state.asking}
+                            responding={this.state.responding}
+                            declaring={this.state.declaring}
+                            showDeclare={this.state.showDeclare}
+                            declarer={this.state.declarer}
+                            resetDeclare={() => this.setState({showDeclare: false,})}
+                            resetAsk={() => this.setState({asking: false,})}
+                            resetRespond={() => this.setState({responding: false,})}
+                            pause={() => this.setState({declaring: true, declarer: this.state.name})}        
+                            gameOver={this.state.winner !== ""}
                         />
                     </>)}
             </div>

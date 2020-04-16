@@ -9,23 +9,13 @@
     font-family: 'Source Sans Pro', sans-serif;
 }
 
-.playroom-container {
-    width: 65%;
-    height: 100%;
-    align-self: end;
-    padding: 1rem;  
+.playroom {
     display: flex;
     flex-direction: column;
     justify-content: space-between;  
 }
 
 .header {
-    height: 10vh;
-    padding: 15px 10px 0 0;
-    display: flex;
-    width:100%;
-    justify-content:flex-end;        
-
     .declare-btn{
         @include inverted-btn($primary);
     }
@@ -123,8 +113,8 @@
     z-index: 999;
 }
 .stats {
-    width: 100%;
-    margin: 2.5rem 0;
+    width: 90%;
+    margin: 1rem auto 2rem auto;
     .stats_team-name,
     .stats_players {
         display: flex;
@@ -132,10 +122,8 @@
     }
     .stats_team-name {
         margin-bottom: .75rem;
-        @include second-font();
     }
     .stats_players {
-        @include main-font();        
         .stats_player {
             width: 15.5%;
             text-align: center;
@@ -170,23 +158,15 @@
             margin: 0 0 1rem 0;
         }
     
-        .history_move-what{
-            min-height: 25px;
-            border-radius: 25px;
-            padding: 0.75rem 1.5rem;
-        }
-    
         .history_move-who {
-            min-width: 25px;
             padding: 0.75rem 0.25rem;
-            width: 15%;
         }
     }
     .left {
         justify-content: flex-start;
-    }
-    .history_move-result {
-        padding: 0.5rem 0 .5rem 0;
+        &:first-child {
+            padding-top:1em;
+        }
     }
 }
 
@@ -194,39 +174,20 @@
     width: 20% !important;
 }
 
-.sidebar-container {
-    width: 35%;
-    height: 100%;
-    padding: 0 0 0 10px;
-}
-
-.playroom-container {
-    width: 60%;
-}
-
 .active-sidebar {
-    color: #D68033;
-    font-family: 'Secular One', sans-serif;
-    font-size: 24px;
-    transition: color 0.25s;
-
+    cursor: pointer;
 }
-
 .inactive-sidebar {
-    color: black;
-    font-family: 'Secular One', sans-serif;
-    font-size: 24px;
-    transition: color 0.25s;
-
+    color: #888888 !important;
+    cursor: pointer;
+    
+    transition: color 0.2s;
     &:hover {
-        color: $primary;
+        color: white !important;
     }
 }
 
 .divider {
-    color: black;
-    font-family: "Source Sans Pro", sans-serif;
-    font-size: 24px;
     margin: 0 10px;
 }
 .game-over{

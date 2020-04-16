@@ -28,7 +28,9 @@ router.get("/chat", (req, res) => {
 });
 
 router.post("/chat", (req, res) => {
+    console.log(req.body.sender_index);
     const mes = new Message({
+        sender_index: req.body.sender_index,
         sender_name: req.body.sender_name,
         content: req.body.content,
         key: req.body.room_key,
@@ -112,6 +114,7 @@ router.post("/create_room", (req, res) => {
                 players: [{name: creatorName, index: 0, ready: true}],
                 hands: [],
                 start: false,
+                whoseTurn: creatorName,
             });
             game.save().then((game) => {
                 socket.addUser(roomKey, socket.getSocketFromSocketID(req.body.socketid), creatorName);

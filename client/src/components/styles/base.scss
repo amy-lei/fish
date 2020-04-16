@@ -1,33 +1,59 @@
+@import url('https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600&display=swap');
+
 $team-blue: #9BD0BF;
 $team-red: #CA5164;
-$primary: #D68033;
+$primary: #FE8D50;
+$primary-shadow: #F68244;
+$background: #F8F8F8;
+$light-grey: #f3f3f3;
+$grey: #808080;
+$dark-grey: #C4C4C4;
+$chat-label: #BDC4C1;
+
 $out: #858585;
 $alert: #BC0202;
-$team-blue: #9BD0BF;
-$team-red: #CA5164;
-$primary: #D68033;
-$out: #858585;
-$alert: #BC0202;
+$alert-shadow: #C92C32;
 $accept: #50A385;
+$accept-shadow: #3F9475;
 $object: #BF150B;
+$object-shadow: #AD1209;
+
+$radius: 10px;
+$long: 250px;
+$short: 125px;
+
+$button-font-size: 14px;
+$main-font-size: 16px;
+
+$main-font-weight: 400;
+$label-font-weight: 300;
+$bold-font-weight: 600;
 
 * {
-    box-sizing: border-box;
     margin: 0;
     padding: 0;
+    box-sizing: border-box;
     transition: opacity 0.2s;
+    font-family: 'Source Sans Pro', sans-serif;
+    font-weight: $main-font-weight;
     &:focus {
         outline:none;
     }
 }
 
+body {
+    width: 100vw;
+    height:100vh;
+    background-color: $background;
+    overflow:hidden;
+}
+
 @mixin btn {
-    padding: 15px 30px;
-    border-radius: 3rem;
+    padding: 12px 30px;
+    border-radius: $radius;
     border-style: solid;
     background-color: none;
-    font-family: 'Secular One', sans-serif;
-    font-size: 14px;
+    font-size: $button-font-size;
     cursor: pointer;
 }
 
@@ -37,6 +63,7 @@ $object: #BF150B;
     border-color: $color;
     color: white;
     transition: 0.25s;
+    box-shadow: 0px 4px 25px rgba(0, 0, 0, 0.1);
 
     &:hover{
         color: $color;
@@ -56,12 +83,31 @@ $object: #BF150B;
     border-color: $color;
     background-color: white;
     transition: 0.25s;
-
-
+    
     &:hover{
         background-color: $color;
         border-color: $color;
         color: white;
+    }
+    
+    &:focus{
+        box-shadow: 0 0 5px $color,
+    }
+}
+
+
+@mixin solid-btn($color, $hover) {
+    @include btn;
+    background-color: $color;
+    border-color: $color;
+    color: white;
+    transition: 0.25s;
+    box-shadow: 0px 4px 25px rgba(0, 0, 0, 0.1);
+
+    &:hover{
+        color: white;
+        border-color: $hover;
+        background-color: $hover;
     }
 
     &:focus{
@@ -69,10 +115,53 @@ $object: #BF150B;
     }
 }
 
+.primary-btn {
+    @include solid-btn($primary, $primary-shadow);
+}
+
+.primary-inverted-btn {
+    @include inverted-btn($primary);
+}
+
+.alert-btn {
+    @include solid-btn($alert, $alert-shadow);
+}
+
+.long-btn {
+    width: $long;
+}
+.short-btn {
+    width: $short;
+}
+
 input {
     &:focus{
         box-shadow: 0 0 5px $primary,
     }
+}
+
+.input-btn-field {
+    width: 65%;
+    padding: 12px 30px;
+    border: 1px solid $light-grey;
+    border-style: solid;
+    border-right: none;
+    border-radius: $radius 0 0 $radius;
+    text-align: center;
+    font-size: $button-font-size;
+    text-decoration: none;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.05);
+
+}
+
+.input-btn-submit {
+    display:inline;
+    background-color: white;
+    border-radius: 0 $radius $radius 0 !important;
+    text-align: center;
+    text-decoration: none;
+    width: 35%;
+
 }
 
 .warning {
@@ -94,4 +183,24 @@ input {
     &:hover {
         color: $primary;
     }
+}
+
+@mixin player-logo{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 100%;
+    color: #FFF;
+    font-size: 24px;
+    height: 50px;
+    width: 50px;
+    border: 4px solid rgba(0,0,0,0);
+}
+
+.team-odd {
+    background-color: $team-red;
+}
+
+.team-even {
+    background-color: $team-blue;
 }
