@@ -4,10 +4,16 @@ $team-blue: #9BD0BF;
 $team-red: #CA5164;
 $primary: #FE8D50;
 $primary-shadow: #F68244;
+$light-grey: #D6D6D6;
 $out: #858585;
 $alert: #BC0202;
 $accept: #50A385;
 $object: #BF150B;
+
+$radius: 10px;
+$long: 250px;
+
+$button-font-size: 14px;
 
 * {
     box-sizing: border-box;
@@ -22,11 +28,11 @@ $object: #BF150B;
 
 @mixin btn {
     padding: 12px 30px;
-    width: 300px;
-    border-radius: 10px;
+
+    border-radius: $radius;
     border-style: solid;
     background-color: none;
-    font-size: 14px;
+    font-size: $button-font-size;
     cursor: pointer;
 }
 
@@ -57,7 +63,6 @@ $object: #BF150B;
     background-color: white;
     transition: 0.25s;
     
-    
     &:hover{
         background-color: $color;
         border-color: $color;
@@ -68,6 +73,7 @@ $object: #BF150B;
         box-shadow: 0 0 5px $color,
     }
 }
+
 
 @mixin solid-btn($color, $hover) {
     @include btn;
@@ -86,16 +92,49 @@ $object: #BF150B;
     &:focus{
         box-shadow: 0 0 5px $color,
     }
-    
 }
+
 .primary-btn {
     @include solid-btn($primary, $primary-shadow);
+}
+
+.primary-inverted-btn {
+    @include inverted-btn($primary);
+}
+
+.long-btn {
+    width: $long;
 }
 
 input {
     &:focus{
         box-shadow: 0 0 5px $primary,
     }
+}
+
+.input-btn-field {
+    border-width: 1px;
+    border-color: $light-grey;
+    border-style: solid;
+    border-right: none;
+    border-radius: $radius 0 0 $radius;
+    text-align: center;
+    font-size: $button-font-size;
+    padding: 12px 30px;
+    text-decoration: none;
+    width: 65%;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.05);
+
+}
+
+.input-btn-submit {
+    display:inline;
+    background-color: white;
+    border-radius: 0 $radius $radius 0 !important;
+    text-align: center;
+    text-decoration: none;
+    width: 35%;
+
 }
 
 .warning {
