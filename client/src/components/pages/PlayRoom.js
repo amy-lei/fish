@@ -179,7 +179,7 @@ class PlayRoom extends Component {
                 declaring: false,
                 showDeclare: false, 
                 declarer: "",
-                guess: null,
+                guess: [],
                 lie: false,
                 voted: false,
                 votes: [],

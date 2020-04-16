@@ -243,12 +243,15 @@ router.post("/score", (req, res)=> {
         .then((game) => {
             if (req.body.even) game.even += 1;
             else game.odd += 1;
+            
+            const updatedHands = game.hands.map(hand => removeHalfSuit(hand, req.body.declare));
+            game.hands = updatedHands;
 
             socket.getAllSocketsFromGame(req.body.key).forEach(client => {
                 client.emit("updateScore", {even: req.body.even, declare: req.body.declare});
               });
 
-            game.save().then(() => res.send({}));
+            game.save().then((g) => {console.log(g); res.send({})});
         });
 });
 
