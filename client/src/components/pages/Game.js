@@ -175,6 +175,10 @@ class Game extends Component {
         }
     };
 
+    updateCreator = () => {
+        this.setState({isCreator: true});
+    }
+
     componentDidMount() {
         // update history and update turn after an ask
         socket.on("ask", update => {
@@ -256,11 +260,12 @@ class Game extends Component {
                 {this.state.page === "test"
                     && <TestDrag />}
                 {this.state.page === "home" 
-                    && <Home changePage={this.changePage} enterKey={this.updateKey}/>}
-                {this.state.page === "create_room"
-                    && <NameForm submitName={this.createRoom}/>}
-                {this.state.page === "join_room"
-                    && <NameForm submitName={this.enterRoom}/>}
+                    && <Home 
+                            changePage={this.changePage} 
+                            enterKey={this.updateKey}
+                            updateCreator={this.updateCreator}
+                            submitName={this.state.isCreator ? this.createRoom : this.enterRoom}
+                        />}
                 {this.state.page === "waiting_room"
                     &&                 
                     <WaitingRoom
