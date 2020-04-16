@@ -1,5 +1,4 @@
 import React, { Component } from "react";
-import { post } from "../../utilities";
 import { removeHalfSuit } from "../../game-utilities";
 import { socket } from "../../client-socket";
 import Chat from "./Chat.js";
@@ -109,7 +108,7 @@ class GameHistory extends Component {
             }
         });
         return (
-            <div className={'history'} hidden={this.props.hidden}>
+            <div className={`history ${this.props.hidden ? "hidden" : ""}`} hidden={this.props.hidden}>
                 {this.props.all 
                     ? history
                     : history[history.length - 1]}

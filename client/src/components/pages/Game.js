@@ -92,6 +92,7 @@ class Game extends Component {
             }
             this.updateGame(info.info.hands[info.self.index], yourTeam, otherTeam);
             this.changePage("play_room");
+            console.log('rejoined game',info.info);
             this.setState({
                 name:info.self.name,
                 index: info.self.index,

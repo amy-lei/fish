@@ -6,7 +6,7 @@ import Chat from "./Chat.js";
 import "../styles/game.scss";
 import "../styles/cards.scss";
 
-const MAX_PLAYERS = 3;
+const MAX_PLAYERS = 2;
 
 class WaitingRoom extends Component {
     constructor(props) {
