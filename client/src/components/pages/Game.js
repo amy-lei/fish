@@ -93,7 +93,6 @@ class Game extends Component {
             }
             this.updateGame(info.info.hands[info.self.index], yourTeam, otherTeam);
             this.changePage("play_room");
-            console.log('rejoined game',info.info);
             this.setState({
                 name:info.self.name,
                 index: info.self.index,
@@ -173,7 +172,6 @@ class Game extends Component {
                 index: this.state.index,
             };
             const g = await post("/api/out", body);
-            console.log(g);
         }
     };
 
@@ -219,14 +217,12 @@ class Game extends Component {
                     if (player.index === who.index) player.active = false;
                 }
                 this.setState({yourTeam: updated});
-                console.log("lost a teammate", this.state.yourTeam);
             } else {
                 let updated = this.state.otherTeam;
                 for (let player of updated) {
                     if (player.index === who.index) player.active = false;
                 }
                 this.setState({otherTeam: updated});
-                console.log("they lost a teammate", this.state.otherTeam);
             }
         });
     }
