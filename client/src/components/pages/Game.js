@@ -3,6 +3,7 @@ import Home from "./Home.js";
 import NameForm from "./NameForm.js";
 import WaitingRoom from "./WaitingRoom.js";
 import PlayRoom from "./PlayRoom.js";
+import TestDrag from "./TestDrag.js";
 
 import "../../utilities.css";
 import { post } from "../../utilities";
@@ -224,6 +225,8 @@ class Game extends Component {
         
         return (
             <div className="game-container">
+                {this.state.page === "test"
+                    && <TestDrag />}
                 {this.state.page === "home" 
                     && <Home changePage={this.changePage} enterKey={this.updateKey}/>}
                 {this.state.page === "create_room"
