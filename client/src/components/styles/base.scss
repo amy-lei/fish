@@ -1,11 +1,9 @@
+@import url('https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600&display=swap');
+
 $team-blue: #9BD0BF;
 $team-red: #CA5164;
-$primary: #D68033;
-$out: #858585;
-$alert: #BC0202;
-$team-blue: #9BD0BF;
-$team-red: #CA5164;
-$primary: #D68033;
+$primary: #FE8D50;
+$primary-shadow: #F68244;
 $out: #858585;
 $alert: #BC0202;
 $accept: #50A385;
@@ -16,17 +14,18 @@ $object: #BF150B;
     margin: 0;
     padding: 0;
     transition: opacity 0.2s;
+    font-family: 'Source Sans Pro', sans-serif;
     &:focus {
         outline:none;
     }
 }
 
 @mixin btn {
-    padding: 15px 30px;
-    border-radius: 3rem;
+    padding: 12px 30px;
+    width: 300px;
+    border-radius: 10px;
     border-style: solid;
     background-color: none;
-    font-family: 'Secular One', sans-serif;
     font-size: 14px;
     cursor: pointer;
 }
@@ -37,6 +36,7 @@ $object: #BF150B;
     border-color: $color;
     color: white;
     transition: 0.25s;
+    box-shadow: 0px 4px 25px rgba(0, 0, 0, 0.1);
 
     &:hover{
         color: $color;
@@ -56,17 +56,40 @@ $object: #BF150B;
     border-color: $color;
     background-color: white;
     transition: 0.25s;
-
-
+    
+    
     &:hover{
         background-color: $color;
         border-color: $color;
         color: white;
     }
+    
+    &:focus{
+        box-shadow: 0 0 5px $color,
+    }
+}
+
+@mixin solid-btn($color, $hover) {
+    @include btn;
+    background-color: $color;
+    border-color: $color;
+    color: white;
+    transition: 0.25s;
+    box-shadow: 0px 4px 25px rgba(0, 0, 0, 0.1);
+
+    &:hover{
+        color: white;
+        border-color: $hover;
+        background-color: $hover;
+    }
 
     &:focus{
         box-shadow: 0 0 5px $color,
     }
+    
+}
+.primary-btn {
+    @include solid-btn($primary, $primary-shadow);
 }
 
 input {

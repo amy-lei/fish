@@ -11,7 +11,20 @@
 // For Home.js
 .home-container {
     text-align: center;
-    padding-top: 15vh;
+    padding-top: 12vh;
+    
+    .home-tagline {
+        font-weight: 500;
+        padding: 10px;
+    }
+
+    .home-options {
+        margin-top: 20px;
+    }
+
+    div > button {
+        margin-bottom: 10px;
+    }
 }
 
 //focus go away border

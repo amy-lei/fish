@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import { post } from "../../utilities";
-
+import landing_illustration from "../../public/landing_illustration.svg";
+import logo from "../../public/logo.svg";
 class Home extends Component {
     constructor(props) {
         super(props);
@@ -35,46 +36,52 @@ class Home extends Component {
     };
 
     render() {
-        return (
-            <div className={"home-container"}>
-                <p className={"title"}>fish</p>
-                <button
-                    onClick={() => this.props.changePage("create_room")}
-                    className={"home-button"}
-                >
-                    Create a Room
-                </button>
-                <br/>
-                {
-                    !this.state.wantToJoinRoom ?
-                        <button
-                            onClick={() => {this.setState({wantToJoinRoom: true})}}
-                            className={"home-button"}
-                        >
-                            Join a Room
-                        </button>
-                        :
-                        <div className={"room-key-wrapper"}>
-                            <div className={"room-key-label"}>Enter room key:</div>
-                            <input
-                                type="text"
-                                value={this.state.roomKey}
-                                onChange={(e) => this.keyChange(e)}
-                                className={"room-key-input"}
-                                maxLength={4}
-                                onKeyPress={(e) => this.checkRoom(e)}
-                            />
-                            <button onClick={() => this.checkRoom(null)} className={"room-key-submit"}>ENTER</button>
-                            {
-                                this.state.roomKeyError &&
-                                <div className={"room-key-error"}>
-                                    The key you entered does not exist. Please try again.
-                                </div>
-                            }
-                        </div>
-                }
+        return (<>
+            <div className="header"> 
+                <img className="header-logo logo" src={logo}/>
             </div>
-        )
+            <div className="home-container">
+                <img className="home-illustration" src={landing_illustration}/>
+                <p className="home-tagline">Stay connected with your friends through fish!</p>
+                <div className="home-options">
+                    <button
+                        onClick={() => this.props.changePage("create_room")}
+                        className="btn primary-btn"
+                    >
+                        Create a Room
+                    </button>
+                    <br/>
+                    {
+                        !this.state.wantToJoinRoom ?
+                            <button
+                                onClick={() => {this.setState({wantToJoinRoom: true})}}
+                                className="btn primary-btn"
+                            >
+                                Join a Room
+                            </button>
+                            :
+                            <div className={"room-key-wrapper"}>
+                                <div className={"room-key-label"}>Enter room key:</div>
+                                <input
+                                    type="text"
+                                    value={this.state.roomKey}
+                                    onChange={(e) => this.keyChange(e)}
+                                    className="input room-key-input"
+                                    maxLength={4}
+                                    onKeyPress={(e) => this.checkRoom(e)}
+                                />
+                                <button onClick={() => this.checkRoom(null)} className={"room-key-submit"}>ENTER</button>
+                                {
+                                    this.state.roomKeyError &&
+                                    <div className="error room-key-error">
+                                        The key you entered does not exist. Please try again.
+                                    </div>
+                                }
+                            </div>
+                }
+                </div>
+            </div>
+        </>)
     }
 
 }
