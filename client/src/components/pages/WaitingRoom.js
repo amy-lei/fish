@@ -7,6 +7,7 @@ import "../styles/game.scss";
 import "../styles/cards.scss";
 
 const MAX_PLAYERS = 2;
+const FACES = [':)', '•_•', '=U','°_o',':O','°Д°']
 
 class WaitingRoom extends Component {
     constructor(props) {
@@ -97,58 +98,73 @@ class WaitingRoom extends Component {
     };
 
     render() {
-        const areYouReady = this.state.players.filter(player => player.name === this.props.name)[0].ready;
+        const isReady = this.state.players.filter(player => player.name === this.props.name)[0].ready;
         const placeholderPlayers = [...Array(6 - this.state.players.length).keys()].map((num) => (
             {name: `placeholder${num}`, index: -1, ready: false, active: false}
         ));
         const disableStart = !(this.state.players.every(player => player.ready) && this.state.players.length === MAX_PLAYERS);
         return (
         <>
-            <div className="header"></div>
-            <div className={"waiting-container"}>
-                <div className={"chat-container"}>
-                    <div style={{cursor: "default"}} className={"chat-label sidebar-label"}>Chat Room</div>
+            <div className="container">
+                <div className="sidebar chat-container">
+                    <div className="sidebar-label" style={{cursor: "default"}}>
+                        <div className="sidebar-label_options">Chat History</div>
+                    </div>
                     <Chat
+                        index={this.props.index}
                         name={this.props.name}
                         roomKey={this.props.roomKey}
                         hidden={false}
                     />
                 </div>
-                <div className={"waiting-key-container"}>
-                    <div className={"friends-label"}>Share this key with five friends:</div>
-                    <div className={"waiting-key"} onClick={this.copyKey} >{this.props.roomKey}</div>
-                    <input type="text" ref={this.key_ref} value={this.props.roomKey} hidden={true} readOnly/>
-                    {
-                        this.props.isCreator ?
-                        <button
-                            onClick={this.start}
-                            className={disableStart ? "disabled-start" : "waiting-button"}
-                            disabled={disableStart}
-                        >
-                            Start Game
-                        </button>
-                        :
-                         areYouReady ?
-                            <button onClick={() => this.ready(false)} className={"waiting-button"}>
-                                Not Ready
+                <div className="main-container waiting-room">
+                    <div className="waiting-room_top">
+                        <div className="waiting-room_label">
+                            Share this key with five friends:
+                        </div>
+                        <div className="waiting-room_key" onClick={this.copyKey}>
+                            {this.props.roomKey}
+                        </div>
+                        <input 
+                            type="text" 
+                            ref={this.key_ref} 
+                            value={this.props.roomKey} 
+                            hidden={true} 
+                            readOnly
+                        />
+                        {
+                            this.props.isCreator ?
+                            <button
+                                onClick={this.start}
+                                className={`btn long-btn ${disableStart ? "disabled-start" : "primary-btn"}`}
+                                disabled={disableStart}
+                            >
+                                Start Game
                             </button>
                             :
-                            <button onClick={() => this.ready(true)} className={"waiting-button"}>
-                                Ready
-                            </button>
-                    }
-                    <div className={"players-container"}>
+                            isReady ?
+                                <button onClick={() => this.ready(false)} className="btn primary-btn long-btn">
+                                    Not Ready
+                                </button>
+                                :
+                                <button onClick={() => this.ready(true)} className="btn primary-btn long-btn">
+                                    Ready
+                                </button>
+                        }
+                    </div>
+                    <div className="waiting-room_players">
                         {this.state.players.concat(placeholderPlayers).map((player, k) => (
-                            <div key={k} className={"player"}>
-                                <div className={`circle ${player.index === -1 ?
-                                                'placeholder' : player.index % 2 === 0 ?
-                                                    'team-even' : 'team-odd'} 
-                                                 ${player.ready && 'ready'}`}
+                            <div key={k} className="player">
+                                <div className={`player-img ${player.index === -1 ? 'placeholder' 
+                                                            : player.index % 2 === 0 
+                                                            ? 'team-even' : 'team-odd'} ${player.name === this.props.name && "YOU"}`}
                                 >
-                                    {player.name === this.props.name && "YOU"}
+                                    {FACES[player.index]}
                                 </div>
-                                <div className={"waiting-player-name"}>
+                                <div className="player-name">
                                     {player.index === -1 ? "" : player.name}
+                                    {player.ready && ' (ready)'}
+
                                 </div>
                             </div>
                         ))}

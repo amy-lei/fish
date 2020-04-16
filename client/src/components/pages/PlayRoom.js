@@ -282,6 +282,7 @@ class PlayRoom extends Component {
 
                         <Chat
                             name={this.props.name}
+                            index={this.props.index}
                             roomKey={this.props.roomKey}
                             hidden={this.state.sidebar !== "chat"}
                         />

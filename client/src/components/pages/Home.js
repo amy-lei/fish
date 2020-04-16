@@ -1,7 +1,6 @@
 import React, { Component } from "react";
 import { post } from "../../utilities";
 import landing_illustration from "../../public/landing_illustration.svg";
-import Header from "../modules/Header";
 
 class RoomForm extends Component {
     constructor(props) {
@@ -57,12 +56,12 @@ class RoomForm extends Component {
                 :
                 <div className="input-btn-wrapper room-key-field">
                     <input
+                        className="input-btn-field room-key-input"
                         type="text"
                         value={this.state.roomKey}
-                        onChange={(e) => this.keyChange(e)}
-                        className="input-btn-field room-key-input"
                         maxLength={4}
                         placeholder="Enter room key"
+                        onChange={(e) => this.keyChange(e)}
                         onKeyPress={(e) => this.checkRoom(e)}
                     />
                     <button 
@@ -145,8 +144,7 @@ class Home extends Component {
 
     render() {
         return (<>
-            <Header/>
-            <div className="home-container">
+            <div className="home">
                 <img className="home-illustration" src={landing_illustration}/>
                 <p className="home-tagline">Stay connected with your friends through fish!</p>
                 <div className="home-options">

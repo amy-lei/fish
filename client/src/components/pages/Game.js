@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import Home from "./Home.js";
-import NameForm from "./NameForm.js";
+import Header from "../modules/Header";
 import WaitingRoom from "./WaitingRoom.js";
 import PlayRoom from "./PlayRoom.js";
 import TestDrag from "./TestDrag.js";
@@ -256,7 +256,8 @@ class Game extends Component {
         });
         
         return (
-            <div className="game-container">
+            <div className={`game-container ${this.state.page === "home" ? "white" : ""}`}>
+                <Header/>
                 {this.state.page === "test"
                     && <TestDrag />}
                 {this.state.page === "home" 

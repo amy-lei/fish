@@ -6,6 +6,8 @@ import { socket } from "../../client-socket.js";
 import "../styles/Chat.scss";
 import "../styles/App.scss";
 
+const FACES = [':)', '•_•', '=U','°_o',':O','°Д°'];
+
 class Chat extends Component {
   constructor(props) {
     super(props);
@@ -101,10 +103,12 @@ class Chat extends Component {
       return;
     }
     const body = { 
+      sender_index: this.props.index,
       sender_name : this.props.name,
       content: trimmedMessage,
       room_key: this.props.roomKey,
     };
+    console.log(body);
     const message = await post('/api/chat', body);
     this.setState({
       curMessage: "",
@@ -130,8 +134,14 @@ class Chat extends Component {
         }
         return (
           <div className="message" key={k}>
-            <div className={"sender"}>{mes.sender_name !== this.props.name ? mes.sender_name : "YOU"}</div>
-            <div className={"content"}>{mes.content}</div>
+            <div className={`message_img ${
+                mes.sender_index % 2 == 0? 'team-even' : 'team-odd'}`}>
+              {FACES[mes.sender_index]} 
+            </div>
+            <div className="message_info">
+              <div className="message_info-sender">{mes.sender_name}:&nbsp;</div> 
+              <div className="message_info-content">{mes.content}</div>
+            </div>
           </div>
         );
       });
@@ -139,22 +149,25 @@ class Chat extends Component {
 
     return (
       <div className="chat" hidden={this.props.hidden}>
-        <div className="message-container">
+        <div className="chat-messages messages">
           {messages}
-          <div className={"thing-at-bottom"} ref={this.bottom_ref}>
+          <div className="thing-at-bottom" ref={this.bottom_ref}>
           </div>
         </div>
-        <div className="chat-input-wrapper">
+        <div className="chat-functions input-btn-wrapper">
           <input
             type="text"
             value={this.state.curMessage}
             onChange={this.handleOnChange}
-            className="chat-input"
+            className="chat-functions_input input-btn-field"
             placeholder="Send a message"
             onKeyPress={(e) => this.sendMessage(e)}
           />
-          <button onClick={() => this.sendMessage(null)} className="btn chat-submit">
-            &lt;
+          <button 
+            onClick={() => this.sendMessage(null)} 
+            className="chat-functions_submit btn primary-inverted-btn input-btn-submit"
+          >
+            <div className="send-symbol"></div>
           </button>
         </div>
       </div>
