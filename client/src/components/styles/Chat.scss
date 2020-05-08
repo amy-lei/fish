@@ -1,11 +1,10 @@
-@import "./base.scss";
-// For Chat.js
+@import './base.scss';
+
 .chat {
   display:flex;
   flex-direction: column;
   height: 92%;
   width:100%;
-  // padding: 1em 0;
 
 }
 .chat-functions {

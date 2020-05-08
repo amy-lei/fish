@@ -7,12 +7,8 @@ import TestDrag from "./TestDrag.js";
 
 import "../../utilities.css";
 import { post } from "../../utilities";
-import { hasCard, isValidAsk, isValidDeclare, canObject, removeHalfSuit } from "../../game-utilities";
+import { hasCard, removeHalfSuit } from "../../game-utilities";
 import { socket } from "../../client-socket";
-import { card_svgs } from "../card_svgs.js";
-
-import "../styles/game.scss";
-import "../styles/cards.scss";
 
 const WIN = 5; // FIX WHEN LAUNCH!!!
 class Game extends Component {

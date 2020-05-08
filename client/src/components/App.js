@@ -10,6 +10,8 @@ import { socket } from "../client-socket.js";
 
 import { get, post } from "../utilities";
 
+import './styles/App.scss';
+
 /**
  * Define the "App" component as a class.
  */
