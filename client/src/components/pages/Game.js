@@ -26,7 +26,7 @@ import { socket } from "../../client-socket";
 import "../styles/game.scss";
 import "../styles/cards.scss";
 
-const WIN = 1; // FIX WHEN LAUNCH!!!
+const WIN = 5; // FIX WHEN LAUNCH!!!
 class Game extends Component {
     constructor(props) {
         super(props);
