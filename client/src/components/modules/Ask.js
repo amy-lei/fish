@@ -75,6 +75,7 @@ class Ask extends Component {
 
 const mapStateToProps = (state) => ({
     hand: state.hand,
+    otherTeam: state.teams.otherTeam,
 });
 
 export default connect(mapStateToProps)(Ask);

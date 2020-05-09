@@ -2,7 +2,10 @@ import React, { Component } from "react";
 import { post } from "../../utilities";
 import { socket } from "../../client-socket";
 import { connect } from 'react-redux';
-import { setHand } from '../../actions/gameActions';
+import { 
+    setHand,
+    setTeams,
+ } from '../../actions/gameActions';
 import Chat from "./Chat.js";
 
 import "../styles/game.scss";
@@ -84,7 +87,7 @@ class WaitingRoom extends Component {
             if (player.index % 2 === parity) yourTeam.push(player);
             else otherTeam.push(player);
         });
-        this.props.updateGame(yourTeam, otherTeam);
+        this.props.setTeams(yourTeam, otherTeam);
         this.props.changePage("play_room");
 
     };
@@ -188,6 +191,7 @@ const mapStateToProps = (state) => ({
 
 const mapDispatchToProps = {
     setHand,
+    setTeams,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(WaitingRoom);

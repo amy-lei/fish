@@ -212,7 +212,6 @@ class PlayRoom extends Component {
                 {!this.props.gameOver && !this.props.declaring && this.props.asking && 
                     <Ask
                         submitAsk={this.props.submitAsk}
-                        otherTeam={this.props.otherTeam}
                         reset={this.props.resetAsk}
                     />}
                 {!this.props.gameOver && !this.props.declaring && this.props.responding && 
@@ -279,6 +278,8 @@ const mapStateToProps = (state) => ({
     index: state.user.index,
     roomkey: state.roomkey,
     hand: state.hand,
+    yourTeam: state.teams.yourTeam,
+    otherTeam: state.teams.otherTeam,
 });
 
 export default connect(mapStateToProps, {})(PlayRoom);

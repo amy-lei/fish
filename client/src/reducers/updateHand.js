@@ -9,7 +9,6 @@ import { removeHalfSuit } from '../game-utilities';
 const initialState = [];
 
 export default (state = initialState, action) => {
-    console.log('before', state);
     let hand;
     switch (action.type) {
         case INIT_HAND:
@@ -19,7 +18,6 @@ export default (state = initialState, action) => {
                 rank: action.payload.rank,
                 suit: action.payload.suit,
             }];
-            console.log('after', hand);
             return hand
 
         case REMOVE_CARD:
@@ -41,10 +39,8 @@ export default (state = initialState, action) => {
             key: action.payload.roomkey,
             index: action.payload.index,
         }
-        console.log('out!');
         post('/api/out', body);
     }
-    console.log('after', hand);
     return hand;
 
 }

@@ -12,6 +12,8 @@ import {
     addCard,
     removeCard,
     removeSuit,
+    playerOut,
+    setTeams,
  } from '../../actions/gameActions';
 
 import "../../utilities.css";
@@ -29,8 +31,6 @@ class Game extends Component {
         this.state = {
             page: "home",
             isCreator: false,
-            yourTeam: null,
-            otherTeam: null,
             history: [],
             yourTeamScore: 0,
             otherTeamScore: 0,
@@ -96,7 +96,7 @@ class Game extends Component {
                 yourScore = info.info.odd;
                 otherScore = info.info.even;
             }
-            this.updateGame(yourTeam, otherTeam);
+            this.props.setTeams(yourTeam, otherTeam);
             this.changePage("play_room");
             this.setState({
                 history: info.info.history,
@@ -116,14 +116,6 @@ class Game extends Component {
         
     };
     
-    updateGame = (yourTeam, otherTeam) => {
-        this.setState({yourTeam, otherTeam});
-    };
-
-    // updateHand = (hand) => {
-    //     this.setState({hand});
-    // };
-
     // Send ask with info pertaining to who and what
     ask = async (who, rank, suit) => {
         const body = {
@@ -156,7 +148,7 @@ class Game extends Component {
     updateScore = (yours) => {
         let newScore;
         if (yours) {
-            newScore = this.state.yourTeamScore + 1;
+            newScore = this.props.yourTeamScore + 1;
             this.setState({yourTeamScore: newScore});
         } else {
             newScore = this.state.otherTeamScore + 1;
@@ -164,16 +156,6 @@ class Game extends Component {
         }
         return newScore === WIN;
     }
-
-    checkIfActive = async(hand) => {
-        if (hand.length === 0) {
-            const body = {
-                key: this.props.roomkey,
-                index: this.props.index,
-            };
-            const g = await post("/api/out", body);
-        }
-    };
 
     updateCreator = () => {
         this.setState({isCreator: true});
@@ -216,20 +198,22 @@ class Game extends Component {
 
 
         socket.on("playerOut", who => {
-            const sameTeam = (who.index % 2 === 0) === (this.state.index % 2 === 0);
-            if (sameTeam) {
-                let updated = this.state.yourTeam;
-                for (let player of updated) {
-                    if (player.index === who.index) player.active = false;
-                }
-                this.setState({yourTeam: updated});
-            } else {
-                let updated = this.state.otherTeam;
-                for (let player of updated) {
-                    if (player.index === who.index) player.active = false;
-                }
-                this.setState({otherTeam: updated});
-            }
+            this.props.playerOut(who.index);
+            // const sameTeam = (who.index % 2 === 0) === (this.props.index % 2 === 0);
+            
+            // if (sameTeam) {
+            //     let updated = this.state.yourTeam;
+            //     for (let player of updated) {
+            //         if (player.index === who.index) player.active = false;
+            //     }
+            //     this.setState({yourTeam: updated});
+            // } else {
+            //     let updated = this.state.otherTeam;
+            //     for (let player of updated) {
+            //         if (player.index === who.index) player.active = false;
+            //     }
+            //     this.setState({otherTeam: updated});
+            // }
         });
 
         socket.on("declaring", (info) => {
@@ -269,28 +253,6 @@ class Game extends Component {
     }
 
     render() {
-        let history = this.state.history.map(move => {
-            if (move.type === 'ASK')
-                return (
-                    <div>
-                        {move.asker.name} asked {move.recipient} for {move.rank} {move.suit}
-                    </div>
-                );
-            else {
-                const result = move.success ? "did" : "did not";
-                return (
-                    <>
-                        <div>
-                            {move.responder.name} responded with {move.response}
-                        </div>
-                        <div>
-                            {move.responder.name} {result} have the {move.rank} {move.suit}
-                        </div>
-                        <br/>
-                    </>
-                );
-            }
-        });
         return (
             <div className={`game-container ${this.state.page === "home" ? "white" : ""}`}>
                 <Header
@@ -329,13 +291,10 @@ class Game extends Component {
                     && (
                     <>
                         <PlayRoom
-                            yourTeam={this.state.yourTeam}
-                            otherTeam={this.state.otherTeam}
                             submitAsk={this.ask}
                             submitResponse={this.respond}
                             history={this.state.history}
                             updateScore={this.updateScore}
-                            checkIfActive={this.checkIfActive}
                             yourTeamScore={this.state.yourTeamScore}
                             otherTeamScore={this.state.otherTeamScore}
                             asking={this.state.asking}
@@ -371,6 +330,8 @@ const mapDispatchToProps = {
     addCard,
     removeCard,
     removeSuit,
+    playerOut,
+    setTeams,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(Game);

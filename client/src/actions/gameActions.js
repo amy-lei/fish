@@ -5,6 +5,8 @@ import {
     ADD_CARD,
     REMOVE_HALF_SUIT,
     INIT_HAND,
+    PLAYER_OUT,
+    SET_TEAMS,
 } from './types';
 
 export const setRoomKey = (key) => (dispatch) => {
@@ -48,3 +50,17 @@ export const setHand = (hand) => (dispatch) => {
         payload: hand,
     });
 }
+
+export const setTeams = (yourTeam, otherTeam) => (dispatch) => {
+    dispatch({
+        type: SET_TEAMS,
+        payload: { yourTeam, otherTeam },
+    });
+}
+
+export const playerOut = (index) => (dispatch) => {
+    dispatch({
+        type: PLAYER_OUT,
+        payload: index,
+    });
+} 

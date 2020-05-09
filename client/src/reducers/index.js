@@ -4,7 +4,7 @@ import updateTurn from './updateTurn';
 import updateHand from './updateHand';
 import roomkey from './roomkey';
 import updateScores from './updateScores.js';
-import { yourTeam, otherTeam } from './updateTeams';
+import updateTeams from './updateTeams';
 
 
 export default combineReducers({
@@ -12,7 +12,6 @@ export default combineReducers({
     user: updateUser,
     turnInfo: updateTurn,
     hand: updateHand,
-    yourTeam,
-    otherTeam,
+    teams: updateTeams,
     scores: updateScores,
 });
