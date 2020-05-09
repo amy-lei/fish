@@ -1,6 +1,14 @@
 import React, { Component } from "react";
+import TestDrag from "./pages/TestDrag.js";
+import Home from "./pages/Home.js"
 import NotFound from "./pages/NotFound.js";
 import Game from "./pages/Game.js";
+import {
+  BrowserRouter as Router, 
+  Switch,
+  Route,
+  Link,
+} from "react-router-dom";
 
 import "../utilities.css";
 import "./styles/cards.scss";
@@ -25,9 +33,12 @@ class App extends Component {
 
   render() {
     return (
-      <>
-        <Game/>
-      </>
+      <Router>
+        <Route exact path='/' component={Home}/>
+        <Route exact path='/:roomkey' component={TestDrag}/>
+        <Route path='/:roomkey/play' component={TestDrag}/>
+        {/* <Game/> */}
+      </Router>
     );
   }
 }

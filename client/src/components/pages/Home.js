@@ -139,6 +139,8 @@ class Home extends Component {
         super(props);
         this.state = {
             view: "room",
+            isCreator: false,
+            roomkey: "",
         }
     }
 
@@ -151,10 +153,9 @@ class Home extends Component {
                     {
                         this.state.view === "room"
                         ? <RoomForm
-                            enterKey={this.props.enterKey}
+                            enterKey={(k) => this.setState({ roomkey: k })}
                             changeView={() => this.setState({view: "name"})}
-                            updateCreator={this.props.updateCreator}
-                            changePage={this.props.changePage}
+                            updateCreator={() => this.setState({ isCreator: true })}
                         />
                         : <NameForm
                             submitName={this.props.submitName}
