@@ -8,7 +8,7 @@ import { yourTeam, otherTeam } from './updateTeams';
 
 
 export default combineReducers({
-    key: roomkey,
+    roomkey,
     user: updateUser,
     turnInfo: updateTurn,
     hand: updateHand,

@@ -23,7 +23,7 @@ class DecResponse extends Component {
      */
     resToDeclare = async (bool) => {
         const body = {
-            key: this.props.roomKey,
+            key: this.props.roomkey,
             player: this.props.name, 
             agree: bool,
         };
@@ -51,7 +51,7 @@ class DecResponse extends Component {
         const even = this.props.index % 2 === 0; // your team
         const body = {
             even: objections ? !even : even,
-            key: this.props.roomKey, 
+            key: this.props.roomkey, 
             declare: this.props.guess
         };
         // reset declaring states

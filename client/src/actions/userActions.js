@@ -8,7 +8,6 @@ export const submitName = (name) => (dispatch) => {
 };
 
 export const setIndex = (index) => (dispatch) => {
-    console.log('setting index to', index);
     dispatch({
         type: SET_INDEX,
         payload: index,

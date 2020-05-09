@@ -32,14 +32,14 @@ class Declare extends Component {
         });
         
         this.props.pause();
-        const res = post("/api/pause", {key: this.props.roomKey, player: this.props.name});
+        const res = post("/api/pause", {key: this.props.roomkey, player: this.props.name});
     }
 
     // validate the declare before announcing 
     confirm = async () => {
         if (isValidDeclare(this.state.guess)) {
             this.setState({invalid: false, declaring: false,});
-            await post("/api/declare", {guess: this.state.guess, key: this.props.roomKey});
+            await post("/api/declare", {guess: this.state.guess, key: this.props.roomkey});
             this.props.reset();
         } else {
             this.setState({invalid: true,});

@@ -81,7 +81,7 @@ class GameHistory extends Component {
 
     render() {
         const history = this.props.history.map(move => {
-            if (move.type === "ask")
+            if (move.type === 'ASK')
                 return (
                     <div className={`message history_move ${this.props.all?"left":""}`}>
                         <div className={`message_img ${
@@ -193,7 +193,7 @@ class PlayRoom extends Component {
                     <Declare 
                         name={this.props.name}
                         yourTeam={this.props.yourTeam} 
-                        roomKey={this.props.roomKey}
+                        roomkey={this.props.roomkey}
                         pause={this.props.pause}
                         reset={this.props.resetDeclare}
                     />}
@@ -203,7 +203,7 @@ class PlayRoom extends Component {
                         name={this.props.name}
                         guess={this.state.guess}
                         declarer={this.props.declarer}
-                        roomKey={this.props.roomKey}
+                        roomkey={this.props.roomkey}
                         hand={this.props.hand}
                         index={this.props.index}
                         minVotes={this.props.yourTeam.length + this.props.otherTeam.length - 1}
@@ -243,7 +243,7 @@ class PlayRoom extends Component {
                         <Chat
                             name={this.props.name}
                             index={this.props.index}
-                            roomKey={this.props.roomKey}
+                            roomkey={this.props.roomkey}
                             hidden={this.state.sidebar !== "chat"}
                         />
                         <GameHistory
@@ -277,6 +277,7 @@ class PlayRoom extends Component {
 const mapStateToProps = (state) => ({
     name: state.user.name,
     index: state.user.index,
+    roomkey: state.roomkey,
 });
 
 export default connect(mapStateToProps, {})(PlayRoom);

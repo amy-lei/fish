@@ -7,7 +7,7 @@ import Chat from "./Chat.js";
 import "../styles/game.scss";
 import "../styles/cards.scss";
 
-const MAX_PLAYERS = 1;
+const MAX_PLAYERS = 2;
 const FACES = [':)', '•_•', '=U','°_o',':O','°Д°']
 
 class WaitingRoom extends Component {
@@ -56,14 +56,14 @@ class WaitingRoom extends Component {
             alert(`You need ${MAX_PLAYERS} players to start!`);
             return;
         }
-        const body = {key: this.props.roomKey};
+        const body = {key: this.props.roomkey};
         const hands = await post("/api/start_game", body);
         this.setUpGame(hands[this.state.index]);
     };
 
     ready = async (isReady) => {
         const body = {
-            key: this.props.roomKey,
+            key: this.props.roomkey,
             playerName: this.props.name,
             isReady: isReady,
         };
@@ -114,7 +114,7 @@ class WaitingRoom extends Component {
                     <Chat
                         index={this.props.index}
                         name={this.props.name}
-                        roomKey={this.props.roomKey}
+                        roomKey={this.props.roomkey}
                         hidden={false}
                     />
                 </div>
@@ -124,12 +124,12 @@ class WaitingRoom extends Component {
                             Share this key with five friends:
                         </div>
                         <div className="waiting-room_key" onClick={this.copyKey}>
-                            {this.props.roomKey}
+                            {this.props.roomkey}
                         </div>
                         <input 
                             type="text" 
                             ref={this.key_ref} 
-                            value={this.props.roomKey} 
+                            value={this.props.roomkey} 
                             hidden={true} 
                             readOnly
                         />
@@ -181,6 +181,7 @@ class WaitingRoom extends Component {
 const mapStateToProps = (state) => ({
     name: state.user.name,
     index: state.user.index,
+    roomkey: state.roomkey,
 });
 
 export default connect(mapStateToProps)(WaitingRoom);

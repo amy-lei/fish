@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import { post } from "../../utilities";
 import { connect } from 'react-redux';
 import { submitName } from '../../actions/userActions';
+import { setRoomKey } from '../../actions/gameActions';
 
 import landing_illustration from "../../public/landing_illustration.svg";
 
@@ -28,12 +29,13 @@ class RoomForm extends Component {
 
     checkRoom = async (e) => {
         if ((e && e.key !== "Enter") || this.state.roomKey.trim() === "") { return; }
+        
         const body = {
             roomKey: this.state.roomKey,
         };
         const canJoin = await post("/api/check_room", body);
         if (canJoin) {
-            this.props.enterKey(this.state.roomKey);
+            this.props.setRoomKey(this.state.roomKey);
             this.props.changeView();
         }
         else {
@@ -155,7 +157,7 @@ class Home extends Component {
                     {
                         this.state.view === "room"
                         ? <RoomForm
-                            enterKey={this.props.enterKey}
+                            setRoomKey={this.props.setRoomKey}
                             changeView={() => this.setState({view: "name"})}
                             updateCreator={this.props.updateCreator}
                             changePage={this.props.changePage}
@@ -172,4 +174,4 @@ class Home extends Component {
 
 }
 
-export default connect(null, { submitName })(Home);
+export default connect(null, { submitName, setRoomKey })(Home);

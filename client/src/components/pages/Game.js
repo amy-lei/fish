@@ -5,11 +5,12 @@ import WaitingRoom from "./WaitingRoom.js";
 import PlayRoom from "./PlayRoom.js";
 import TestDrag from "./TestDrag.js";
 import { connect } from 'react-redux';
-import { submitName, setIndex } from '../../actions/userActions';
+import { setIndex } from '../../actions/userActions';
+import { setRoomKey, updateTurn } from '../../actions/gameActions';
 
 import "../../utilities.css";
 import { post } from "../../utilities";
-import { hasCard, isValidAsk, isValidDeclare, canObject, removeHalfSuit } from "../../game-utilities";
+import { hasCard, removeHalfSuit } from "../../game-utilities";
 import { socket } from "../../client-socket";
 
 import "../styles/game.scss";
@@ -21,14 +22,11 @@ class Game extends Component {
         super(props);
         this.state = {
             page: "home",
-            key: "",
-            isCreator: "",
+            isCreator: false,
             hand: null,
             yourTeam: null,
             otherTeam: null,
-            turnType: "ask",
             history: [],
-            whoseTurn: "",
             yourTeamScore: 0,
             otherTeamScore: 0,
             asking: false,
@@ -44,12 +42,7 @@ class Game extends Component {
         this.setState({page});
     };
 
-    updateKey = (key) => {
-        this.setState({key})
-    };
-
     createRoom = async (name) => {
-        console.log('creating room')
         const trimmedName = name.trim();
         if (trimmedName === "") {
           return;
@@ -59,12 +52,14 @@ class Game extends Component {
             socketid: socket.id,
         };
         const game = await post('/api/create_room', body);
+        
         this.props.setIndex(0);
+        this.props.setRoomKey(game.key);
+        this.props.updateTurn(this.props.name, 'ASK');
+
         this.setState({
             page: "waiting_room",
             isCreator: true,
-            key: game.key,
-            whoseTurn: name,
         });
     };
 
@@ -75,7 +70,7 @@ class Game extends Component {
         }
         const body = {
             playerName: name,
-            room_key: this.state.key,
+            room_key: this.props.roomkey,
             socketid: socket.id,
         };
         const info = await post('/api/join_room', body);
@@ -99,9 +94,7 @@ class Game extends Component {
             this.updateGame(info.info.hands[info.self.index], yourTeam, otherTeam);
             this.changePage("play_room");
             this.setState({
-                turnType: info.info.turnType,
                 history: info.info.history,
-                whoseTurn: info.info.whoseTurn,
                 yourTeamScore: yourScore,
                 otherTeamScore: otherScore,
             })
@@ -110,10 +103,10 @@ class Game extends Component {
                 page: "waiting_room",
                 isCreator: false,
                 info: info.info,
-                whoseTurn: info.info.whoseTurn,
-                turnType: info.info.turnType,
             });
         }
+
+        this.props.updateTurn(info.info.whoseTurn, info.info.turnType);
         this.props.setIndex(info.self.index);
         
     };
@@ -129,8 +122,8 @@ class Game extends Component {
     // Send ask with info pertaining to who and what
     ask = async (who, rank, suit) => {
         const body = {
-            key: this.state.key,
-            asker: { name: this.state.name, index: this.state.index},
+            key: this.props.roomkey,
+            asker: { name: this.props.name, index: this.props.index},
             recipient: who, 
             rank: rank,
             suit: suit,
@@ -144,8 +137,8 @@ class Game extends Component {
         const card = { rank: lastAsk.rank, suit: lastAsk.suit };
         const success = hasCard(this.state.hand, card);
         const body = {
-            key: this.state.key,
-            responder: {name: this.state.name, index: this.state.index},
+            key: this.props.roomkey,
+            responder: {name: this.props.name, index: this.props.index},
             asker: lastAsk.asker,
             response: response,
             success: success,
@@ -170,8 +163,8 @@ class Game extends Component {
     checkIfActive = async(hand) => {
         if (hand.length === 0) {
             const body = {
-                key: this.state.key,
-                index: this.state.index,
+                key: this.props.key,
+                index: this.props.index,
             };
             const g = await post("/api/out", body);
         }
@@ -184,11 +177,11 @@ class Game extends Component {
     componentDidMount() {
         // update history and update turn after an ask
         socket.on("ask", update => {
+            console.log('someone was asked,', update);
             this.setState({
                 history: update.history,
-                whoseTurn: update.move.recipient,
-                turnType: "respond",
             });
+            this.props.updateTurn(update.move.recipient, 'RESPOND');
         });
 
         // update turn and hand if successful
@@ -209,9 +202,8 @@ class Game extends Component {
             // update history
             this.setState({
                 history: update.history,
-                whoseTurn: turn,
-                turnType: "ask",
             });
+            this.props.updateTurn(turn, 'ASK');
         });
 
 
@@ -268,7 +260,7 @@ class Game extends Component {
 
     render() {
         let history = this.state.history.map(move => {
-            if (move.type === "ask")
+            if (move.type === 'ASK')
                 return (
                     <div>
                         {move.asker.name} asked {move.recipient} for {move.rank} {move.suit}
@@ -295,12 +287,12 @@ class Game extends Component {
                     gameBegan={this.state.page === "play_room"}
                     gameOver={this.state.winner !== ""}
                     showAsk={!this.state.declaring 
-                            && this.state.turnType === "ask"    
-                            && this.state.whoseTurn === this.state.name
+                            && this.props.turnType === 'ASK'    
+                            && this.props.whoseTurn === this.props.name
                             }
                     showRespond={!this.state.declaring 
-                            && this.state.turnType === "respond"    
-                            && this.state.whoseTurn === this.state.name
+                            && this.props.turnType === 'RESPOND'    
+                            && this.props.whoseTurn === this.props.name
                             }
                     showDeclare={this.state.declarer === ""}
                     onClickDeclare={() => this.setState({showDeclare: true})}
@@ -312,14 +304,12 @@ class Game extends Component {
                 {this.state.page === "home" 
                     && <Home 
                             changePage={this.changePage} 
-                            enterKey={this.updateKey}
                             updateCreator={this.updateCreator}
                             enterRoom={this.state.isCreator ? this.createRoom : this.enterRoom}
                         />}
                 {this.state.page === "waiting_room"
                     &&                 
                     <WaitingRoom
-                        roomKey={this.state.key}
                         isCreator={this.state.isCreator}
                         roomInfo={this.state.info}
                         changePage={this.changePage}
@@ -329,12 +319,9 @@ class Game extends Component {
                     && (
                     <>
                         <PlayRoom
-                            roomKey={this.state.key}
                             hand={this.state.hand}
                             yourTeam={this.state.yourTeam}
                             otherTeam={this.state.otherTeam}
-                            whoseTurn={this.state.whoseTurn}
-                            turnType={this.state.turnType}
                             submitAsk={this.ask}
                             submitResponse={this.respond}
                             history={this.state.history}
@@ -363,6 +350,15 @@ class Game extends Component {
 const mapStateToProps = (state) => ({
     name: state.user.name,
     index: state.user.index,
+    roomkey: state.roomkey,
+    turnType: state.turnInfo.turnType,
+    whoseTurn: state.turnInfo.whoseTurn,
 });
 
-export default connect(mapStateToProps, { setIndex })(Game);
+const mapDispatchToProps = {
+    setIndex,
+    setRoomKey,
+    updateTurn,
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(Game);

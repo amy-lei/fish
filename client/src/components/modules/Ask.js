@@ -31,6 +31,7 @@ class Ask extends Component {
                 rank: "",
                 suit: "",
             });
+            console.log('submitting ask')
             this.props.reset();
         } else this.setState({invalid: true});
     }
