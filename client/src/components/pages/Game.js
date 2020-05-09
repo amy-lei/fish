@@ -163,7 +163,7 @@ class Game extends Component {
     checkIfActive = async(hand) => {
         if (hand.length === 0) {
             const body = {
-                key: this.props.key,
+                key: this.props.roomkey,
                 index: this.props.index,
             };
             const g = await post("/api/out", body);
@@ -177,7 +177,6 @@ class Game extends Component {
     componentDidMount() {
         // update history and update turn after an ask
         socket.on("ask", update => {
-            console.log('someone was asked,', update);
             this.setState({
                 history: update.history,
             });
@@ -188,12 +187,12 @@ class Game extends Component {
         socket.on("respond", update => {
             const turn = update.move.success ? update.move.asker.name: update.move.responder.name;
             if (update.move.success) {
-                if (update.move.responder.name === this.state.name) {
+                if (update.move.responder.name === this.props.name) {
                     let hand = this.state.hand.filter(card => 
                         !(card.rank === update.move.rank && card.suit === update.move.suit)); 
                     this.setState({hand});
                     this.checkIfActive(hand);
-                } else if (update.move.asker.name === this.state.name) {
+                } else if (update.move.asker.name === this.props.name) {
                     let hand = this.state.hand.concat({rank:update.move.rank, suit: update.move.suit})
                     this.setState({hand});
                     this.checkIfActive(hand);

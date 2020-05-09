@@ -38,7 +38,7 @@ class WaitingRoom extends Component {
 
         // set up game when someone hits start 
         socket.on("startGame", (info) => {
-            this.setUpGame(info.cards[this.state.index]);
+            this.setUpGame(info.cards[this.props.index]);
         });
 
         // updates ready/ unready state

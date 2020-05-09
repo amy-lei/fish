@@ -39,7 +39,7 @@ const generateCards = (n) => {
 
     let output = [];
     const numCards = SIZE / n;
-    cards.sort(() => Math.random() - 0.5);
+    // cards.sort(() => Math.random() - 0.5);
 
     for(let i = 0; i < n; i++) {
         output.push(cards.slice(i * numCards, i * numCards + numCards));
