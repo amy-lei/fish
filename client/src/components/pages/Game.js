@@ -4,12 +4,13 @@ import Header from "../modules/Header";
 import WaitingRoom from "./WaitingRoom.js";
 import PlayRoom from "./PlayRoom.js";
 import TestDrag from "./TestDrag.js";
+import { connect } from 'react-redux';
+import { submitName, setIndex } from '../../actions/userActions';
 
 import "../../utilities.css";
 import { post } from "../../utilities";
 import { hasCard, isValidAsk, isValidDeclare, canObject, removeHalfSuit } from "../../game-utilities";
 import { socket } from "../../client-socket";
-import { card_svgs } from "../card_svgs.js";
 
 import "../styles/game.scss";
 import "../styles/cards.scss";
@@ -21,8 +22,6 @@ class Game extends Component {
         this.state = {
             page: "home",
             key: "",
-            name: "",
-            index: "",
             isCreator: "",
             hand: null,
             yourTeam: null,
@@ -50,6 +49,7 @@ class Game extends Component {
     };
 
     createRoom = async (name) => {
+        console.log('creating room')
         const trimmedName = name.trim();
         if (trimmedName === "") {
           return;
@@ -59,11 +59,10 @@ class Game extends Component {
             socketid: socket.id,
         };
         const game = await post('/api/create_room', body);
+        this.props.setIndex(0);
         this.setState({
             page: "waiting_room",
-            name: name,
             isCreator: true,
-            index: 0,
             key: game.key,
             whoseTurn: name,
         });
@@ -100,8 +99,6 @@ class Game extends Component {
             this.updateGame(info.info.hands[info.self.index], yourTeam, otherTeam);
             this.changePage("play_room");
             this.setState({
-                name:info.self.name,
-                index: info.self.index,
                 turnType: info.info.turnType,
                 history: info.info.history,
                 whoseTurn: info.info.whoseTurn,
@@ -111,14 +108,13 @@ class Game extends Component {
         } else {
             this.setState({
                 page: "waiting_room",
-                name: info.self.name,
                 isCreator: false,
-                index: info.self.index,
                 info: info.info,
                 whoseTurn: info.info.whoseTurn,
                 turnType: info.info.turnType,
             });
         }
+        this.props.setIndex(info.self.index);
         
     };
     
@@ -318,14 +314,12 @@ class Game extends Component {
                             changePage={this.changePage} 
                             enterKey={this.updateKey}
                             updateCreator={this.updateCreator}
-                            submitName={this.state.isCreator ? this.createRoom : this.enterRoom}
+                            enterRoom={this.state.isCreator ? this.createRoom : this.enterRoom}
                         />}
                 {this.state.page === "waiting_room"
                     &&                 
                     <WaitingRoom
                         roomKey={this.state.key}
-                        name={this.state.name}
-                        index={this.state.index}
                         isCreator={this.state.isCreator}
                         roomInfo={this.state.info}
                         changePage={this.changePage}
@@ -336,8 +330,6 @@ class Game extends Component {
                     <>
                         <PlayRoom
                             roomKey={this.state.key}
-                            name={this.state.name}
-                            index={this.state.index}
                             hand={this.state.hand}
                             yourTeam={this.state.yourTeam}
                             otherTeam={this.state.otherTeam}
@@ -368,4 +360,9 @@ class Game extends Component {
     };
 }
 
-export default Game;
+const mapStateToProps = (state) => ({
+    name: state.user.name,
+    index: state.user.index,
+});
+
+export default connect(mapStateToProps, { setIndex })(Game);

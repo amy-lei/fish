@@ -7,6 +7,7 @@ import Respond from "../modules/Respond.js";
 import Declare from "../modules/Declare.js";
 import DecResponse from "../modules/DecResponse.js";
 import { card_svgs } from "../card_svgs.js";
+import { connect } from 'react-redux';
 
 import "../styles/Chat.scss";
 import "../styles/game.scss";
@@ -273,5 +274,9 @@ class PlayRoom extends Component {
     }
 }
 
+const mapStateToProps = (state) => ({
+    name: state.user.name,
+    index: state.user.index,
+});
 
-export default PlayRoom;
+export default connect(mapStateToProps, {})(PlayRoom);

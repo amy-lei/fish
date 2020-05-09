@@ -1,12 +1,13 @@
 import React, { Component } from "react";
 import { post } from "../../utilities";
 import { socket } from "../../client-socket";
+import { connect } from 'react-redux';
 import Chat from "./Chat.js";
 
 import "../styles/game.scss";
 import "../styles/cards.scss";
 
-const MAX_PLAYERS = 6;
+const MAX_PLAYERS = 1;
 const FACES = [':)', '•_•', '=U','°_o',':O','°Д°']
 
 class WaitingRoom extends Component {
@@ -177,4 +178,9 @@ class WaitingRoom extends Component {
     }
 }
 
-export default WaitingRoom;
+const mapStateToProps = (state) => ({
+    name: state.user.name,
+    index: state.user.index,
+});
+
+export default connect(mapStateToProps)(WaitingRoom);

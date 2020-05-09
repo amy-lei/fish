@@ -1,5 +1,8 @@
 import React, { Component } from "react";
 import { post } from "../../utilities";
+import { connect } from 'react-redux';
+import { submitName } from '../../actions/userActions';
+
 import landing_illustration from "../../public/landing_illustration.svg";
 
 class RoomForm extends Component {
@@ -103,6 +106,7 @@ class NameForm extends Component {
         }
         if (!e || e.key === "Enter") {
             this.setState({clickedButton: true}, () => this.props.submitName(this.state.name));
+            this.props.enterRoom(this.state.name);
         }
     };
 
@@ -157,6 +161,7 @@ class Home extends Component {
                             changePage={this.props.changePage}
                         />
                         : <NameForm
+                            enterRoom={this.props.enterRoom}
                             submitName={this.props.submitName}
                         />
                     }
@@ -167,4 +172,4 @@ class Home extends Component {
 
 }
 
-export default Home;
+export default connect(null, { submitName })(Home);
