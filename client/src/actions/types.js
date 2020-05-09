@@ -16,3 +16,4 @@ export const SET_TEAMS = 'SET_TEAMS';
 // actions for updating game state
 export const UPDATE_TURN = 'UPDATE_TURN';
 export const UPDATE_SCORE = 'UPDATE_SCORE';
+export const UPDATE_HISTORY = 'UPDATE_HISTORY';

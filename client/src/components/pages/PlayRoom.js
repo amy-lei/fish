@@ -138,8 +138,6 @@ class PlayRoom extends Component {
         super(props);
         this.state = {
             guess: [],
-            ongoing: true,
-            winner: null,
             sidebar: "chat",
         };
     }
@@ -279,6 +277,7 @@ const mapStateToProps = (state) => ({
     yourTeam: state.teams.yourTeam,
     otherTeam: state.teams.otherTeam,
     scores: state.scores,
+    history: state.history,
 });
 
 export default connect(mapStateToProps, {})(PlayRoom);

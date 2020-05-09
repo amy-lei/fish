@@ -107,8 +107,8 @@ class NameForm extends Component {
             return;
         }
         if (!e || e.key === "Enter") {
-            this.setState({clickedButton: true}, () => this.props.submitName(this.state.name));
-            this.props.enterRoom(this.state.name);
+            this.setState({clickedButton: true}, () => this.props.enterRoom(this.state.name));
+            ;
         }
     };
 
@@ -174,4 +174,4 @@ class Home extends Component {
 
 }
 
-export default connect(null, { submitName, setRoomKey })(Home);
+export default connect(null, { setRoomKey })(Home);

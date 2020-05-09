@@ -15,6 +15,7 @@ import {
     playerOut,
     setTeams,
     declareResults,
+    updateHistory,
  } from '../../actions/gameActions';
 
 import "../../utilities.css";
@@ -32,9 +33,6 @@ class Game extends Component {
         this.state = {
             page: "home",
             isCreator: false,
-            history: [],
-            yourTeamScore: 0,
-            otherTeamScore: 0,
             asking: false,
             responding: false,
             declaring: false,
@@ -60,6 +58,7 @@ class Game extends Component {
         const game = await post('/api/create_room', body);
         
         this.props.setIndex(0);
+        this.props.submitName(name);
         this.props.setRoomKey(game.key);
         this.props.updateTurn(this.props.name, 'ASK');
 
@@ -98,12 +97,9 @@ class Game extends Component {
                 otherScore = info.info.even;
             }
             this.props.setTeams(yourTeam, otherTeam);
+            this.props.updateScore(yourScore, otherScore);
             this.changePage("play_room");
-            this.setState({
-                history: info.info.history,
-                yourTeamScore: yourScore,
-                otherTeamScore: otherScore,
-            })
+            this.props.updateHistory(info.info.history);
         } else {
             this.setState({
                 page: "waiting_room",
@@ -132,7 +128,7 @@ class Game extends Component {
 
     // Send response with info about who, what, and success
     respond = async (response) => {
-        const lastAsk = this.state.history[this.state.history.length - 1]
+        const lastAsk = this.props.history[this.props.history.length - 1]
         const card = { rank: lastAsk.rank, suit: lastAsk.suit };
         const success = hasCard(this.props.hand, card);
         const body = {
@@ -156,16 +152,10 @@ class Game extends Component {
         return evenScore === WIN || oddScore === WIN;
     }
 
-    updateCreator = () => {
-        this.setState({isCreator: true});
-    }
-
     componentDidMount() {
         // update history and update turn after an ask
         socket.on("ask", update => {
-            this.setState({
-                history: update.history,
-            });
+            this.props.updateHistory(update.history);
             this.props.updateTurn(update.move.recipient, 'RESPOND');
         });
 
@@ -188,9 +178,7 @@ class Game extends Component {
                 }
             }
             // update history
-            this.setState({
-                history: update.history,
-            });
+            this.props.updateHistory(update.history);
             this.props.updateTurn(turn, 'ASK');
         });
 
@@ -259,7 +247,7 @@ class Game extends Component {
                 {this.state.page === "home" 
                     && <Home 
                             changePage={this.changePage} 
-                            updateCreator={this.updateCreator}
+                            updateCreator={() => this.setState({ isCreator: true })}
                             enterRoom={this.state.isCreator ? this.createRoom : this.enterRoom}
                         />}
                 {this.state.page === "waiting_room"
@@ -275,7 +263,6 @@ class Game extends Component {
                         <PlayRoom
                             submitAsk={this.ask}
                             submitResponse={this.respond}
-                            history={this.state.history}
                             asking={this.state.asking}
                             responding={this.state.responding}
                             declaring={this.state.declaring}
@@ -301,6 +288,7 @@ const mapStateToProps = (state) => ({
     whoseTurn: state.turnInfo.whoseTurn,
     hand: state.hand,
     scores: state.scores,
+    history: state.history,
 });
 
 const mapDispatchToProps = {
@@ -314,6 +302,7 @@ const mapDispatchToProps = {
     playerOut,
     setTeams,
     declareResults,
+    updateHistory,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(Game);

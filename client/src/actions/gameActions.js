@@ -8,6 +8,7 @@ import {
     PLAYER_OUT,
     SET_TEAMS,
     UPDATE_SCORE,
+    UPDATE_HISTORY,
 } from './types';
 
 export const setRoomKey = (key) => (dispatch) => {
@@ -70,5 +71,12 @@ export const declareResults = (yourTeam, otherTeam) => (dispatch) => {
     dispatch({
         type: UPDATE_SCORE,
         payload: { yourTeam, otherTeam },
+    });
+}
+
+export const updateHistory = (history) => (dispatch) => {
+    dispatch({
+        type: UPDATE_HISTORY,
+        payload: history,
     });
 }
