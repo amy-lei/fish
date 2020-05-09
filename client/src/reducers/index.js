@@ -1,17 +1,17 @@
 import { combineReducers } from 'redux';
-import updateUser from './updateUser';
-import updateTurn from './updateTurn';
-import updateHand from './updateHand';
+import user from './updateUser';
+import turnInfo from './updateTurn';
+import hand from './updateHand';
 import roomkey from './roomkey';
-import updateScores from './updateScores.js';
-import updateTeams from './updateTeams';
+import scores from './updateScores.js';
+import teams from './updateTeams';
 
 
 export default combineReducers({
     roomkey,
-    user: updateUser,
-    turnInfo: updateTurn,
-    hand: updateHand,
-    teams: updateTeams,
-    scores: updateScores,
+    user,
+    turnInfo,
+    hand,
+    teams,
+    scores,
 });

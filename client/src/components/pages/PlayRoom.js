@@ -1,5 +1,4 @@
 import React, { Component } from "react";
-import { removeHalfSuit } from "../../game-utilities";
 import { socket } from "../../client-socket";
 import Chat from "./Chat.js";
 import Ask from "../modules/Ask.js";
@@ -188,7 +187,6 @@ class PlayRoom extends Component {
         let asker;
         this.props.history.length !== 0 ? asker = this.props.history[this.props.history.length - 1].asker.name : asker = "";
 
-        const decBtn = (<button className="btn declare-btn" onClick={()=>this.setState({showDeclare: true})}>Declare</button>);
         return (
             <>
                 { !this.props.gameOver && this.props.showDeclare && 
@@ -262,8 +260,8 @@ class PlayRoom extends Component {
                         <GameStats
                             yourTeam={this.props.yourTeam}
                             otherTeam={this.props.otherTeam}
-                            yourTeamScore={this.props.yourTeamScore}
-                            otherTeamScore={this.props.otherTeamScore}
+                            yourTeamScore={this.props.scores.yourTeam}
+                            otherTeamScore={this.props.scores.otherTeam}
                             parity={this.props.index % 2 === 0 ? "even" : "odd"}
                         />
                     </div>
@@ -280,6 +278,7 @@ const mapStateToProps = (state) => ({
     hand: state.hand,
     yourTeam: state.teams.yourTeam,
     otherTeam: state.teams.otherTeam,
+    scores: state.scores,
 });
 
 export default connect(mapStateToProps, {})(PlayRoom);

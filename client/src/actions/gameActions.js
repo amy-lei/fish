@@ -7,6 +7,7 @@ import {
     INIT_HAND,
     PLAYER_OUT,
     SET_TEAMS,
+    UPDATE_SCORE,
 } from './types';
 
 export const setRoomKey = (key) => (dispatch) => {
@@ -64,3 +65,10 @@ export const playerOut = (index) => (dispatch) => {
         payload: index,
     });
 } 
+
+export const declareResults = (yourTeam, otherTeam) => (dispatch) => {
+    dispatch({
+        type: UPDATE_SCORE,
+        payload: { yourTeam, otherTeam },
+    });
+}

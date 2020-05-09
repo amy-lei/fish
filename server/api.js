@@ -245,7 +245,12 @@ router.post("/score", (req, res)=> {
             game.hands = updatedHands;
 
             socket.getAllSocketsFromGame(req.body.key).forEach(client => {
-                client.emit("updateScore", {even: req.body.even, declare: req.body.declare});
+                client.emit("updateScore", {
+                  even: req.body.even, 
+                  declare: req.body.declare,
+                  evenScore: game.even,
+                  oddScore: game.odd,
+                });
               });
 
             game.save().then((g) => {console.log(g); res.send({})});

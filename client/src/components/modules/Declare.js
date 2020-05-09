@@ -32,7 +32,7 @@ class Declare extends Component {
         });
         
         this.props.pause();
-        const res = post("/api/pause", {key: this.props.roomkey, player: this.props.name});
+        post("/api/pause", {key: this.props.roomkey, player: this.props.name});
     }
 
     // validate the declare before announcing 

@@ -5,7 +5,7 @@ import WaitingRoom from "./WaitingRoom.js";
 import PlayRoom from "./PlayRoom.js";
 import TestDrag from "./TestDrag.js";
 import { connect } from 'react-redux';
-import { setIndex } from '../../actions/userActions';
+import { submitName, setIndex } from '../../actions/userActions';
 import { 
     setRoomKey, 
     updateTurn,
@@ -14,17 +14,18 @@ import {
     removeSuit,
     playerOut,
     setTeams,
+    declareResults,
  } from '../../actions/gameActions';
 
 import "../../utilities.css";
 import { post } from "../../utilities";
-import { hasCard, removeHalfSuit } from "../../game-utilities";
+import { hasCard } from "../../game-utilities";
 import { socket } from "../../client-socket";
 
 import "../styles/game.scss";
 import "../styles/cards.scss";
 
-const WIN = 5; // FIX WHEN LAUNCH!!!
+const WIN = 1; // FIX WHEN LAUNCH!!!
 class Game extends Component {
     constructor(props) {
         super(props);
@@ -113,6 +114,7 @@ class Game extends Component {
 
         this.props.updateTurn(info.info.whoseTurn, info.info.turnType);
         this.props.setIndex(info.self.index);
+        this.props.submitName(info.self.name);
         
     };
     
@@ -145,16 +147,13 @@ class Game extends Component {
     };
 
     // Update your score if true, others if false
-    updateScore = (yours) => {
-        let newScore;
-        if (yours) {
-            newScore = this.props.yourTeamScore + 1;
-            this.setState({yourTeamScore: newScore});
+    updateScore = (even, evenScore, oddScore) => {
+        if (even) {
+            this.props.declareResults(evenScore, oddScore);
         } else {
-            newScore = this.state.otherTeamScore + 1;
-            this.setState({otherTeamScore: newScore});
+            this.props.declareResults(oddScore, evenScore);
         }
-        return newScore === WIN;
+        return evenScore === WIN || oddScore === WIN;
     }
 
     updateCreator = () => {
@@ -182,7 +181,6 @@ class Game extends Component {
                         update.move.suit,
                     );
                 } else if (update.move.asker.name === this.props.name) {
-                    console.log('cards before', this.props.hand);
                     this.props.addCard(
                         update.move.rank,
                         update.move.suit,
@@ -199,21 +197,6 @@ class Game extends Component {
 
         socket.on("playerOut", who => {
             this.props.playerOut(who.index);
-            // const sameTeam = (who.index % 2 === 0) === (this.props.index % 2 === 0);
-            
-            // if (sameTeam) {
-            //     let updated = this.state.yourTeam;
-            //     for (let player of updated) {
-            //         if (player.index === who.index) player.active = false;
-            //     }
-            //     this.setState({yourTeam: updated});
-            // } else {
-            //     let updated = this.state.otherTeam;
-            //     for (let player of updated) {
-            //         if (player.index === who.index) player.active = false;
-            //     }
-            //     this.setState({otherTeam: updated});
-            // }
         });
 
         socket.on("declaring", (info) => {
@@ -233,13 +216,13 @@ class Game extends Component {
                 this.props.index,
                 update.declare,
             );
-
-            const even = this.state.index % 2 === 0;
-            const win = this.updateScore(update.even === even);
+            console.log('score update', update);
+            const even = this.props.index % 2 === 0;
+            const gameOver = this.updateScore(even, update.evenScore, update.oddScore);
             
-            if (win) {
+            if (gameOver) {
                 this.setState({
-                    winner: even ? "even" : "odd",
+                    winner: update.even ? "even" : "odd",
                 });
             }
             // reset declaring states
@@ -257,7 +240,7 @@ class Game extends Component {
             <div className={`game-container ${this.state.page === "home" ? "white" : ""}`}>
                 <Header
                     gameBegan={this.state.page === "play_room"}
-                    gameOver={this.state.winner !== ""}
+                    winner={this.state.winner}
                     showAsk={!this.state.declaring 
                             && this.props.turnType === 'ASK'    
                             && this.props.whoseTurn === this.props.name
@@ -285,7 +268,6 @@ class Game extends Component {
                         isCreator={this.state.isCreator}
                         roomInfo={this.state.info}
                         changePage={this.changePage}
-                        updateGame={this.updateGame}
                     />}
                 {this.state.page === "play_room"
                     && (
@@ -294,9 +276,6 @@ class Game extends Component {
                             submitAsk={this.ask}
                             submitResponse={this.respond}
                             history={this.state.history}
-                            updateScore={this.updateScore}
-                            yourTeamScore={this.state.yourTeamScore}
-                            otherTeamScore={this.state.otherTeamScore}
                             asking={this.state.asking}
                             responding={this.state.responding}
                             declaring={this.state.declaring}
@@ -305,7 +284,7 @@ class Game extends Component {
                             resetDeclare={() => this.setState({showDeclare: false,})}
                             resetAsk={() => this.setState({asking: false,})}
                             resetRespond={() => this.setState({responding: false,})}
-                            pause={() => this.setState({declaring: true, declarer: this.state.name})}        
+                            pause={() => this.setState({declaring: true, declarer: this.props.name})}        
                             gameOver={this.state.winner !== ""}
                         />
                     </>)}
@@ -321,9 +300,11 @@ const mapStateToProps = (state) => ({
     turnType: state.turnInfo.turnType,
     whoseTurn: state.turnInfo.whoseTurn,
     hand: state.hand,
+    scores: state.scores,
 });
 
 const mapDispatchToProps = {
+    submitName,
     setIndex,
     setRoomKey,
     updateTurn,
@@ -332,6 +313,7 @@ const mapDispatchToProps = {
     removeSuit,
     playerOut,
     setTeams,
+    declareResults,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(Game);

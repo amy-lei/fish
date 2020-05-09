@@ -175,7 +175,6 @@ class WaitingRoom extends Component {
                             </div>
                         ))}
                     </div>
-
                 </div>
             </div>
         </>
