@@ -6,7 +6,6 @@ const SUITS = [
     'club',
   ];
 const RANKS = [
-    'ace',
     'two',
     'three',
     'four',
@@ -19,6 +18,7 @@ const RANKS = [
     'jack',
     'queen',
     'king',
+    'ace',
 ];
   
 const generateCards = (n) => {
