@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import { post } from "../../utilities";
 import { socket } from "../../client-socket";
 import { connect } from 'react-redux';
+import { setHand } from '../../actions/gameActions';
 import Chat from "./Chat.js";
 
 import "../styles/game.scss";
@@ -38,7 +39,8 @@ class WaitingRoom extends Component {
 
         // set up game when someone hits start 
         socket.on("startGame", (info) => {
-            this.setUpGame(info.cards[this.props.index]);
+            this.props.setHand(info.cards[this.props.index]);
+            this.setUpGame();
         });
 
         // updates ready/ unready state
@@ -58,7 +60,7 @@ class WaitingRoom extends Component {
         }
         const body = {key: this.props.roomkey};
         const hands = await post("/api/start_game", body);
-        this.setUpGame(hands[this.state.index]);
+        this.setUpGame();
     };
 
     ready = async (isReady) => {
@@ -74,7 +76,7 @@ class WaitingRoom extends Component {
         Split players into team by their index
         and update your hand
      */
-    setUpGame = (hand) => {
+    setUpGame = () => {
         let otherTeam = [];
         let yourTeam = [];
         const parity = this.props.index % 2;
@@ -82,7 +84,7 @@ class WaitingRoom extends Component {
             if (player.index % 2 === parity) yourTeam.push(player);
             else otherTeam.push(player);
         });
-        this.props.updateGame(hand, yourTeam, otherTeam);
+        this.props.updateGame(yourTeam, otherTeam);
         this.props.changePage("play_room");
 
     };
@@ -184,4 +186,8 @@ const mapStateToProps = (state) => ({
     roomkey: state.roomkey,
 });
 
-export default connect(mapStateToProps)(WaitingRoom);
+const mapDispatchToProps = {
+    setHand,
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(WaitingRoom);

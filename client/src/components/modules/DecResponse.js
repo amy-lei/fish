@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import { post } from "../../utilities";
 import { canObject } from "../../game-utilities";
 import { socket } from "../../client-socket";
+import { connect } from 'react-redux';
 import "../styles/declare.scss";
 
 
@@ -128,4 +129,8 @@ class DecResponse extends Component {
     }
 }
 
-export default DecResponse;
+const mapStateToProps = (state) => ({
+    hand: state.hand,
+});
+
+export default connect(mapStateToProps)(DecResponse);

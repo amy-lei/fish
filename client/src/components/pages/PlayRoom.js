@@ -150,7 +150,7 @@ class PlayRoom extends Component {
      */
     createCards = (hand) => {
         return hand.map(card => (
-            <div className={`card card-${this.props.hand.length}`}>
+            <div className={`card card-${hand.length}`}>
                 <img src={card_svgs[`${card.rank}-${card.suit}.svg`]}/>
             </div>
         ));
@@ -179,9 +179,11 @@ class PlayRoom extends Component {
     };
 
     render() {
+        const { hand } = this.props;
+
         let cards = "Loading cards";
-        if (this.props.hand) {
-            cards = this.createCards(this.props.hand);
+        if (hand) {
+            cards = this.createCards(hand);
         }
         let asker;
         this.props.history.length !== 0 ? asker = this.props.history[this.props.history.length - 1].asker.name : asker = "";
@@ -204,7 +206,6 @@ class PlayRoom extends Component {
                         guess={this.state.guess}
                         declarer={this.props.declarer}
                         roomkey={this.props.roomkey}
-                        hand={this.props.hand}
                         index={this.props.index}
                         minVotes={this.props.yourTeam.length + this.props.otherTeam.length - 1}
                     />}
@@ -212,7 +213,6 @@ class PlayRoom extends Component {
                     <Ask
                         submitAsk={this.props.submitAsk}
                         otherTeam={this.props.otherTeam}
-                        hand={this.props.hand}
                         reset={this.props.resetAsk}
                     />}
                 {!this.props.gameOver && !this.props.declaring && this.props.responding && 
@@ -278,6 +278,7 @@ const mapStateToProps = (state) => ({
     name: state.user.name,
     index: state.user.index,
     roomkey: state.roomkey,
+    hand: state.hand,
 });
 
 export default connect(mapStateToProps, {})(PlayRoom);

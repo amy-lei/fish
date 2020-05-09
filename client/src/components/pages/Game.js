@@ -6,7 +6,13 @@ import PlayRoom from "./PlayRoom.js";
 import TestDrag from "./TestDrag.js";
 import { connect } from 'react-redux';
 import { setIndex } from '../../actions/userActions';
-import { setRoomKey, updateTurn } from '../../actions/gameActions';
+import { 
+    setRoomKey, 
+    updateTurn,
+    addCard,
+    removeCard,
+    removeSuit,
+ } from '../../actions/gameActions';
 
 import "../../utilities.css";
 import { post } from "../../utilities";
@@ -23,7 +29,6 @@ class Game extends Component {
         this.state = {
             page: "home",
             isCreator: false,
-            hand: null,
             yourTeam: null,
             otherTeam: null,
             history: [],
@@ -91,7 +96,7 @@ class Game extends Component {
                 yourScore = info.info.odd;
                 otherScore = info.info.even;
             }
-            this.updateGame(info.info.hands[info.self.index], yourTeam, otherTeam);
+            this.updateGame(yourTeam, otherTeam);
             this.changePage("play_room");
             this.setState({
                 history: info.info.history,
@@ -111,13 +116,13 @@ class Game extends Component {
         
     };
     
-    updateGame = (hand, yourTeam, otherTeam) => {
-        this.setState({hand, yourTeam, otherTeam});
+    updateGame = (yourTeam, otherTeam) => {
+        this.setState({yourTeam, otherTeam});
     };
 
-    updateHand = (hand) => {
-        this.setState({hand});
-    };
+    // updateHand = (hand) => {
+    //     this.setState({hand});
+    // };
 
     // Send ask with info pertaining to who and what
     ask = async (who, rank, suit) => {
@@ -135,7 +140,7 @@ class Game extends Component {
     respond = async (response) => {
         const lastAsk = this.state.history[this.state.history.length - 1]
         const card = { rank: lastAsk.rank, suit: lastAsk.suit };
-        const success = hasCard(this.state.hand, card);
+        const success = hasCard(this.props.hand, card);
         const body = {
             key: this.props.roomkey,
             responder: {name: this.props.name, index: this.props.index},
@@ -188,14 +193,18 @@ class Game extends Component {
             const turn = update.move.success ? update.move.asker.name: update.move.responder.name;
             if (update.move.success) {
                 if (update.move.responder.name === this.props.name) {
-                    let hand = this.state.hand.filter(card => 
-                        !(card.rank === update.move.rank && card.suit === update.move.suit)); 
-                    this.setState({hand});
-                    this.checkIfActive(hand);
+                    this.props.removeCard(
+                        this.props.roomkey,
+                        this.props.index,
+                        update.move.rank,
+                        update.move.suit,
+                    );
                 } else if (update.move.asker.name === this.props.name) {
-                    let hand = this.state.hand.concat({rank:update.move.rank, suit: update.move.suit})
-                    this.setState({hand});
-                    this.checkIfActive(hand);
+                    console.log('cards before', this.props.hand);
+                    this.props.addCard(
+                        update.move.rank,
+                        update.move.suit,
+                    )
                 }
             }
             // update history
@@ -229,15 +238,17 @@ class Game extends Component {
                 declarer: info.player,
                 asking: false,
                 responding: false,
-                showDeclare: this.state.declarer === this.state.name,
+                showDeclare: this.state.declarer === this.props.name,
             });
         });
 
         // update game with results of the declare
         socket.on("updateScore", update => {
-            const hand = removeHalfSuit(this.state.hand, update.declare);
-            this.updateHand(hand);
-            this.checkIfActive(hand);
+            this.props.removeSuit(
+                this.props.roomkey,
+                this.props.index,
+                update.declare,
+            );
 
             const even = this.state.index % 2 === 0;
             const win = this.updateScore(update.even === even);
@@ -318,14 +329,12 @@ class Game extends Component {
                     && (
                     <>
                         <PlayRoom
-                            hand={this.state.hand}
                             yourTeam={this.state.yourTeam}
                             otherTeam={this.state.otherTeam}
                             submitAsk={this.ask}
                             submitResponse={this.respond}
                             history={this.state.history}
                             updateScore={this.updateScore}
-                            updateHand={this.updateHand}
                             checkIfActive={this.checkIfActive}
                             yourTeamScore={this.state.yourTeamScore}
                             otherTeamScore={this.state.otherTeamScore}
@@ -352,12 +361,16 @@ const mapStateToProps = (state) => ({
     roomkey: state.roomkey,
     turnType: state.turnInfo.turnType,
     whoseTurn: state.turnInfo.whoseTurn,
+    hand: state.hand,
 });
 
 const mapDispatchToProps = {
     setIndex,
     setRoomKey,
     updateTurn,
+    addCard,
+    removeCard,
+    removeSuit,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(Game);

@@ -3,6 +3,8 @@ import {
     UPDATE_TURN,
     REMOVE_CARD,
     ADD_CARD,
+    REMOVE_HALF_SUIT,
+    INIT_HAND,
 } from './types';
 
 export const setRoomKey = (key) => (dispatch) => {
@@ -37,5 +39,12 @@ export const removeSuit = (roomkey, index, declare) => (dispatch) => {
     dispatch({
         type: REMOVE_HALF_SUIT,
         payload: { roomkey, index, declare },
-    })
+    });
+}
+
+export const setHand = (hand) => (dispatch) => {
+    dispatch({
+        type: INIT_HAND,
+        payload: hand,
+    });
 }
