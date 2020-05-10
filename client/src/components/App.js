@@ -3,7 +3,6 @@ import Game from "./pages/Game.js";
 import store from '../store';
 import { Provider } from 'react-redux';
 
-import "../utilities.css";
 import './styles/App.scss';
 
 /**
