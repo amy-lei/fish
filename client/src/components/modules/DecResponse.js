@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import { post } from "../../utilities";
 import { canObject } from "../../game-utilities";
 import { socket } from "../../client-socket";
+import { connect } from 'react-redux';
 import "../styles/declare.scss";
 
 
@@ -23,7 +24,7 @@ class DecResponse extends Component {
      */
     resToDeclare = async (bool) => {
         const body = {
-            key: this.props.roomKey,
+            key: this.props.roomkey,
             player: this.props.name, 
             agree: bool,
         };
@@ -51,7 +52,7 @@ class DecResponse extends Component {
         const even = this.props.index % 2 === 0; // your team
         const body = {
             even: objections ? !even : even,
-            key: this.props.roomKey, 
+            key: this.props.roomkey, 
             declare: this.props.guess
         };
         // reset declaring states
@@ -128,4 +129,8 @@ class DecResponse extends Component {
     }
 }
 
-export default DecResponse;
+const mapStateToProps = (state) => ({
+    hand: state.hand,
+});
+
+export default connect(mapStateToProps)(DecResponse);

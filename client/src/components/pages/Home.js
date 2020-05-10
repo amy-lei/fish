@@ -1,5 +1,9 @@
 import React, { Component } from "react";
 import { post } from "../../utilities";
+import { connect } from 'react-redux';
+import { submitName } from '../../actions/userActions';
+import { setRoomKey } from '../../actions/gameActions';
+
 import landing_illustration from "../../public/landing_illustration.svg";
 
 class RoomForm extends Component {
@@ -25,12 +29,13 @@ class RoomForm extends Component {
 
     checkRoom = async (e) => {
         if ((e && e.key !== "Enter") || this.state.roomKey.trim() === "") { return; }
+        
         const body = {
             roomKey: this.state.roomKey,
         };
         const canJoin = await post("/api/check_room", body);
         if (canJoin) {
-            this.props.enterKey(this.state.roomKey);
+            this.props.setRoomKey(this.state.roomKey);
             this.props.changeView();
         }
         else {
@@ -102,7 +107,8 @@ class NameForm extends Component {
             return;
         }
         if (!e || e.key === "Enter") {
-            this.setState({clickedButton: true}, () => this.props.submitName(this.state.name));
+            this.setState({clickedButton: true}, () => this.props.enterRoom(this.state.name));
+            ;
         }
     };
 
@@ -153,11 +159,12 @@ class Home extends Component {
                     {
                         this.state.view === "room"
                         ? <RoomForm
-                            enterKey={(k) => this.setState({ roomkey: k })}
+                            setRoomKey={this.props.setRoomKey}
                             changeView={() => this.setState({view: "name"})}
                             updateCreator={() => this.setState({ isCreator: true })}
                         />
                         : <NameForm
+                            enterRoom={this.props.enterRoom}
                             submitName={this.props.submitName}
                         />
                     }
@@ -168,4 +175,4 @@ class Home extends Component {
 
 }
 
-export default Home;
+export default connect(null, { setRoomKey })(Home);

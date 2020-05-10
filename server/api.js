@@ -1,17 +1,11 @@
-/*
-|--------------------------------------------------------------------------
-| api.js -- server routes
-|--------------------------------------------------------------------------
-|
-| This file defines the routes for your server.
-|
-*/
-
-const removeHalfSuit = require("./util.js");
 const express = require("express");
 const Message = require("./models/message.js");
 const Game = require("./models/game.js");
+
+// modules for card handling
 const gen_cards = require("./cards.js");
+const removeHalfSuit = require("./util.js");
+
 // api endpoints: all these paths will be prefixed with "/api/"
 const router = express.Router();
 
@@ -160,7 +154,7 @@ router.post("/start_game", (req, res) => {
 
 router.post("/ask", (req, res) => {
   const move = {
-    type: "ask",
+    type: 'ASK',
     asker: req.body.asker,
     recipient: req.body.recipient,
     rank: req.body.rank,
@@ -184,7 +178,7 @@ router.post("/ask", (req, res) => {
 
 router.post("/respond", (req, res) => {
   const move = {
-    type: "respond",
+    type: 'RESPOND',
     responder: req.body.responder,
     asker: req.body.asker,
     response: req.body.response,
@@ -251,7 +245,12 @@ router.post("/score", (req, res)=> {
             game.hands = updatedHands;
 
             socket.getAllSocketsFromGame(req.body.key).forEach(client => {
-                client.emit("updateScore", {even: req.body.even, declare: req.body.declare});
+                client.emit("updateScore", {
+                  even: req.body.even, 
+                  declare: req.body.declare,
+                  evenScore: game.even,
+                  oddScore: game.odd,
+                });
               });
 
             game.save().then((g) => {console.log(g); res.send({})});

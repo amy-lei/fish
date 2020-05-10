@@ -1,12 +1,10 @@
-@import "./playroom.scss";
-@import "./base.scss";
+@import './base.scss';
 
 .hidden {
     opacity: 0;
 }
 
 .declare-confirm {
-    @include main-font();
     padding: 50px;
     height:50%
 }
