@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import { isValidAsk } from "../../game-utilities";
 import GuessInput from "./GuessInput.js";
+import { connect } from 'react-redux';
 
 
 import "../styles/game.scss";
@@ -31,6 +32,7 @@ class Ask extends Component {
                 rank: "",
                 suit: "",
             });
+            console.log('submitting ask')
             this.props.reset();
         } else this.setState({invalid: true});
     }
@@ -71,4 +73,9 @@ class Ask extends Component {
     }
 }
 
-export default Ask;
+const mapStateToProps = (state) => ({
+    hand: state.hand,
+    otherTeam: state.teams.otherTeam,
+});
+
+export default connect(mapStateToProps)(Ask);

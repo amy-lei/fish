@@ -1,5 +1,4 @@
 import React, { Component } from "react";
-import { removeHalfSuit } from "../../game-utilities";
 import { socket } from "../../client-socket";
 import Chat from "./Chat.js";
 import Ask from "../modules/Ask.js";
@@ -7,6 +6,7 @@ import Respond from "../modules/Respond.js";
 import Declare from "../modules/Declare.js";
 import DecResponse from "../modules/DecResponse.js";
 import { card_svgs } from "../card_svgs.js";
+import { connect } from 'react-redux';
 
 const PARITY_TO_TEAM = { "even": "BLUE", "odd": "RED" };
 const FACES = [':)', '•_•', '=U','°_o',':O','°Д°'];
@@ -72,7 +72,7 @@ class GameHistory extends Component {
 
     render() {
         const history = this.props.history.map(move => {
-            if (move.type === "ask")
+            if (move.type === 'ASK')
                 return (
                     <div className={`message history_move ${this.props.all?"left":""}`}>
                         <div className={`message_img ${
@@ -130,8 +130,6 @@ class PlayRoom extends Component {
         super(props);
         this.state = {
             guess: [],
-            ongoing: true,
-            winner: null,
             sidebar: "chat",
         };
     }
@@ -141,7 +139,7 @@ class PlayRoom extends Component {
      */
     createCards = (hand) => {
         return hand.map(card => (
-            <div className={`card card-${this.props.hand.length}`}>
+            <div className={`card card-${hand.length}`}>
                 <img src={card_svgs[`${card.rank}-${card.suit}.svg`]}/>
             </div>
         ));
@@ -170,21 +168,22 @@ class PlayRoom extends Component {
     };
 
     render() {
+        const { hand } = this.props;
+
         let cards = "Loading cards";
-        if (this.props.hand) {
-            cards = this.createCards(this.props.hand);
+        if (hand) {
+            cards = this.createCards(hand);
         }
         let asker;
         this.props.history.length !== 0 ? asker = this.props.history[this.props.history.length - 1].asker.name : asker = "";
 
-        const decBtn = (<button className="btn declare-btn" onClick={()=>this.setState({showDeclare: true})}>Declare</button>);
         return (
             <>
                 { !this.props.gameOver && this.props.showDeclare && 
                     <Declare 
                         name={this.props.name}
                         yourTeam={this.props.yourTeam} 
-                        roomKey={this.props.roomKey}
+                        roomkey={this.props.roomkey}
                         pause={this.props.pause}
                         reset={this.props.resetDeclare}
                     />}
@@ -194,16 +193,13 @@ class PlayRoom extends Component {
                         name={this.props.name}
                         guess={this.state.guess}
                         declarer={this.props.declarer}
-                        roomKey={this.props.roomKey}
-                        hand={this.props.hand}
+                        roomkey={this.props.roomkey}
                         index={this.props.index}
                         minVotes={this.props.yourTeam.length + this.props.otherTeam.length - 1}
                     />}
                 {!this.props.gameOver && !this.props.declaring && this.props.asking && 
                     <Ask
                         submitAsk={this.props.submitAsk}
-                        otherTeam={this.props.otherTeam}
-                        hand={this.props.hand}
                         reset={this.props.resetAsk}
                     />}
                 {!this.props.gameOver && !this.props.declaring && this.props.responding && 
@@ -234,7 +230,7 @@ class PlayRoom extends Component {
                         <Chat
                             name={this.props.name}
                             index={this.props.index}
-                            roomKey={this.props.roomKey}
+                            roomkey={this.props.roomkey}
                             hidden={this.state.sidebar !== "chat"}
                         />
                         <GameHistory
@@ -254,8 +250,8 @@ class PlayRoom extends Component {
                         <GameStats
                             yourTeam={this.props.yourTeam}
                             otherTeam={this.props.otherTeam}
-                            yourTeamScore={this.props.yourTeamScore}
-                            otherTeamScore={this.props.otherTeamScore}
+                            yourTeamScore={this.props.scores.yourTeam}
+                            otherTeamScore={this.props.scores.otherTeam}
                             parity={this.props.index % 2 === 0 ? "even" : "odd"}
                         />
                     </div>
@@ -265,5 +261,15 @@ class PlayRoom extends Component {
     }
 }
 
+const mapStateToProps = (state) => ({
+    name: state.user.name,
+    index: state.user.index,
+    roomkey: state.roomkey,
+    hand: state.hand,
+    yourTeam: state.teams.yourTeam,
+    otherTeam: state.teams.otherTeam,
+    scores: state.scores,
+    history: state.history,
+});
 
-export default PlayRoom;
+export default connect(mapStateToProps, {})(PlayRoom);

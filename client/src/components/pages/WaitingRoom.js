@@ -1,9 +1,14 @@
 import React, { Component } from "react";
 import { post } from "../../utilities";
 import { socket } from "../../client-socket";
+import { connect } from 'react-redux';
+import { 
+    setHand,
+    setTeams,
+ } from '../../actions/gameActions';
 import Chat from "./Chat.js";
 
-const MAX_PLAYERS = 1;
+const MAX_PLAYERS = 6;
 const FACES = [':)', '•_•', '=U','°_o',':O','°Д°']
 
 class WaitingRoom extends Component {
@@ -34,7 +39,8 @@ class WaitingRoom extends Component {
 
         // set up game when someone hits start 
         socket.on("startGame", (info) => {
-            this.setUpGame(info.cards[this.state.index]);
+            this.props.setHand(info.cards[this.props.index]);
+            this.setUpGame();
         });
 
         // updates ready/ unready state
@@ -52,14 +58,14 @@ class WaitingRoom extends Component {
             alert(`You need ${MAX_PLAYERS} players to start!`);
             return;
         }
-        const body = {key: this.props.roomKey};
+        const body = {key: this.props.roomkey};
         const hands = await post("/api/start_game", body);
-        this.setUpGame(hands[this.state.index]);
+        this.setUpGame();
     };
 
     ready = async (isReady) => {
         const body = {
-            key: this.props.roomKey,
+            key: this.props.roomkey,
             playerName: this.props.name,
             isReady: isReady,
         };
@@ -70,7 +76,7 @@ class WaitingRoom extends Component {
         Split players into team by their index
         and update your hand
      */
-    setUpGame = (hand) => {
+    setUpGame = () => {
         let otherTeam = [];
         let yourTeam = [];
         const parity = this.props.index % 2;
@@ -78,7 +84,7 @@ class WaitingRoom extends Component {
             if (player.index % 2 === parity) yourTeam.push(player);
             else otherTeam.push(player);
         });
-        this.props.updateGame(hand, yourTeam, otherTeam);
+        this.props.setTeams(yourTeam, otherTeam);
         this.props.changePage("play_room");
 
     };
@@ -110,7 +116,7 @@ class WaitingRoom extends Component {
                     <Chat
                         index={this.props.index}
                         name={this.props.name}
-                        roomKey={this.props.roomKey}
+                        roomKey={this.props.roomkey}
                         hidden={false}
                     />
                 </div>
@@ -120,12 +126,12 @@ class WaitingRoom extends Component {
                             Share this key with five friends:
                         </div>
                         <div className="waiting-room_key" onClick={this.copyKey}>
-                            {this.props.roomKey}
+                            {this.props.roomkey}
                         </div>
                         <input 
                             type="text" 
                             ref={this.key_ref} 
-                            value={this.props.roomKey} 
+                            value={this.props.roomkey} 
                             hidden={true} 
                             readOnly
                         />
@@ -166,7 +172,6 @@ class WaitingRoom extends Component {
                             </div>
                         ))}
                     </div>
-
                 </div>
             </div>
         </>
@@ -174,4 +179,15 @@ class WaitingRoom extends Component {
     }
 }
 
-export default WaitingRoom;
+const mapStateToProps = (state) => ({
+    name: state.user.name,
+    index: state.user.index,
+    roomkey: state.roomkey,
+});
+
+const mapDispatchToProps = {
+    setHand,
+    setTeams,
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(WaitingRoom);
