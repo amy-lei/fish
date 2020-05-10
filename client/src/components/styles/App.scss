@@ -1,14 +1,107 @@
+
+@import './base.scss';
+@import './cards.scss';
+@import './Chat.scss';
+@import './declare.scss';
+@import './game.scss';
+@import './header.scss';
+@import './playroom.scss';
+@import './respond.scss';
+
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    :focus {
-        outline: none;
+    transition: opacity 0.2s;
+    font-family: $main-font;
+    font-weight: $main-font-weight;
+    &:focus {
+        outline:none;
     }
 }
 
 body {
     width: 100vw;
     height:100vh;
+    background-color: $background;
     overflow:hidden;
+}
+
+
+.primary-btn {
+    @include solid-btn($primary, $primary-shadow);
+}
+
+.primary-inverted-btn {
+    @include inverted-btn($primary);
+}
+
+.alert-btn {
+    @include solid-btn($alert, $alert-shadow);
+}
+
+.long-btn {
+    width: $long;
+}
+.short-btn {
+    width: $short;
+}
+
+input {
+    &:focus{
+        box-shadow: 0 0 5px $primary,
+    }
+}
+
+.input-btn-field {
+    width: 65%;
+    padding: 12px 30px;
+    border: 1px solid $light-grey;
+    border-style: solid;
+    border-right: none;
+    border-radius: $radius 0 0 $radius;
+    text-align: center;
+    font-size: $button-font-size;
+    text-decoration: none;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.05);
+
+}
+
+.input-btn-submit {
+    display:inline;
+    background-color: white;
+    border-radius: 0 $radius $radius 0 !important;
+    text-align: center;
+    text-decoration: none;
+    width: 35%;
+
+}
+
+.warning {
+    font-family: "Source Sans Pro", sans-serif;
+    color: #808080;
+    font-size: 16px;
+}
+
+.close-btn {
+    position: absolute;
+    right:0;
+    top:0;
+    border: none;
+    background: none;
+    font-size: 25px;
+    font-weight: 300;
+    cursor: pointer;
+    padding: 20px;
+    &:hover {
+        color: $primary;
+    }
+}
+
+.team-odd {
+    background-color: $team-red;
+}
+
+.team-even {
+    background-color: $team-blue;
 }

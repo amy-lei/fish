@@ -8,9 +8,6 @@ import {
  } from '../../actions/gameActions';
 import Chat from "./Chat.js";
 
-import "../styles/game.scss";
-import "../styles/cards.scss";
-
 const MAX_PLAYERS = 6;
 const FACES = [':)', '•_•', '=U','°_o',':O','°Д°']
 

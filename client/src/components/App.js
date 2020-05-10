@@ -3,6 +3,11 @@ import Game from "./pages/Game.js";
 import store from '../store';
 import { Provider } from 'react-redux';
 
+import './styles/App.scss';
+
+/**
+ * Define the "App" component as a class.
+ */
 class App extends Component {
   constructor(props) {
     super(props);

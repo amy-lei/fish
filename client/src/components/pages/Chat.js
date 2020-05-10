@@ -3,9 +3,6 @@ import React, { Component } from "react";
 import { get, post } from "../../utilities";
 import { socket } from "../../client-socket.js";
 
-import "../styles/Chat.scss";
-import "../styles/App.scss";
-
 const FACES = [':)', '•_•', '=U','°_o',':O','°Д°'];
 
 class Chat extends Component {
