@@ -7,6 +7,7 @@ import Declare from "../modules/Declare.js";
 import DecResponse from "../modules/DecResponse.js";
 import { card_svgs } from "../card_svgs.js";
 import { connect } from 'react-redux';
+import { Redirect } from 'react-router';
 
 const PARITY_TO_TEAM = { "even": "BLUE", "odd": "RED" };
 const FACES = [':)', '•_•', '=U','°_o',':O','°Д°'];
@@ -168,6 +169,11 @@ class PlayRoom extends Component {
     };
 
     render() {
+        // prevent users from skipping waiting room/homepage
+        if (!this.props.name || !this.props.roomkey || !this.props.otherTeam) {
+            return <Redirect to='/'/>;
+        }
+
         const { hand } = this.props;
 
         let cards = "Loading cards";

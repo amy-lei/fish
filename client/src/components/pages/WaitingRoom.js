@@ -6,6 +6,7 @@ import {
     setHand,
     setTeams,
  } from '../../actions/gameActions';
+import { Redirect } from 'react-router'; 
 import Chat from "./Chat.js";
 
 const MAX_PLAYERS = 6;
@@ -15,13 +16,20 @@ class WaitingRoom extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            players: this.props.isCreator ? [{name:this.props.name, index: 0, ready: true, active: true}] : this.props.roomInfo.players,
+            players: [],
             index: this.props.index,
         };
         this.key_ref = React.createRef();
     };
 
     componentDidMount() {
+        if (this.props.name && this.props.roomkey) {
+            console.log('succeeded');
+            this.setState({
+                players: this.props.isCreator ? [{name:this.props.name, index: 0, ready: true, active: true}] : this.props.roomInfo.players,
+                redirect: false,
+            });
+        }
         // update when someone joins
         socket.on("joinedWaitingRoom", (newName) => {
             this.setState({
@@ -43,23 +51,15 @@ class WaitingRoom extends Component {
             this.setUpGame();
         });
 
-        // updates ready/ unready state
+        // updates ready or unready state
         socket.on("ready", (readyInfo) => {
             this.setState({players: readyInfo.playerList});
         });
     }
 
     start = async () => {
-        if (!this.state.players.every(player => player.ready)) {
-            alert("Not all players are ready!");
-            return;
-        }
-        if (this.state.players.length < MAX_PLAYERS) {
-            alert(`You need ${MAX_PLAYERS} players to start!`);
-            return;
-        }
         const body = {key: this.props.roomkey};
-        const hands = await post("/api/start_game", body);
+        await post("/api/start_game", body);
         this.setUpGame();
     };
 
@@ -92,15 +92,21 @@ class WaitingRoom extends Component {
     copyKey = () => {
         // Got this from W3 schools
         const keyText = this.key_ref.current;
-        /* Select the text field */
+        // select the text field 
         keyText.select();
-        keyText.setSelectionRange(0, 99999); /*For mobile devices*/
+        keyText.setSelectionRange(0, 99999); // for mobile devices
 
-        /* Copy the text inside the text field */
+        // copy the text inside the text field
         document.execCommand("copy");
     };
 
     render() {
+        // only render if user inputed name and key
+        if (!this.props.name || !this.props.roomkey) {
+            console.log(this.props.name, this.props.roomkey);
+            return <Redirect to='/'/>
+        }
+
         const isReady = this.state.players.filter(player => player.name === this.props.name)[0].ready;
         const placeholderPlayers = [...Array(6 - this.state.players.length).keys()].map((num) => (
             {name: `placeholder${num}`, index: -1, ready: false, active: false}

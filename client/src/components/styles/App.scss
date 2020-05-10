@@ -105,3 +105,26 @@ input {
 .team-even {
     background-color: $team-blue;
 }
+
+.loading {
+    height: 100vh;
+    width:100vw;
+    &_spinner {
+        position: fixed;
+        top: 50vh;
+        left: 50vw;
+        width: 60px;
+        height: 60px;
+        transform: translate(-30px, -30px);
+        // background: black;
+        border-radius: 100%;
+        border: 5px solid $light-grey;
+        border-top: 5px solid $primary;
+        animation: spin 2s linear infinite;
+    }
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% {transform: rotate(360deg); }
+}
