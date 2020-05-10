@@ -16,20 +16,15 @@ class WaitingRoom extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            players: [],
+            redirect: false,
+            isReady: false,
+            players: this.props.isCreator ? [{name:this.props.name, index: 0, ready: true, active: true}] : this.props.players,
             index: this.props.index,
         };
         this.key_ref = React.createRef();
     };
 
     componentDidMount() {
-        if (this.props.name && this.props.roomkey) {
-            console.log('succeeded');
-            this.setState({
-                players: this.props.isCreator ? [{name:this.props.name, index: 0, ready: true, active: true}] : this.props.roomInfo.players,
-                redirect: false,
-            });
-        }
         // update when someone joins
         socket.on("joinedWaitingRoom", (newName) => {
             this.setState({
@@ -102,12 +97,10 @@ class WaitingRoom extends Component {
 
     render() {
         // only render if user inputed name and key
-        if (!this.props.name || !this.props.roomkey) {
-            console.log(this.props.name, this.props.roomkey);
+        if (!(this.props.name || this.props.roomkey)) {
             return <Redirect to='/'/>
         }
 
-        const isReady = this.state.players.filter(player => player.name === this.props.name)[0].ready;
         const placeholderPlayers = [...Array(6 - this.state.players.length).keys()].map((num) => (
             {name: `placeholder${num}`, index: -1, ready: false, active: false}
         ));
@@ -151,7 +144,7 @@ class WaitingRoom extends Component {
                                 Start Game
                             </button>
                             :
-                            isReady ?
+                            this.state.isReady ?
                                 <button onClick={() => this.ready(false)} className="btn primary-btn long-btn">
                                     Not Ready
                                 </button>
@@ -188,7 +181,9 @@ class WaitingRoom extends Component {
 const mapStateToProps = (state) => ({
     name: state.user.name,
     index: state.user.index,
+    isCreator: state.user.isCreator,
     roomkey: state.roomkey,
+    players: state.players,
 });
 
 const mapDispatchToProps = {

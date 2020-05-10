@@ -9,6 +9,7 @@ import {
     SET_TEAMS,
     UPDATE_SCORE,
     UPDATE_HISTORY,
+    SET_PLAYERS,
 } from './types';
 
 export const setRoomKey = (key) => (dispatch) => {
@@ -50,6 +51,13 @@ export const setHand = (hand) => (dispatch) => {
     dispatch({
         type: INIT_HAND,
         payload: hand,
+    });
+}
+
+export const setPlayers = (players) => (dispatch) => {
+    dispatch({
+        type: SET_PLAYERS,
+        payload: players,
     });
 }
 

@@ -48,6 +48,7 @@ router.post("/check_room", (req, res) => {
 router.post("/join_room", (req, res) => {
     const requestedRoomKey = req.body.room_key;
     const playerName = req.body.playerName;
+    console.log(requestedRoomKey);
     Game.findOne({key: requestedRoomKey})
         .then((foundGame) => {
           socket.addUser(foundGame.key, socket.getSocketFromSocketID(req.body.socketid), playerName);
@@ -61,8 +62,8 @@ router.post("/join_room", (req, res) => {
               }
             }
             
-            foundGame.save().then(g => {
-              res.send({self: targetPlayer, info: g, return: true});
+            foundGame.save().then(game => {
+              res.send({self: targetPlayer, game, return: true, ...g});
             });
           } else {
             const allPlayerNames = foundGame.players.map((player) => player.name);
@@ -81,7 +82,7 @@ router.post("/join_room", (req, res) => {
             });
             foundGame.players.push(newPlayer);
             foundGame.save()
-                     .then(() => res.send({self: newPlayer, info: foundGame, return: false}));
+                     .then((game) => res.send({self: newPlayer, game, return: false}));
           }
         });
 });
