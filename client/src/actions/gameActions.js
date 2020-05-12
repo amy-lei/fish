@@ -48,7 +48,6 @@ export const removeSuit = (roomkey, index, declare) => (dispatch) => {
 }
 
 export const setHand = (hand) => (dispatch) => {
-    console.log('reducer', hand);
     dispatch({
         type: INIT_HAND,
         payload: hand,

@@ -19,7 +19,6 @@ class Chat extends Component {
     this.loadMessages();
 
     socket.on("newMessage", (message) => {
-      console.log('got sent',message);
       this.setState({
         allMessages: this.state.allMessages.concat(message),
       });

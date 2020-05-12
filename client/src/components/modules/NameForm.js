@@ -102,7 +102,6 @@ class NameForm extends Component {
                 isCreator: false,
                 info: game,
             });
-            console.log(game.players);
             this.props.setPlayers(game.players);
             this.props.redirect('lobby');
         }

@@ -22,7 +22,6 @@ router.get("/chat", (req, res) => {
 });
 
 router.post("/chat", (req, res) => {
-    console.log(req.body.sender_index);
     const mes = new Message({
         sender_index: req.body.sender_index,
         sender_name: req.body.sender_name,
@@ -48,7 +47,6 @@ router.post("/check_room", (req, res) => {
 router.post("/join_room", (req, res) => {
     const requestedRoomKey = req.body.room_key;
     const playerName = req.body.playerName;
-    console.log(requestedRoomKey);
     Game.findOne({key: requestedRoomKey})
         .then((foundGame) => {
           socket.addUser(foundGame.key, socket.getSocketFromSocketID(req.body.socketid), playerName);
