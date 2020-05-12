@@ -5,7 +5,6 @@ import WaitingRoom from "./WaitingRoom.js";
 import PlayRoom from "./PlayRoom.js";
 import TestDrag from "./TestDrag.js";
 import { connect } from 'react-redux';
-import { submitName, setIndex } from '../../actions/userActions';
 import { 
     setRoomKey, 
     updateTurn,
@@ -18,8 +17,6 @@ import {
     updateHistory,
  } from '../../actions/gameActions';
 
-import { post } from "../../utilities";
-import { hasCard } from "../../game-utilities";
 import { socket } from "../../client-socket";
 
 const WIN = 5; // FIX WHEN LAUNCH!!!
@@ -176,8 +173,6 @@ const mapStateToProps = (state) => ({
 });
 
 const mapDispatchToProps = {
-    submitName,
-    setIndex,
     setRoomKey,
     updateTurn,
     addCard,

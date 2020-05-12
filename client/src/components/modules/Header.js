@@ -39,7 +39,7 @@ class Header extends Component {
 
         let gameStatus;
         if (gameOver) {
-            gameStatus = <span>Game Over! Team {PARITY_TO_TEAM[this.props.winner]} won!</span>
+            gameStatus = <span>Game Over! Team {PARITY_TO_TEAM[winner]} won!</span>
         }
 
         return (

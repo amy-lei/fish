@@ -50,7 +50,7 @@ class Ask extends Component {
             <div className="popup">
                 <button
                     className="close-btn"
-                    onClick={this.props.toggleAsk}
+                    onClick={this.props.reset}
                 >
                     X
                 </button>

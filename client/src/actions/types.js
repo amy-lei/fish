@@ -17,7 +17,3 @@ export const SET_PLAYERS = 'SET_PLAYERS';
 export const UPDATE_TURN = 'UPDATE_TURN';
 export const UPDATE_SCORE = 'UPDATE_SCORE';
 export const UPDATE_HISTORY = 'UPDATE_HISTORY';
-export const TOGGLE_ASK = 'TOGGLE_ASK';
-export const TOGGLE_RESPONSE = 'TOGGLE_RESPONSE';
-export const TOGGLE_DECLARE = 'TOGGLE_DECLARE';
-export const SET_WINNER = 'SET_WINNER';

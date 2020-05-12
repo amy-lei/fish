@@ -19,6 +19,7 @@ class Chat extends Component {
     this.loadMessages();
 
     socket.on("newMessage", (message) => {
+      console.log('got sent',message);
       this.setState({
         allMessages: this.state.allMessages.concat(message),
       });
@@ -105,7 +106,7 @@ class Chat extends Component {
       content: trimmedMessage,
       room_key: this.props.roomkey,
     };
-    console.log(body);
+
     const message = await post('/api/chat', body);
     this.setState({
       curMessage: "",

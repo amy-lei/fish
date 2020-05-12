@@ -21,7 +21,7 @@ import {
     updateHistory,
 } from '../../actions/gameActions';
 
-const WIN = 1; // FIX WHEN LAUNCH!!!
+const WIN = 5; // FIX WHEN LAUNCH!!!
 
 class PlayRoom extends Component {
     constructor(props) {
@@ -165,7 +165,6 @@ class PlayRoom extends Component {
                 <Header
                     winner={winner}
                     gameBegan={true}
-                    winner={this.state.winner}
                     showAsk={!declaring 
                         && turnType === 'ASK'
                         && whoseTurn === name}
@@ -247,7 +246,6 @@ const mapStateToProps = (state) => ({
     hand: state.hand,
     yourTeam: state.teams.yourTeam,
     otherTeam: state.teams.otherTeam,
-    winner: state.winner,
     history: state.history,
     turnType: state.turnInfo.turnType,
     whoseTurn: state.turnInfo.whoseTurn,

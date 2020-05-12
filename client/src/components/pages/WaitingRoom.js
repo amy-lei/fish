@@ -10,8 +10,8 @@ import {
 import { Redirect } from 'react-router'; 
 import Chat from "./Chat.js";
 
-const MAX_PLAYERS = 1;
-const FACES = [':)', '•_•', '=U','°_o',':O','°Д°']
+const MAX_PLAYERS = 6;
+const FACES = [':)', '•_•', '=U','°_o',':O','°Д°'];
 
 class WaitingRoom extends Component {
     constructor(props) {
@@ -135,7 +135,7 @@ class WaitingRoom extends Component {
                     <Chat
                         index={index}
                         name={name}
-                        roomKey={roomkey}
+                        roomkey={roomkey}
                         hidden={false}
                     />
                 </div>
