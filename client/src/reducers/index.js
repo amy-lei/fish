@@ -6,7 +6,7 @@ import roomkey from './roomkey';
 import scores from './updateScores';
 import teams from './updateTeams';
 import history from './updateHistory';
-
+import players from './updatePlayers';
 
 export default combineReducers({
     roomkey,
@@ -16,4 +16,5 @@ export default combineReducers({
     teams,
     scores,
     history,
+    players,
 });

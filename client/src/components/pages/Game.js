@@ -5,7 +5,6 @@ import WaitingRoom from "./WaitingRoom.js";
 import PlayRoom from "./PlayRoom.js";
 import TestDrag from "./TestDrag.js";
 import { connect } from 'react-redux';
-import { submitName, setIndex } from '../../actions/userActions';
 import { 
     setRoomKey, 
     updateTurn,
@@ -18,8 +17,6 @@ import {
     updateHistory,
  } from '../../actions/gameActions';
 
-import { post } from "../../utilities";
-import { hasCard } from "../../game-utilities";
 import { socket } from "../../client-socket";
 
 const WIN = 5; // FIX WHEN LAUNCH!!!
@@ -27,8 +24,6 @@ class Game extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            page: "home",
-            isCreator: false,
             asking: false,
             responding: false,
             declaring: false,
@@ -36,106 +31,6 @@ class Game extends Component {
             declarer: "",
             winner: "",
         };
-    };
-
-    changePage = (page) => {
-        this.setState({page});
-    };
-
-    createRoom = async (name) => {
-        const trimmedName = name.trim();
-        if (trimmedName === "") {
-          return;
-        }
-        const body = {
-            creatorName: name,
-            socketid: socket.id,
-        };
-        const game = await post('/api/create_room', body);
-        
-        this.props.setIndex(0);
-        this.props.submitName(name);
-        this.props.setRoomKey(game.key);
-        this.props.updateTurn(this.props.name, 'ASK');
-
-        this.setState({
-            page: "waiting_room",
-            isCreator: true,
-        });
-    };
-
-    enterRoom = async (name) => {
-        const trimmedName = name.trim();
-        if (trimmedName === "") {
-          return;
-        }
-        const body = {
-            playerName: name,
-            room_key: this.props.roomkey,
-            socketid: socket.id,
-        };
-        const info = await post('/api/join_room', body);
-        if (info.return) {
-            let otherTeam = [];
-            let yourTeam = [];
-            let yourScore;
-            let otherScore;
-            const parity = info.self.index % 2;
-            info.info.players.forEach((player) => {
-                if (player.index % 2 === parity) yourTeam.push(player);
-                else otherTeam.push(player);
-            });
-            if (parity) {
-                yourScore = info.info.even;
-                otherScore = info.info.odd;
-            } else {
-                yourScore = info.info.odd;
-                otherScore = info.info.even;
-            }
-            this.props.setTeams(yourTeam, otherTeam);
-            this.props.updateScore(yourScore, otherScore);
-            this.changePage("play_room");
-            this.props.updateHistory(info.info.history);
-        } else {
-            this.setState({
-                page: "waiting_room",
-                isCreator: false,
-                info: info.info,
-            });
-        }
-
-        this.props.updateTurn(info.info.whoseTurn, info.info.turnType);
-        this.props.setIndex(info.self.index);
-        this.props.submitName(info.self.name);
-        
-    };
-    
-    // Send ask with info pertaining to who and what
-    ask = async (who, rank, suit) => {
-        const body = {
-            key: this.props.roomkey,
-            asker: { name: this.props.name, index: this.props.index},
-            recipient: who, 
-            rank: rank,
-            suit: suit,
-        };
-        const res = await post('/api/ask', body);
-    };
-
-    // Send response with info about who, what, and success
-    respond = async (response) => {
-        const lastAsk = this.props.history[this.props.history.length - 1]
-        const card = { rank: lastAsk.rank, suit: lastAsk.suit };
-        const success = hasCard(this.props.hand, card);
-        const body = {
-            key: this.props.roomkey,
-            responder: {name: this.props.name, index: this.props.index},
-            asker: lastAsk.asker,
-            response: response,
-            success: success,
-            card: card,
-        };
-        await post("/api/respond", body);
     };
 
     // Update your score if true, others if false
@@ -200,7 +95,6 @@ class Game extends Component {
                 this.props.index,
                 update.declare,
             );
-            console.log('score update', update);
             const even = this.props.index % 2 === 0;
             const gameOver = this.updateScore(even, update.evenScore, update.oddScore);
             
@@ -223,7 +117,6 @@ class Game extends Component {
         return (
             <div className={`game-container ${this.state.page === "home" ? "white" : ""}`}>
                 <Header
-                    gameBegan={this.state.page === "play_room"}
                     winner={this.state.winner}
                     showAsk={!this.state.declaring 
                             && this.props.turnType === 'ASK'    
@@ -257,16 +150,8 @@ class Game extends Component {
                     && (
                     <>
                         <PlayRoom
-                            submitAsk={this.ask}
-                            submitResponse={this.respond}
-                            asking={this.state.asking}
-                            responding={this.state.responding}
-                            declaring={this.state.declaring}
-                            showDeclare={this.state.showDeclare}
                             declarer={this.state.declarer}
                             resetDeclare={() => this.setState({showDeclare: false,})}
-                            resetAsk={() => this.setState({asking: false,})}
-                            resetRespond={() => this.setState({responding: false,})}
                             pause={() => this.setState({declaring: true, declarer: this.props.name})}        
                             gameOver={this.state.winner !== ""}
                         />
@@ -288,8 +173,6 @@ const mapStateToProps = (state) => ({
 });
 
 const mapDispatchToProps = {
-    submitName,
-    setIndex,
     setRoomKey,
     updateTurn,
     addCard,

@@ -1,6 +1,5 @@
 // actions for joining a game
-export const SUBMIT_NAME = 'SUBMIT_NAME';
-export const SET_INDEX = 'SET_INDEX';
+export const ENTER_GAME = 'ENTER_GAME';
 export const SET_ROOM = 'SET_ROOM';
 
 // actions for updating hand 
@@ -12,6 +11,7 @@ export const INIT_HAND = 'INIT_HAND';
 // actions for updating teams 
 export const PLAYER_OUT = 'PLAYER_OUT';
 export const SET_TEAMS = 'SET_TEAMS';
+export const SET_PLAYERS = 'SET_PLAYERS';
 
 // actions for updating game state
 export const UPDATE_TURN = 'UPDATE_TURN';

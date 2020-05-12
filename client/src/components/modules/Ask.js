@@ -1,8 +1,8 @@
 import React, { Component } from "react";
 import { isValidAsk } from "../../game-utilities";
-import GuessInput from "./GuessInput.js";
 import { connect } from 'react-redux';
-
+import { post } from "../../utilities";
+import GuessInput from "./GuessInput.js";
 
 import "../styles/game.scss";
 import "../styles/cards.scss";
@@ -22,19 +22,27 @@ class Ask extends Component {
         Validate ask before posting,
         and reset states related to ask
     */
-    ask = () => {
-        if (isValidAsk(this.props.hand, {rank: this.state.rank, suit: this.state.suit})) {
-            this.props.submitAsk(this.state.recipient, this.state.rank, this.state.suit)
+    ask = async() => {
+        const { recipient, rank, suit } = this.state;
+        const { hand, roomkey, name, index } = this.props;
+        
+        if (isValidAsk(hand, {rank, suit})) {
+            const body = {
+                key: roomkey,
+                asker: { name, index },
+                recipient, 
+                rank,
+                suit,
+            };
+            const res = await post('/api/ask', body);
             this.setState({
                 invalid: false,
-                asking: false,
                 recipient: "",
                 rank: "",
                 suit: "",
             });
-            console.log('submitting ask')
             this.props.reset();
-        } else this.setState({invalid: true});
+        } else this.setState({ invalid: true });
     }
 
     render() {
@@ -74,8 +82,11 @@ class Ask extends Component {
 }
 
 const mapStateToProps = (state) => ({
+    name: state.user.name,
+    index: state.user.index,
+    roomkey: state.roomkey,
     hand: state.hand,
     otherTeam: state.teams.otherTeam,
 });
 
-export default connect(mapStateToProps)(Ask);
+export default connect(mapStateToProps, {})(Ask);

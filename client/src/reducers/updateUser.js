@@ -1,25 +1,21 @@
 import { 
-    SUBMIT_NAME,
-    SET_INDEX,
+    ENTER_GAME,
  } from '../actions/types';
 
 const initialState = {
     name: '',
     index: null,
+    isCreator: false,
 };
 
 export default (state = initialState, action) => {
     switch (action.type) {
-        case SUBMIT_NAME:
+        case ENTER_GAME:
             return {
-                ...state,
-                name: action.payload,
-            }
-        case SET_INDEX:
-            return {
-                ...state,
-                index: action.payload,
-            }
+                name: action.payload.name,
+                index: action.payload.index,
+                isCreator: action.payload.isCreator,
+            };
         default:
             return state;
     }

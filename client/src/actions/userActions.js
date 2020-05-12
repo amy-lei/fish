@@ -1,15 +1,8 @@
-import { SUBMIT_NAME, SET_INDEX } from './types';
+import { ENTER_GAME } from './types';
 
-export const submitName = (name) => (dispatch) => {
+export const joinGame = (name, index, isCreator) => (dispatch) => {
     dispatch({
-        type: SUBMIT_NAME,
-        payload: name,
-    });
-};
-
-export const setIndex = (index) => (dispatch) => {
-    dispatch({
-        type: SET_INDEX,
-        payload: index,
+        type: ENTER_GAME,
+        payload: { name, index, isCreator },
     });
 }

@@ -1,24 +1,42 @@
-import React, { Component } from "react";
-import Game from "./pages/Game.js";
+import React, { Component, Suspense, lazy } from "react";
+import {
+  BrowserRouter as Router, 
+  Route,
+} from "react-router-dom";
 import store from '../store';
 import { Provider } from 'react-redux';
-
+import Loading from "./pages/Loading";
 import './styles/App.scss';
 
-/**
- * Define the "App" component as a class.
- */
+const Home = lazy(() => import('./pages/Home'));
+const WaitingRoom = lazy(() => import('./pages/WaitingRoom'));
+const PlayRoom = lazy(() => import('./pages/PlayRoom'));
+
 class App extends Component {
   constructor(props) {
     super(props);
-    this.state = {
-    };
+    this.state = {};
   }
 
   render() {
     return (
       <Provider store={store}>
-        <Game/>
+        <Router>
+          <Suspense fallback={Loading}>
+            <Route 
+              exact path='/' 
+              component={Home}
+            />
+            <Route 
+              path='/lobby' 
+              component={WaitingRoom}
+            />
+            <Route 
+              path='/play' 
+              component={PlayRoom}
+            />
+          </Suspense>
+        </Router>
       </Provider>
     );
   }

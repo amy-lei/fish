@@ -22,7 +22,6 @@ router.get("/chat", (req, res) => {
 });
 
 router.post("/chat", (req, res) => {
-    console.log(req.body.sender_index);
     const mes = new Message({
         sender_index: req.body.sender_index,
         sender_name: req.body.sender_name,
@@ -61,8 +60,8 @@ router.post("/join_room", (req, res) => {
               }
             }
             
-            foundGame.save().then(g => {
-              res.send({self: targetPlayer, info: g, return: true});
+            foundGame.save().then(game => {
+              res.send({self: targetPlayer, game, return: true, ...g});
             });
           } else {
             const allPlayerNames = foundGame.players.map((player) => player.name);
@@ -81,7 +80,7 @@ router.post("/join_room", (req, res) => {
             });
             foundGame.players.push(newPlayer);
             foundGame.save()
-                     .then(() => res.send({self: newPlayer, info: foundGame, return: false}));
+                     .then((game) => res.send({self: newPlayer, game, return: false}));
           }
         });
 });

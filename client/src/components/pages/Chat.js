@@ -105,7 +105,7 @@ class Chat extends Component {
       content: trimmedMessage,
       room_key: this.props.roomkey,
     };
-    console.log(body);
+
     const message = await post('/api/chat', body);
     this.setState({
       curMessage: "",
