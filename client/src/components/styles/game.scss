@@ -1,29 +1,51 @@
 @import './base.scss';
 
-.game-container{
-    width: 100vw;
-    height: 100vh;
-    &.white {
-        background-color: white;
-    }
-}
-
 .home {
     text-align: center;
-    padding-top: 15vh;
-    height:90vh;
+    height:100vh;
+    padding-left: 10em;
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    background-image: url('../../public/illustration.svg');
+    background-size: 950px;
+    background-repeat: no-repeat;
+    background-position: 100% 50%;
 
-    &-tagline {
-        font-weight: 500;
-        font-size: $main-font-size;
-        padding: 10px;
-    }
-    &-options {
-        display:flex;
+    &-desc {
+        display: flex;
         flex-direction: column;
-        align-items: center;
-        margin-top: 20px;
+        align-items: flex-start;
+
+        width: 35%;
+        &_title,
+        &_tagline {
+            text-shadow: 0px 0px 4px rgba(255, 255, 255, 1);
+            white-space: nowrap;
+        }
+        &_title {
+            font-weight: 700;
+            font-size: 60px;
+            text-align: left;
+        }
+        &_tagline {
+            font-weight: 500;
+            font-size: $main-font-size;
+            text-align: left;
+            padding: 10px;
+        }
+        &_options {
+            display:flex;
+            flex-direction: column;
+            align-items: center;
+            margin-top: 20px;
+        }
     }
+    &-illustration {
+        width: 850px;
+        padding-left: 1rem;
+    }
+
     div > button {
         margin-bottom: 15px;
     }

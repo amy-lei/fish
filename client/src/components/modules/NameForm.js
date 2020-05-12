@@ -54,7 +54,6 @@ class NameForm extends Component {
             socketid: socket.id,
         };
         const game = await post('/api/create_room', body);
-        console.log('name', name);
         this.props.joinGame(name, 0, true);
         this.props.setRoomKey(game.key);
         this.props.updateTurn(name, 'ASK');
