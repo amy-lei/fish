@@ -10,6 +10,9 @@ import {
     UPDATE_SCORE,
     UPDATE_HISTORY,
     SET_PLAYERS,
+    TOGGLE_ASK,
+    TOGGLE_DECLARE,
+    SET_WINNER,
 } from './types';
 
 export const setRoomKey = (key) => (dispatch) => {
@@ -48,6 +51,7 @@ export const removeSuit = (roomkey, index, declare) => (dispatch) => {
 }
 
 export const setHand = (hand) => (dispatch) => {
+    console.log('reducer', hand);
     dispatch({
         type: INIT_HAND,
         payload: hand,
@@ -86,5 +90,31 @@ export const updateHistory = (history) => (dispatch) => {
     dispatch({
         type: UPDATE_HISTORY,
         payload: history,
+    });
+}
+
+export const toggleAsk = () => (dispatch) => {
+    dispatch({
+        type: TOGGLE_ASK,
+    });
+}
+
+export const toggleResponse = () => (dispatch) => {
+    dispatch({
+        type: TOGGLE_RESPONSE,
+    });
+}
+
+export const toggleDeclare = (name) => (dispatch) => {
+    dispatch({
+        type: TOGGLE_DECLARE,
+        payload: name,
+    });
+}
+
+export const setWinner = (name) => (dispatch) => {
+    dispatch({
+        type: SET_WINNER,
+        payload: name,
     });
 }

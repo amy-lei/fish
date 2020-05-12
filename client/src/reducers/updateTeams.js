@@ -24,7 +24,6 @@ const filterPlayers = (players, index) => {
 export default (state = initialState, action) => {
     switch(action.type) {
         case PLAYER_OUT:
-            console.log('player out!', action.payload);
             return {
                 yourTeam: filterPlayers(state.yourTeam, action.payload),
                 otherTeam: filterPlayers(state.otherTeam, action.payload),

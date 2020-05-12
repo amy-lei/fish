@@ -5,126 +5,23 @@ import Ask from "../modules/Ask.js";
 import Respond from "../modules/Respond.js";
 import Declare from "../modules/Declare.js";
 import DecResponse from "../modules/DecResponse.js";
+import GameStats from '../modules/GameStats';
+import GameHistory from '../modules/GameHistory';
+import Header from '../modules/Header';
 import { card_svgs } from "../card_svgs.js";
 import { connect } from 'react-redux';
 import { Redirect } from 'react-router';
+import {
+    declareResults,
+    updateTurn,
+    addCard,
+    removeCard,
+    removeSuit,
+    playerOut,
+    updateHistory,
+} from '../../actions/gameActions';
 
-const PARITY_TO_TEAM = { "even": "BLUE", "odd": "RED" };
-const FACES = [':)', '•_•', '=U','°_o',':O','°Д°'];
-
-class GameStats extends Component {
-    constructor(props){
-        super(props);
-        this.state = {
-        };
-    }
-
-    componentDidMount() {
-        socket.on("playerOut", info => {
-            this.setState({counter: this.state.counter + 1});
-        })
-    }
-
-    generatePlayer = (parity) => {
-        let team;
-        if (this.props.parity === parity) team = this.props.yourTeam;
-        else team = this.props.otherTeam;
-
-        if (team) {
-            return team.map(player => {
-                return(
-                <div className={`stats_player team-${parity} ${player.active ? "" : "out"}`}>
-                    {player.name} {player.active ? "": " (OUT)"}
-                </div>
-            )});
-        }
-    }
-
-    render() {
-
-        return (
-        <div className="stats">
-            <div className="stats_team-name">
-                {Object.keys(PARITY_TO_TEAM).map(parity => (
-                    <span> 
-                        TEAM {PARITY_TO_TEAM[parity]} 
-                        {this.props.parity === parity 
-                            ? `(YOU): ${this.props.yourTeamScore}`
-                            : `: ${this.props.otherTeamScore}`}
-                    </span>                
-                ))}
-            </div>
-            <div className="stats_players">
-                {Object.keys(PARITY_TO_TEAM).map(parity => this.generatePlayer(parity))}
-            </div>
-        </div>
-        
-        )
-    }
-}
-
-class GameHistory extends Component {
-    constructor(props){
-        super(props);
-        this.state = {
-
-        };
-    }
-
-    render() {
-        const history = this.props.history.map(move => {
-            if (move.type === 'ASK')
-                return (
-                    <div className={`message history_move ${this.props.all?"left":""}`}>
-                        <div className={`message_img ${
-                            move.asker.index % 2 == 0? 'team-even' : 'team-odd'}`}>
-                            {FACES[move.asker.index]} 
-                        </div>
-                        <div className="message_info">
-                            <div className={`message_info-sender history_move-who ${this.props.all ? "more-space": ""}`}>
-                                {move.asker.name} asked 
-                            </div>
-                            <div className="message_info-content history_move-what">
-                                {move.recipient} do you have the {move.rank} {move.suit}?
-                            </div>
-                        </div>
-                    </div>
-                );
-            else {
-                const result = move.success ? "did" : "did not";
-                return (
-                    <>
-                        <div className={`message history_move ${this.props.all?"left":""}`}>
-                            <div className={`message_img ${
-                                move.responder.index % 2 == 0? 'team-even' : 'team-odd'}`}>
-                                {FACES[move.responder.index]} 
-                            </div>
-                            <div className="message_info">
-                                <div className={`message_info-sender history_move-who ${this.props.all ? "more-space": ""}`}>
-                                    {move.responder.name} said
-                                </div>
-                                <div className="message_info-content history_move-what">
-                                    {move.response}
-                                </div>
-                            </div>
-                        </div>
-                        <div className="server-message history_move-result">
-                            {move.responder.name} {result} have the {move.rank} {move.suit}
-                        </div>
-                    </>
-                );
-            }
-        });
-        return (
-            <div className={`messages history ${this.props.hidden ? "hidden" : ""}`} hidden={this.props.hidden}>
-                {this.props.all 
-                    ? history
-                    : history[history.length - 1]}
-            </div>
-        );
-    }
-}
-
+const WIN = 1; // FIX WHEN LAUNCH!!!
 
 class PlayRoom extends Component {
     constructor(props) {
@@ -132,6 +29,12 @@ class PlayRoom extends Component {
         this.state = {
             guess: [],
             sidebar: "chat",
+            asking: false,
+            declaring: false,
+            showDeclare: false,
+            responding: false,
+            declarer: '',
+            winner: '',
         };
     }
 
@@ -146,20 +49,85 @@ class PlayRoom extends Component {
         ));
     };
 
+    // Update your score if true, others if false
+    updateScore = (even, evenScore, oddScore) => {
+        if (even) {
+            this.props.declareResults(evenScore, oddScore);
+        } else {
+            this.props.declareResults(oddScore, evenScore);
+        }
+        return evenScore === WIN || oddScore === WIN;
+    }
+
     componentDidMount() {
+        // update history and update turn after an ask
+        socket.on("ask", update => {
+            this.props.updateHistory(update.history);
+            this.props.updateTurn(update.move.recipient, 'RESPOND');
+        });
+
+        // update turn and hand if successful
+        socket.on("respond", update => {
+            const turn = update.move.success ? update.move.asker.name: update.move.responder.name;
+            if (update.move.success) {
+                if (update.move.responder.name === this.props.name) {
+                    this.props.removeCard(
+                        this.props.roomkey,
+                        this.props.index,
+                        update.move.rank,
+                        update.move.suit,
+                    );
+                } else if (update.move.asker.name === this.props.name) {
+                    this.props.addCard(
+                        update.move.rank,
+                        update.move.suit,
+                    )
+                }
+            }
+            // update history
+            this.props.updateHistory(update.history);
+            this.props.updateTurn(turn, 'ASK');
+        });
+
+        socket.on("playerOut", who => {
+            this.props.playerOut(who.index);
+        });
+        
         // update with the declarer's guess
         socket.on("declared", info => {
             this.setState({guess: info.guess});
         });
 
+        socket.on("declaring", (info) => {
+            this.setState({
+                declaring: true,
+                declarer: info.player,
+                asking: false,
+                responding: false,
+                showDeclare: info.player === this.props.name,
+            });
+        });
+
         // update game with results of the declare
         socket.on("updateScore", update => {
+            this.props.removeSuit(
+                this.props.roomkey,
+                this.props.index,
+                update.declare,
+            );
+            const even = this.props.index % 2 === 0;
+            const gameOver = this.updateScore(even, update.evenScore, update.oddScore);
+            
+            if (gameOver) {
+                this.setState({
+                    winner: update.even ? "even" : "odd",
+                });
+            }
             // reset declaring states
             this.setState({
-                guess: [],
-                lie: false,
-                voted: false,
-                votes: [],
+                declaring: false,
+                showDeclare: false,
+                declarer: '',
             });
         });
     }
@@ -174,47 +142,60 @@ class PlayRoom extends Component {
             return <Redirect to='/'/>;
         }
 
-        const { hand } = this.props;
-
+        const { 
+            hand,
+            turnType,
+            whoseTurn,
+            name,
+        } = this.props;
+        const { 
+            asking,
+            responding,
+            declaring,
+            declarer,
+            showDeclare,
+            winner,
+        } = this.state;
+        
         let cards = "Loading cards";
-        if (hand) {
-            cards = this.createCards(hand);
-        }
-        let asker;
-        this.props.history.length !== 0 ? asker = this.props.history[this.props.history.length - 1].asker.name : asker = "";
-
+        if (hand) { cards = this.createCards(hand); }
+        const gameOver = this.props.winner !== '';
         return (
             <>
-                { !this.props.gameOver && this.props.showDeclare && 
-                    <Declare 
-                        name={this.props.name}
-                        yourTeam={this.props.yourTeam} 
-                        roomkey={this.props.roomkey}
-                        pause={this.props.pause}
-                        reset={this.props.resetDeclare}
+                <Header
+                    winner={winner}
+                    gameBegan={true}
+                    winner={this.state.winner}
+                    showAsk={!declaring 
+                        && turnType === 'ASK'
+                        && whoseTurn === name}
+                    showRespond={!declaring
+                        && turnType === 'RESPOND'
+                        && whoseTurn === name}
+                    showDeclare={declarer === ''}
+                    onClickDeclare={() => this.setState({showDeclare: true})}
+                    onClickAsk={() => this.setState({asking: true})}
+                    onClickRespond={() => this.setState({responding: true})}
+                />
+                {!gameOver && showDeclare && 
+                    <Declare
+                        reset={() => this.setState({ showDeclare: false })}
                     />}
-                {!this.props.gameOver && this.props.declarer &&
+                {!gameOver && declaring && declarer &&
                     <DecResponse
-                        isDeclarer={this.props.declarer === this.props.name}
+                        isDeclarer={this.state.declarer === this.props.name}
                         name={this.props.name}
                         guess={this.state.guess}
-                        declarer={this.props.declarer}
+                        declarer={this.state.declarer}
                         roomkey={this.props.roomkey}
                         index={this.props.index}
                         minVotes={this.props.yourTeam.length + this.props.otherTeam.length - 1}
                     />}
-                {!this.props.gameOver && !this.props.declaring && this.props.asking && 
-                    <Ask
-                        submitAsk={this.props.submitAsk}
-                        reset={this.props.resetAsk}
-                    />}
-                {!this.props.gameOver && !this.props.declaring && this.props.responding && 
-                    <Respond
-                        submitResponse={this.props.submitResponse}
-                        asker={asker}
-                        reset={this.props.resetRespond}
-                    />}
-                <div className={`overlay ${this.props.showDeclare || this.props.asking || this.props.responding ? "" : "hidden"}`}></div>
+                {!gameOver && !declaring && asking && 
+                    <Ask reset={() => this.setState({ asking: false })}/>}
+                {!gameOver && !declaring && responding && 
+                    <Respond reset={() => this.setState({ responding: false })}/>}
+                <div className={`overlay ${showDeclare || this.props.asking || this.props.responding ? "" : "hidden"}`}></div>
                 <div className="container">
                     <div className="sidebar">
                         <div className="sidebar-label">
@@ -240,7 +221,6 @@ class PlayRoom extends Component {
                             hidden={this.state.sidebar !== "chat"}
                         />
                         <GameHistory
-                            history={this.props.history}
                             all={true}
                             hidden={this.state.sidebar === "chat"}
                         />
@@ -248,18 +228,11 @@ class PlayRoom extends Component {
                     <div className="main-container playroom">                            
                         {this.props.history &&
                             <GameHistory
-                                history={this.props.history}
                                 all={false}
                             />
                         }
                         <div className="cards">{cards}</div>
-                        <GameStats
-                            yourTeam={this.props.yourTeam}
-                            otherTeam={this.props.otherTeam}
-                            yourTeamScore={this.props.scores.yourTeam}
-                            otherTeamScore={this.props.scores.otherTeam}
-                            parity={this.props.index % 2 === 0 ? "even" : "odd"}
-                        />
+                        <GameStats/>
                     </div>
                 </div>
             </>
@@ -274,8 +247,20 @@ const mapStateToProps = (state) => ({
     hand: state.hand,
     yourTeam: state.teams.yourTeam,
     otherTeam: state.teams.otherTeam,
-    scores: state.scores,
+    winner: state.winner,
     history: state.history,
+    turnType: state.turnInfo.turnType,
+    whoseTurn: state.turnInfo.whoseTurn,
 });
 
-export default connect(mapStateToProps, {})(PlayRoom);
+const mapDispatchToProps = {
+    declareResults,
+    updateTurn,
+    addCard,
+    removeCard,
+    removeSuit,
+    playerOut,
+    updateHistory,
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(PlayRoom);

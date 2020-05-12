@@ -74,18 +74,25 @@ class DecResponse extends Component {
     }
 
     render() {
+        const {
+            declarer,
+            name,
+            guess,
+            minVotes,
+        } = this.props;
+
         const declaration = (
             <div className="declare-name">
-                {this.props.declarer} declared!
+                {declarer} declared!
             </div>);
 
-        let guess;
-        if (this.props.guess.length === 0) {
-            guess = <p className="declare-guess_wait">
-            {`${this.props.declarer} is making their guess. Communication disabled in the meantime.`}
+        let declaredGuess;
+        if (guess.length === 0) {
+            declaredGuess = <p className="declare-guess_wait">
+            {`${declarer} is making their guess. Communication disabled in the meantime.`}
             </p>
         } else {
-            guess = this.props.guess.map(combo => (
+            declaredGuess = guess.map(combo => (
                 <div className="declare-guess">
                     {combo.player} has the {combo.rank} {combo.suit}
                 </div>
@@ -96,7 +103,7 @@ class DecResponse extends Component {
             <div className="declare-votes">{vote.name} {vote.agree ? "agees": "OBJECTED"}</div>)
 
         let finish;
-            if (this.props.isDeclarer && this.state.votes.length === this.props.minVotes) {
+            if (declarer === name && this.state.votes.length === minVotes) {
                 finish = (<button className="btn primary-btn" onClick={this.endDeclare}>Finish</button>);
             }
     
@@ -104,9 +111,9 @@ class DecResponse extends Component {
             <div className="sidebar declare">
                 {declaration}
                 <div className="declare-guesses">
-                    {guess}
+                    {declaredGuess}
                 </div>
-                {!this.props.isDeclarer && this.props.guess.length !== 0 && !this.state.voted && 
+                {!(declarer === name) && guess.length !== 0 && !this.state.voted && 
                 (<div className="declare-vote_instruction">
                     Press OBJECT if you see a contradiction. ACCEPT otherwise.
                     <div className="declare-vote_btns">
@@ -130,6 +137,9 @@ class DecResponse extends Component {
 }
 
 const mapStateToProps = (state) => ({
+    name: state.user.name,
+    index: state.user.index,
+    roomkey: state.roomkey,
     hand: state.hand,
 });
 

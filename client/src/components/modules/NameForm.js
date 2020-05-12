@@ -54,11 +54,11 @@ class NameForm extends Component {
             socketid: socket.id,
         };
         const game = await post('/api/create_room', body);
-        
+        console.log('name', name);
         this.props.joinGame(name, 0, true);
         this.props.setRoomKey(game.key);
         this.props.updateTurn(name, 'ASK');
-        this.props.redirect();
+        this.props.redirect('lobby');
 
     };
 
@@ -95,6 +95,7 @@ class NameForm extends Component {
             this.props.setTeams(yourTeam, otherTeam);
             this.props.declareResults(yourScore, otherScore);
             this.props.updateHistory(game.history);
+            this.props.redirect('play');
         } else {
             this.setState({
                 page: "waiting_room",
@@ -103,7 +104,7 @@ class NameForm extends Component {
             });
             console.log(game.players);
             this.props.setPlayers(game.players);
-            this.props.redirect();
+            this.props.redirect('lobby');
         }
         this.props.updateTurn(game.whoseTurn, game.turnType);
         this.props.joinGame(self.name, self.index, false);

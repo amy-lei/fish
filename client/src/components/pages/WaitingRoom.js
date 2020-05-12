@@ -1,4 +1,5 @@
 import React, { Component } from "react";
+import Header from '../modules/Header';
 import { post } from "../../utilities";
 import { socket } from "../../client-socket";
 import { connect } from 'react-redux';
@@ -9,7 +10,7 @@ import {
 import { Redirect } from 'react-router'; 
 import Chat from "./Chat.js";
 
-const MAX_PLAYERS = 6;
+const MAX_PLAYERS = 1;
 const FACES = [':)', '•_•', '=U','°_o',':O','°Д°']
 
 class WaitingRoom extends Component {
@@ -25,10 +26,12 @@ class WaitingRoom extends Component {
     };
 
     componentDidMount() {
+        const { index, players } = this.state;
+
         // update when someone joins
         socket.on("joinedWaitingRoom", (newName) => {
             this.setState({
-                players: this.state.players.concat(newName)
+                players: players.concat(newName)
             });
         });
 
@@ -42,8 +45,9 @@ class WaitingRoom extends Component {
 
         // set up game when someone hits start 
         socket.on("startGame", (info) => {
-            this.props.setHand(info.cards[this.props.index]);
+            this.props.setHand(info.cards[index || 0]);
             this.setUpGame();
+            this.setState({ redirect: true });
         });
 
         // updates ready or unready state
@@ -59,10 +63,11 @@ class WaitingRoom extends Component {
     };
 
     ready = async (isReady) => {
+        this.setState({ isReady });
         const body = {
             key: this.props.roomkey,
             playerName: this.props.name,
-            isReady: isReady,
+            isReady,
         };
         const _ = await post("/api/ready", body);
     };
@@ -74,21 +79,19 @@ class WaitingRoom extends Component {
     setUpGame = () => {
         let otherTeam = [];
         let yourTeam = [];
-        const parity = this.props.index % 2;
+        const parity = this.state.index % 2;
         this.state.players.forEach((player) => {
             if (player.index % 2 === parity) yourTeam.push(player);
             else otherTeam.push(player);
         });
         this.props.setTeams(yourTeam, otherTeam);
-        this.props.changePage("play_room");
 
     };
 
     copyKey = () => {
         // Got this from W3 schools
         const keyText = this.key_ref.current;
-        // select the text field 
-        keyText.select();
+        keyText.select(); // select the text field 
         keyText.setSelectionRange(0, 99999); // for mobile devices
 
         // copy the text inside the text field
@@ -98,24 +101,41 @@ class WaitingRoom extends Component {
     render() {
         // only render if user inputed name and key
         if (!(this.props.name || this.props.roomkey)) {
-            return <Redirect to='/'/>
+            return <Redirect to='/'/>;
         }
 
-        const placeholderPlayers = [...Array(6 - this.state.players.length).keys()].map((num) => (
+        if (this.state.redirect) {
+            return <Redirect to='/play'/>;
+        }
+
+        const {
+            name,
+            roomkey,
+            isCreator,
+        } = this.props;
+
+        const {
+            index,
+            isReady,
+            players
+        } = this.state;
+
+        const placeholderPlayers = [...Array(6 - players.length).keys()].map((num) => (
             {name: `placeholder${num}`, index: -1, ready: false, active: false}
         ));
-        const disableStart = !(this.state.players.every(player => player.ready) && this.state.players.length === MAX_PLAYERS);
+        const disableStart = !(players.every(player => player.ready) && players.length === MAX_PLAYERS);
         return (
         <>
+            <Header gameBegan={false} winner=''/>
             <div className="container">
                 <div className="sidebar chat-container">
                     <div className="sidebar-label" style={{cursor: "default"}}>
                         <div className="sidebar-label_options">Chat History</div>
                     </div>
                     <Chat
-                        index={this.props.index}
-                        name={this.props.name}
-                        roomKey={this.props.roomkey}
+                        index={index}
+                        name={name}
+                        roomKey={roomkey}
                         hidden={false}
                     />
                 </div>
@@ -125,17 +145,17 @@ class WaitingRoom extends Component {
                             Share this key with five friends:
                         </div>
                         <div className="waiting-room_key" onClick={this.copyKey}>
-                            {this.props.roomkey}
+                            {roomkey}
                         </div>
                         <input 
                             type="text" 
                             ref={this.key_ref} 
-                            value={this.props.roomkey} 
+                            value={roomkey} 
                             hidden={true} 
                             readOnly
                         />
                         {
-                            this.props.isCreator ?
+                            isCreator ?
                             <button
                                 onClick={this.start}
                                 className={`btn long-btn ${disableStart ? "disabled-start" : "primary-btn"}`}
@@ -144,7 +164,7 @@ class WaitingRoom extends Component {
                                 Start Game
                             </button>
                             :
-                            this.state.isReady ?
+                            isReady ?
                                 <button onClick={() => this.ready(false)} className="btn primary-btn long-btn">
                                     Not Ready
                                 </button>

@@ -1,7 +1,8 @@
 import React, { Component } from "react";
 import { isValidDeclare } from "../../game-utilities";
-import GuessInput from "./GuessInput.js";
 import { post } from "../../utilities";
+import { connect } from 'react-redux';
+import GuessInput from "./GuessInput.js";
 
 import "../styles/game.scss";
 import "../styles/cards.scss";
@@ -28,10 +29,8 @@ class Declare extends Component {
         this.setState({
             showInput: true,
             declaring: true,
-            declarer: this.props.name,
         });
         
-        this.props.pause();
         post("/api/pause", {key: this.props.roomkey, player: this.props.name});
     }
 
@@ -88,7 +87,7 @@ class Declare extends Component {
             <>
                 <button
                     className="close-btn"
-                    onClick={this.props.reset}
+                    onClick={() => this.props.reset('')}
                 >
                     X
                 </button>
@@ -122,6 +121,13 @@ class Declare extends Component {
             </div></>);
 
     }
- }
- 
- export default Declare;
+}
+
+const mapStateToProps = (state) => ({
+    name: state.user.name,
+    index: state.user.index,
+    roomkey: state.roomkey,
+    yourTeam: state.teams.yourTeam,
+});
+
+export default connect(mapStateToProps)(Declare);

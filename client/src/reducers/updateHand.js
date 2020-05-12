@@ -12,6 +12,7 @@ export default (state = initialState, action) => {
     let hand;
     switch (action.type) {
         case INIT_HAND:
+            console.log('given',action.payload);
             return action.payload;
         case ADD_CARD:
             hand = [...state, {

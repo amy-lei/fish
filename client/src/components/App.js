@@ -5,8 +5,6 @@ import {
 } from "react-router-dom";
 import store from '../store';
 import { Provider } from 'react-redux';
-
-import Header from "./modules/Header.js";
 import Loading from "./pages/Loading";
 import './styles/App.scss';
 
@@ -23,7 +21,6 @@ class App extends Component {
   render() {
     return (
       <Provider store={store}>
-        <Header/>
         <Router>
           <Suspense fallback={Loading}>
             <Route 

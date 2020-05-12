@@ -1,7 +1,7 @@
 import React, { Component } from "react";
-import { post } from "../../utilities";
 import { Redirect } from 'react-router';
 
+import Header from '../modules/Header';
 import NameForm from '../modules/NameForm';
 import RoomForm from '../modules/RoomForm';
 import landing_illustration from "../../public/landing_illustration.svg";
@@ -10,17 +10,19 @@ class Home extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            redirect: false,
+            redirect: '',
             isCreator: false,
             view: "room",
         }
     }
 
     render() {
-        if (this.state.redirect) {
-            return <Redirect to='/lobby'/>
+        if (this.state.redirect !== '') {
+            return <Redirect to={`/${this.state.redirect}`}/>
         }
-        return (<>
+        return (
+        <>
+            <Header gameBegan={false} winner={''}/>
             <div className="home">
                 <img className="home-illustration" src={landing_illustration}/>
                 <p className="home-tagline">Stay connected with your friends through fish!</p>
@@ -33,7 +35,7 @@ class Home extends Component {
                         />
                         : <NameForm
                             isCreator={this.state.isCreator}
-                            redirect={() => this.setState({ redirect: true })}
+                            redirect={(room) => this.setState({ redirect: room })}
                         />
                     }
                 </div>
