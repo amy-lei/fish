@@ -85,7 +85,7 @@ class Ask extends Component {
                 onClick = () => {};
             }
             return (<div 
-                className={`player-option ${this.state.recipient === player.name && 'selected-card'} ${!player.active && 'out'}`}
+                className={`playroom-option player ${this.state.recipient === player.name && 'selected-card'} ${!player.active && 'out'}`}
                 onClick={onClick}
             >
                  {player.name} {player.active ? '' : '(OUT)'}
@@ -112,7 +112,7 @@ class Ask extends Component {
                     </div>
                     <div className='ask-section ask-section_suit'>
                         <label>Select to a player to ask:</label>
-                        <div className='player-options'>
+                        <div className='playroom-options'>
                             {this.createPlayers()}
                         </div>
                     </div>

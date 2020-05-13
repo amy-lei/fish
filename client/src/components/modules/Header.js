@@ -33,6 +33,9 @@ class Header extends Component {
                 onClick={() => this.props.changeView('declare')}
                 disabled={!showDeclare}>
                 Declare
+                {view !== 'declare' 
+                && <span className='tooltip'>You cannot back out of a declare once you begin</span>
+                }
             </button>);
         const ask = (
             <button 

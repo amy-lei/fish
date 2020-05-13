@@ -22,23 +22,32 @@ export const rankToVal = {
  */
 export const hasCard = (hand, target) => {
     for(let card of hand) 
-        if (card.rank === target.rank && card.suit === target.suit) return true;
-    return false;        
+        if (card.rank === target.rank && card.suit === target.suit) 
+            return {
+                card,
+                have: true,
+            };
+    return {
+        card: null,
+        have: false,
+    };        
 }
 
-
 /*
-    Returns whether the player has a card in the halfsuit 
-
-    @hand (array): list of cards
-    @target (object): a card in the desired halfsuit
- */
-export const isValidAsk = (hand, target) => {
-    if (!hasCard(hand, target)) {
-        for (let card of hand) 
-            if (sameHalfSuit(target, card)) return true;
+*/
+export const separateHalfSuit = (hand, halfSuit) => {
+    const ownCards = new Set();
+    for(let c of hand) {
+        const {card, have} = hasCard(halfSuit, c);
+        if (have) {
+            ownCards.add(card);
+        }
     }
-    return false;
+    
+    return {
+        ownCards,
+        availableCards: halfSuit.filter(card => !ownCards.has(card)),
+    };
 }
 
 
@@ -53,7 +62,7 @@ export const isValidDeclare = (declare) => {
     for (let guess of declare) {
         // make sure nothing is empty 
         if (guess.player && guess.rank && guess.suit) {
-            if (!sameHalfSuit(declare[0], guess) || hasCard(asked, guess)) return false;
+            if (!sameHalfSuit(declare[0], guess) || hasCard(asked, guess).have) return false;
             else asked.push(guess);
         } else return false;
     }
@@ -70,7 +79,7 @@ export const isValidDeclare = (declare) => {
  */
 export const canObject = (hand, declare, name) => {
     for (let guess of declare) {
-        let have = hasCard(hand, guess);
+        let {have} = hasCard(hand, guess);
         let you = declare.player === name;
         if (have && !you) return true;
         if (you && !have) return true;

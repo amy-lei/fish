@@ -29,7 +29,6 @@ class PlayRoom extends Component {
             view: 'hand',
             guess: [],
             sidebar: "chat",
-            showWarning: false,
             declaring: false,
             declarer: '',
             winner: '',
@@ -168,7 +167,6 @@ class PlayRoom extends Component {
                             && turnType === 'RESPOND'
                             && whoseTurn === name}
                         showDeclare={declarer === ''}
-                        confirmDeclare={() => this.setState({showWarning: true})}
                         changeView={(view) => this.setState({view})}
                     />
                     {curView}

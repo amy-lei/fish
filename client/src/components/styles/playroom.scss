@@ -24,7 +24,7 @@
 }
 .ask {
     &-section {
-        margin: 2rem 0;
+        margin: 1rem 0;
         .mini-cards,
         .player-options {
             padding: 0.5rem 0;
@@ -32,19 +32,29 @@
     }
 }
 
-.player-options {
+.playroom-options {
     display: flex;
-    .player-option {
+    flex-wrap: wrap;
+    .playroom-option {
+        cursor: pointer;
         display: flex;
         align-items: center;
         justify-content: center;
-        width: 25%;
+        text-align: center;
         margin-right: 1rem;
+        margin-bottom: 0.5rem;
         background-color: white;
-        height: 2rem;
+        min-height: 2rem;
         border-radius: 0.25rem;
         box-shadow: -2px 2px 5px 1px rgba(black, 0.05);
-        
+        padding: 0.5em 1em;
+        &.player {
+            width: 25%;
+        }
+        &.halfsuit {
+            width: 20%;
+        }
+
         &.selected-card {
             box-shadow: 0 0 15px 1px rgba($primary, 0.25);
         }

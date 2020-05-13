@@ -1,8 +1,9 @@
 import React, { Component } from "react";
-import { isValidDeclare } from "../../game-utilities";
+import { isValidDeclare, separateHalfSuit } from "../../game-utilities";
 import { post } from "../../utilities";
 import { connect } from 'react-redux';
-import GuessInput from "./GuessInput.js";
+import { card_svgs } from '../card_svgs';
+import { halfSuits } from '../card_objs';
 
 import "../styles/game.scss";
 import "../styles/cards.scss";
@@ -13,9 +14,7 @@ class Declare extends Component {
         super(props);
         this.state = {
             guess: [],
-            showInput: false,
-            invalid: false,
-            declaring: false,
+            halfSuit: null,
             hide: false,
         };
     }
@@ -51,56 +50,78 @@ class Declare extends Component {
             guess.push({player: "", rank: "", suit: ""});
         }
         this.setState({guess});
+        console.log('making a pause')
+        post("/api/pause", {key: this.props.roomkey, player: this.props.name});
+
+    }
+
+    createHand = (hand) => {
+        return hand.map((card,i) => (
+            <img 
+                key={i}
+                className={`mini-card ${this.state.selectedCard === card && 'selected-card'}`} 
+                src={card_svgs[`${card.rank}-${card.suit}.svg`]}
+            />
+        ));
+    };
+
+    createHalfSuitOptions = () => {
+        return Object.keys(halfSuits).map((halfSuit, i) => (
+            <div 
+                key={i} 
+                className={`playroom-option halfsuit ${this.state.halfSuit === halfSuit && 'selected-card'}`}
+                value={halfSuit}
+                onClick={() => this.setState({halfSuit})}
+            >
+                {halfSuit.replace('_', ' ')}
+            </div>
+        ))
+    }
+
+
+    createHalfSuits = () => {
+        const { halfSuit } = this.state;
+        const { hand } = this.props;
+        if (halfSuit) {
+            const { availableCards } = separateHalfSuit(hand, halfSuits[halfSuit]);
+            return availableCards
+                .map((card,i) => (
+                    <img 
+                        key={i}
+                        className={`mini-card ${this.state.askedCard === card && 'selected-card'}`} 
+                        src={card_svgs[`${card.rank}-${card.suit}.svg`]}
+                    />
+                ));
+        } else {
+            const cards = [];
+            for (let i = 0; i < 6; i++) {
+                cards.push(<div key={i} className='mini-card placeholder-card'></div>);
+            }
+            return cards;
+        }
     }
 
     render() {
-        let inputs;
-        if (this.state.guess) {
-            inputs = this.state.guess.map((info, i) => 
-            <GuessInput
-                key={i}
-                players={this.props.yourTeam.filter(player => player.active)}
-                who={this.state.guess[i].player}
-                rank={this.state.guess[i].rank}
-                suit={this.state.guess[i].suit}
-                updateWho={(val) => {
-                    let cur = this.state.guess;
-                    cur[i].player = val;
-                    this.setState({guess: cur});
-                }}
-                updateRank={(val) => {
-                    let cur = this.state.guess;
-                    cur[i].rank = val;
-                    this.setState({guess: cur});
-                }}
-                updateSuit={(val) => {
-                    let cur = this.state.guess;
-                    cur[i].suit = val;
-                    this.setState({guess: cur});
-                }}
-                validate={() => true}
-                
-            />)
-        }
+        return(
+            <div className='main-container declare playroom'>
+                <h2 className='playroom-label'>Declare!</h2>
+                <section className='declare-container'>
+                    <div className='declare-section'>
+                        <label>Choose a half-suit:</label>
+                        <div className='playroom-options'>
+                            {this.createHalfSuitOptions()}
+                        </div>
+                    </div>
+                    <div className='declare-section'>
+                        <label>Drag each card to the player you believe has it</label>
+                        <div className='mini-cards'>
+                            {this.createHalfSuits()}
+                        </div>
+                    </div>
+                </section>
+            </div>
+        )
 
-        const confirmation = (
-            <>
-                <button
-                    className="close-btn"
-                    onClick={() => this.props.reset('')}
-                >
-                    X
-                </button>
-                <div className="declare-confirm">
-                    Are you certain? 
-                    You cannot back out in the middle of a declare.
-                    This will pause the game.
-                </div>
-                <div className="declare-btns">
-                    <button className="btn primary-btn"onClick={this.declaring}>Yes</button>
-                </div>
-            </>
-            );
         return(
             <>            
                 {this.state.declaring &&
@@ -126,6 +147,7 @@ class Declare extends Component {
 const mapStateToProps = (state) => ({
     name: state.user.name,
     index: state.user.index,
+    hand: state.hand,
     roomkey: state.roomkey,
     yourTeam: state.teams.yourTeam,
 });

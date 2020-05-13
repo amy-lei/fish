@@ -15,7 +15,38 @@
         transform: translateY(-50%);
     }       
     &-btn {
+        position: relative;
         border-radius: 0 $radius $radius 0 !important;
         margin: 0.25rem 0;
     }
 }
+
+.tooltip {
+    font-size: 14px;
+    visibility: hidden;
+    background-color: rgba(black, 0.75);
+    color: #fff;
+    text-align: center;
+    border-radius: 6px;
+    width: 20em;
+    white-space: initial;
+    padding: 1em;
+    position: absolute;
+    z-index: 25;
+    top: -5px;
+    left: 110%;
+  }
+  
+  .tooltip::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    right: 100%;
+    margin-top: -10px;
+    border-width: 10px;
+    border-style: solid;
+    border-color: transparent rgba(black, 0.75) transparent transparent;
+  }
+  .header-btn:hover .tooltip {
+    visibility: visible;
+  }
