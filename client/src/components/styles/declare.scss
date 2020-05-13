@@ -13,19 +13,45 @@
     }
 }
 
-.declare-inputs {
-    margin-bottom: 10px;
-}
 
 .declare {
+    &-container {
+        display: flex;
+        flex-direction: column;
+    }
     &-section {
-        margin: 1rem 0;
+        margin: 0.5rem 0;
 
         .mini-cards,
         .playroom-options {
             padding: 0.5rem 0;
         }
     }   
+
+    &-column {
+        position: relative;
+        width: 32%;
+        height: 100%;
+        label {
+            font-weight: 600;
+        }
+    }
+    &-input_players {
+        flex-grow: 1;
+        display: flex;
+        justify-content: space-between;
+        text-align: center;
+    }
+    &-input_player{
+        width: 100%;
+        height: 80%;
+        padding: 0.5rem 0.75rem;
+        background-color: white;
+        border-radius: $radius;
+        // box-shadow: -2px 2px 5px 1px rgba(black, 0.05);
+
+    }
+
     &-name {
         font-size: 4rem;
         line-height: 5rem;

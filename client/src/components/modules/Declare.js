@@ -4,6 +4,7 @@ import { post } from "../../utilities";
 import { connect } from 'react-redux';
 import { card_svgs } from '../card_svgs';
 import { halfSuits } from '../card_objs';
+import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 
 import "../styles/game.scss";
 import "../styles/cards.scss";
@@ -16,6 +17,8 @@ class Declare extends Component {
             guess: [],
             halfSuit: null,
             hide: false,
+            availableCards: null,
+            ownCards: null,
         };
     }
     /*
@@ -50,7 +53,6 @@ class Declare extends Component {
             guess.push({player: "", rank: "", suit: ""});
         }
         this.setState({guess});
-        console.log('making a pause')
         post("/api/pause", {key: this.props.roomkey, player: this.props.name});
 
     }
@@ -71,24 +73,30 @@ class Declare extends Component {
                 key={i} 
                 className={`playroom-option halfsuit ${this.state.halfSuit === halfSuit && 'selected-card'}`}
                 value={halfSuit}
-                onClick={() => this.setState({halfSuit})}
+                onClick={() => {
+                    this.setState({halfSuit})
+                    this.splitHand(halfSuit)
+                }}
             >
                 {halfSuit.replace('_', ' ')}
             </div>
         ))
     }
 
+    splitHand = (halfSuit) => {
+        const { hand } = this.props;
+        const { availableCards, ownCards } = separateHalfSuit(hand, halfSuits[halfSuit]);
+        this.setState({ availableCards, ownCards });
+    }
 
     createHalfSuits = () => {
-        const { halfSuit } = this.state;
-        const { hand } = this.props;
-        if (halfSuit) {
-            const { availableCards } = separateHalfSuit(hand, halfSuits[halfSuit]);
+        const { availableCards  } = this.state;
+        if (availableCards && availableCards.length > 0) {
             return availableCards
                 .map((card,i) => (
                     <img 
                         key={i}
-                        className={`mini-card ${this.state.askedCard === card && 'selected-card'}`} 
+                        className={`mini-card`} 
                         src={card_svgs[`${card.rank}-${card.suit}.svg`]}
                     />
                 ));
@@ -101,6 +109,25 @@ class Declare extends Component {
         }
     }
 
+    createPlayerColumns = () => {
+        const { yourTeam, name } = this.props;
+        const { ownCards } = this.state;
+
+        return yourTeam.map((player, i) => 
+            <div className='declare-column'>
+                <label>{player.name}</label>
+                <div key={i} className='declare-input_player'>
+                    {ownCards && player.name === name 
+                        && [...ownCards].map((card, i) =>
+                        <img 
+                            key={i}
+                            className={`mini-card`} 
+                            src={card_svgs[`${card.rank}-${card.suit}.svg`]}
+                        />)} 
+                </div>
+            </div>
+        )
+    }
     render() {
         return(
             <div className='main-container declare playroom'>
@@ -112,13 +139,19 @@ class Declare extends Component {
                             {this.createHalfSuitOptions()}
                         </div>
                     </div>
-                    <div className='declare-section'>
+                    <div className='declare-section declare-input_cards'>
                         <label>Drag each card to the player you believe has it</label>
                         <div className='mini-cards'>
                             {this.createHalfSuits()}
                         </div>
                     </div>
+                    <div className='declare-section declare-input_players'>
+                        {this.createPlayerColumns()}
+                    </div>
                 </section>
+                <button className="btn primary-btn long-btn playroom-btn" onClick={this.confirm}>
+                    Declare
+                </button>
             </div>
         )
 

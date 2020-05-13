@@ -170,7 +170,7 @@ class PlayRoom extends Component {
                         changeView={(view) => this.setState({view})}
                     />
                     {curView}
-                    {!gameOver && declaring && declarer &&
+                    {/* {!gameOver && declaring && declarer &&
                         <DecResponse
                             isDeclarer={this.state.declarer === this.props.name}
                             name={this.props.name}
@@ -179,7 +179,7 @@ class PlayRoom extends Component {
                             roomkey={this.props.roomkey}
                             index={this.props.index}
                             minVotes={this.props.yourTeam.length + this.props.otherTeam.length - 1}
-                        />}
+                        />} */}
                     <div className="sidebar">
                         <div className="sidebar-label">
                             <span
