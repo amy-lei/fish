@@ -8,6 +8,7 @@ import DecResponse from "../modules/DecResponse.js";
 import GameStats from '../modules/GameStats';
 import GameHistory from '../modules/GameHistory';
 import Header from '../modules/Header';
+import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import { card_svgs } from "../card_svgs.js";
 import { connect } from 'react-redux';
 import { Redirect } from 'react-router';
@@ -22,6 +23,53 @@ import {
 } from '../../actions/gameActions';
 
 const WIN = 5; // FIX WHEN LAUNCH!!!
+
+class Cards extends Component {
+    constructor(props) {
+        super(props);
+        this.state = {};
+    }
+
+    /*
+     visualize your current hand
+     */
+    createCards = (hand) => {
+        return hand.map((card, index) => (
+            <Draggable
+                draggableId={`${card.rank}-${card.suit}`}
+                index={index}
+            >
+                {(provided) => (
+                    <div 
+                        className={`card card-${hand.length}`}
+                        {...provided.draggableProps}
+                        {...provided.dragHandleProps}
+                        innerRef={provided.innerRef}
+                    >
+                        <img src={card_svgs[`${card.rank}-${card.suit}.svg`]}/>
+                    </div>
+                )}
+            </Draggable>
+        ));
+    };
+
+    render() {
+        return (
+        <Droppable droppableId='cards'>
+            {(provided) => (
+                <div 
+                    className="cards"
+                    {...provided.droppableProps}
+                    innerRef={provided.innerRef}
+                >
+                    {this.createCards(this.props.hand)}
+                    {provided.placeholder}
+                </div>
+            )}
+        </Droppable>
+        );
+    }
+}
 
 class PlayRoom extends Component {
     constructor(props) {
@@ -136,6 +184,10 @@ class PlayRoom extends Component {
         this.setState({sidebar: type})
     };
 
+    onDragEnd = (result) => {
+
+    }
+
     render() {
         // prevent users from skipping waiting room/homepage
         if (!this.props.name || !this.props.roomkey || !this.props.otherTeam) {
@@ -230,7 +282,16 @@ class PlayRoom extends Component {
                                 all={false}
                             />
                         }
-                        <div className="cards">{cards}</div>
+                        <DragDropContext
+                            onDragEnd={this.onDragEnd}
+                        >
+                            <Cards 
+                                hand={hand}
+                            />
+                        </DragDropContext>
+                        {/* <div className="cards">
+                            {cards}
+                        </div> */}
                         <GameStats/>
                     </div>
                 </div>
