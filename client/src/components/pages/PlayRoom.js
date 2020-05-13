@@ -8,7 +8,6 @@ import DecResponse from "../modules/DecResponse.js";
 import GameHistory from '../modules/GameHistory';
 import ViewHand from '../modules/ViewHand';
 import Header from '../modules/Header';
-import { halfSuits } from '../card_objs';
 import { connect } from 'react-redux';
 import { Redirect } from 'react-router';
 import {
@@ -30,11 +29,8 @@ class PlayRoom extends Component {
             view: 'hand',
             guess: [],
             sidebar: "chat",
-            viewCards: true,
-            asking: false,
+            showWarning: false,
             declaring: false,
-            showDeclare: false,
-            responding: false,
             declarer: '',
             winner: '',
         };
@@ -140,21 +136,30 @@ class PlayRoom extends Component {
             name,
         } = this.props;
         const { 
-            asking,
-            responding,
             declaring,
             declarer,
-            showDeclare,
             winner,
+            view,
         } = this.state;
         
-        const gameOver = this.props.winner !== '';
-        console.log(halfSuits);
+        let curView;
+        const gameOver = winner !== '';
+        if (gameOver || view === 'hand') {
+            curView = <ViewHand hand={hand}/>
+        } else if (view === 'ask') {
+            curView = <Ask reset={(view) => this.setState({view})}/>
+        } else if (view === 'respond') {
+            curView = <Respond reset={(view) => this.setState({view})}/>
+        } else if (view === 'declare') {
+            curView = <Declare />
+        }
+
         return (
             <>
                 <div className="container">
                     <Header
                         winner={winner}
+                        view={view}
                         gameBegan={true}
                         showAsk={!declaring 
                             && turnType === 'ASK'
@@ -163,15 +168,10 @@ class PlayRoom extends Component {
                             && turnType === 'RESPOND'
                             && whoseTurn === name}
                         showDeclare={declarer === ''}
-                        showCards={this.state.viewCards}
-                        onClickDeclare={() => this.setState({showDeclare: true})}
-                        onClickAsk={() => this.setState({asking: true})}
-                        onClickRespond={() => this.setState({responding: true})}
+                        confirmDeclare={() => this.setState({showWarning: true})}
+                        changeView={(view) => this.setState({view})}
                     />
-                    {!gameOver && showDeclare && 
-                        <Declare
-                            reset={() => this.setState({ showDeclare: false })}
-                        />}
+                    {curView}
                     {!gameOver && declaring && declarer &&
                         <DecResponse
                             isDeclarer={this.state.declarer === this.props.name}
@@ -182,13 +182,6 @@ class PlayRoom extends Component {
                             index={this.props.index}
                             minVotes={this.props.yourTeam.length + this.props.otherTeam.length - 1}
                         />}
-                    {!gameOver && !declaring && asking && 
-                        <Ask reset={() => this.setState({ asking: false })}/>}
-                    {!gameOver && !declaring && responding && 
-                        <Respond reset={() => this.setState({ responding: false })}/>}
-                    <ViewHand
-                        hand={hand}
-                    />
                     <div className="sidebar">
                         <div className="sidebar-label">
                             <span

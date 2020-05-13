@@ -13,13 +13,47 @@ import Chat from "./Chat.js";
 const MAX_PLAYERS = 1;
 const FACES = [':)', '•_•', '=U','°_o',':O','°Д°'];
 
+// const FAKE_PEOPLE = [
+//     {
+//         name: 'a',
+//         index: 1,
+//         ready: true,
+//         active: true,
+//     },
+//     {
+//         name: 'b',
+//         index: 2,
+//         ready: true,
+//         active: true,
+//     },
+//     {
+//         name: 'c',
+//         index: 3,
+//         ready: true,
+//         active: true,
+//     },
+//     {
+//         name: 'd',
+//         index: 4,
+//         ready: true,
+//         active: true,
+//     },
+//     {
+//         name: 'e',
+//         index: 5,
+//         ready: true,
+//         active: true,
+//     },
+// ]
+const FAKE_PEOPLE = [];
+
 class WaitingRoom extends Component {
     constructor(props) {
         super(props);
         this.state = {
             redirect: false,
             isReady: false,
-            players: this.props.isCreator ? [{name:this.props.name, index: 0, ready: true, active: true}] : this.props.players,
+            players: this.props.isCreator ? [{name:this.props.name, index: 0, ready: true, active: true}].concat(FAKE_PEOPLE) : this.props.players,
             index: this.props.index,
         };
         this.key_ref = React.createRef();

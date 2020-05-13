@@ -21,6 +21,7 @@ export default (state = initialState, action) => {
             return hand
 
         case REMOVE_CARD:
+            console.log('before remove', state);
             hand = state.filter(card => 
                 !(card.rank === action.payload.rank 
                     && card.suit === action.payload.suit)
@@ -41,6 +42,7 @@ export default (state = initialState, action) => {
         }
         post('/api/out', body);
     }
+    console.log('after remove', hand)
     return hand;
 
 }

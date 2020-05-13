@@ -36,9 +36,11 @@ const generateHalfSuits = () => {
             } else {
                 halfSuit = 'special';
             }
+
+            const card = {rank, suit, halfSuit};
             halfSuit in halfSuits 
-                ? halfSuits[halfSuit].push(rank + '-' + suit)
-                : halfSuits[halfSuit] = [rank + '-' + suit]
+                ? halfSuits[halfSuit].push(card)
+                : halfSuits[halfSuit] = [card]
         }
     }
     // account for the two jokers

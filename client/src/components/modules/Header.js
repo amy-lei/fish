@@ -12,10 +12,10 @@ class Header extends Component {
     render() {
         const {
             winner,
+            view,
             showAsk,
             showRespond,
             showDeclare,
-            showCards,
             onClickDeclare,
             onClickAsk,
             onClickRespond,
@@ -23,32 +23,33 @@ class Header extends Component {
 
         const viewCards = (
             <button 
-                className={`short-btn primary-btn header-btn ${showCards ? 'active-btn' : ''}`}>
+                className={`short-btn primary-btn header-btn ${view === 'hand' && 'active-btn'}`}
+                onClick={() => this.props.changeView('hand')}>
                 View Hand
             </button>);
         const declare = (
             <button 
-                className={`short-btn primary-btn header-btn ${!showDeclare && 'disabled-btn'}`}
-                onClick={onClickDeclare}
+                className={`short-btn primary-btn header-btn ${!showDeclare && 'disabled-btn'} ${view === 'declare' && 'active-btn'}`}
+                onClick={() => this.props.changeView('declare')}
                 disabled={!showDeclare}>
                 Declare
             </button>);
         const ask = (
             <button 
-                className={`short-btn primary-btn header-btn ${!showAsk && 'disabled-btn'}`}
-                onClick={onClickAsk}
+                className={`short-btn primary-btn header-btn ${!showAsk && 'disabled-btn'} ${view === 'ask' && 'active-btn'}`}
+                onClick={() => this.props.changeView('ask')}
                 disabled={!showAsk}>
                     Ask
             </button>);
         const respond = (
             <button 
-                className={`short-btn primary-btn header-btn ${!showRespond && 'disabled-btn'}`}
-                onClick={onClickRespond}
+                className={`short-btn primary-btn header-btn ${!showRespond && 'disabled-btn'} ${view === 'respond' && 'active-btn'}`}
+                onClick={() => this.props.changeView('respond')}
                 disabled={!showRespond}>
                     Respond
             </button>);
+        
         const gameOver = winner !== '';
-
         let buttons;
         if (!gameOver) {
             buttons = (
