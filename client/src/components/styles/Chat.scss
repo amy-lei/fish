@@ -16,11 +16,9 @@
   flex-direction: row;
   justify-content: center;
   align-items: center;
-  color: white;
-  height: 2.5em;
+  height: 3em;
   width: 100%;
-  background-color: $chat-label;
-  border-radius: 15px 15px 0 0;
+  box-shadow: 0 5px 20px -20px rgba(0,0,0,0.5);
 }
 
 
@@ -48,7 +46,7 @@
       background-color: $light-grey;
       border-radius: 15px;
       max-width: 75%;
-      min-height: 25px;
+      min-height: 2em;
       padding: 0.8rem 1.5rem;
       word-wrap: normal;
 
@@ -73,12 +71,28 @@
 
 .chat-functions {
   display:flex;
+  background-color: $light-grey;
+  border-radius: 50px;
+  padding: 12px 30px;
+  width: 90%;
+  margin: auto;
 
   &_input {
-      width: 90% !important;
+      width: 95%;
+      outline: none;
+      border: none;
+      text-decoration: none;
+      background: none;
+      font-size: $main-font-size;
+      &:focus{
+        outline:none;
+        box-shadow: none;
+      }
+
   }
   &_submit {
-    width: 10% !important;
+    border: none;
+    background: none;
     // credits to cssicon.space
     .send-symbol {
       color: #000;
@@ -101,12 +115,9 @@
         }    
     }
     &:hover {
-      .send-symbol {
-        background-color: white;
-      }
       .send-symbol:before {
-        border-top: solid 1px white;
-        border-right: solid 1px white;
+        border-top: solid 1px $primary-shadow;
+        border-right: solid 1px $primary-shadow;
       }
     }
 

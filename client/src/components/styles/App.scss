@@ -46,6 +46,10 @@ body {
 .short-btn {
     width: $short;
 }
+.active-btn {
+    @include solid-btn($primary-shadow, $primary-shadow);
+    width: $medium;
+}
 
 input {
     &:focus{

@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import Header from '../modules/Header';
+import logo from "../../public/header_logo.svg";
 import { post } from "../../utilities";
 import { socket } from "../../client-socket";
 import { connect } from 'react-redux';
@@ -10,7 +10,7 @@ import {
 import { Redirect } from 'react-router'; 
 import Chat from "./Chat.js";
 
-const MAX_PLAYERS = 6;
+const MAX_PLAYERS = 1;
 const FACES = [':)', '•_•', '=U','°_o',':O','°Д°'];
 
 class WaitingRoom extends Component {
@@ -126,18 +126,9 @@ class WaitingRoom extends Component {
         const disableStart = !(players.every(player => player.ready) && players.length === MAX_PLAYERS);
         return (
         <>
-            <Header gameBegan={false} winner=''/>
             <div className="container">
-                <div className="sidebar chat-container">
-                    <div className="sidebar-label" style={{cursor: "default"}}>
-                        <div className="sidebar-label_options">Chat History</div>
-                    </div>
-                    <Chat
-                        index={index}
-                        name={name}
-                        roomkey={roomkey}
-                        hidden={false}
-                    />
+                <div className='header'>
+                    <img className='header-logo logo' src={logo}/>
                 </div>
                 <div className="main-container waiting-room">
                     <div className="waiting-room_top">
@@ -158,7 +149,7 @@ class WaitingRoom extends Component {
                             isCreator ?
                             <button
                                 onClick={this.start}
-                                className={`btn long-btn ${disableStart ? "disabled-start" : "primary-btn"}`}
+                                className={`btn long-btn ${disableStart ? "disabled-btn" : "primary-btn"}`}
                                 disabled={disableStart}
                             >
                                 Start Game
@@ -191,6 +182,17 @@ class WaitingRoom extends Component {
                             </div>
                         ))}
                     </div>
+                </div>
+                <div className="sidebar chat-container">
+                    <div className="sidebar-label" style={{cursor: "default"}}>
+                        <div className="sidebar-label_options">Chat History</div>
+                    </div>
+                    <Chat
+                        index={index}
+                        name={name}
+                        roomkey={roomkey}
+                        hidden={false}
+                    />
                 </div>
             </div>
         </>

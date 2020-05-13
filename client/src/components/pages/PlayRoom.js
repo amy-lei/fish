@@ -5,10 +5,10 @@ import Ask from "../modules/Ask.js";
 import Respond from "../modules/Respond.js";
 import Declare from "../modules/Declare.js";
 import DecResponse from "../modules/DecResponse.js";
-import GameStats from '../modules/GameStats';
 import GameHistory from '../modules/GameHistory';
+import ViewHand from '../modules/ViewHand';
 import Header from '../modules/Header';
-import { card_svgs } from "../card_svgs.js";
+import { halfSuits } from '../card_objs';
 import { connect } from 'react-redux';
 import { Redirect } from 'react-router';
 import {
@@ -27,8 +27,10 @@ class PlayRoom extends Component {
     constructor(props) {
         super(props);
         this.state = {
+            view: 'hand',
             guess: [],
             sidebar: "chat",
+            viewCards: true,
             asking: false,
             declaring: false,
             showDeclare: false,
@@ -37,17 +39,6 @@ class PlayRoom extends Component {
             winner: '',
         };
     }
-
-    /*
-     visualize your current hand
-     */
-    createCards = (hand) => {
-        return hand.map(card => (
-            <div className={`card card-${hand.length}`}>
-                <img src={card_svgs[`${card.rank}-${card.suit}.svg`]}/>
-            </div>
-        ));
-    };
 
     // Update your score if true, others if false
     updateScore = (even, evenScore, oddScore) => {
@@ -157,45 +148,47 @@ class PlayRoom extends Component {
             winner,
         } = this.state;
         
-        let cards = "Loading cards";
-        if (hand) { cards = this.createCards(hand); }
         const gameOver = this.props.winner !== '';
+        console.log(halfSuits);
         return (
             <>
-                <Header
-                    winner={winner}
-                    gameBegan={true}
-                    showAsk={!declaring 
-                        && turnType === 'ASK'
-                        && whoseTurn === name}
-                    showRespond={!declaring
-                        && turnType === 'RESPOND'
-                        && whoseTurn === name}
-                    showDeclare={declarer === ''}
-                    onClickDeclare={() => this.setState({showDeclare: true})}
-                    onClickAsk={() => this.setState({asking: true})}
-                    onClickRespond={() => this.setState({responding: true})}
-                />
-                {!gameOver && showDeclare && 
-                    <Declare
-                        reset={() => this.setState({ showDeclare: false })}
-                    />}
-                {!gameOver && declaring && declarer &&
-                    <DecResponse
-                        isDeclarer={this.state.declarer === this.props.name}
-                        name={this.props.name}
-                        guess={this.state.guess}
-                        declarer={this.state.declarer}
-                        roomkey={this.props.roomkey}
-                        index={this.props.index}
-                        minVotes={this.props.yourTeam.length + this.props.otherTeam.length - 1}
-                    />}
-                {!gameOver && !declaring && asking && 
-                    <Ask reset={() => this.setState({ asking: false })}/>}
-                {!gameOver && !declaring && responding && 
-                    <Respond reset={() => this.setState({ responding: false })}/>}
-                <div className={`overlay ${showDeclare || this.props.asking || this.props.responding ? "" : "hidden"}`}></div>
                 <div className="container">
+                    <Header
+                        winner={winner}
+                        gameBegan={true}
+                        showAsk={!declaring 
+                            && turnType === 'ASK'
+                            && whoseTurn === name}
+                        showRespond={!declaring
+                            && turnType === 'RESPOND'
+                            && whoseTurn === name}
+                        showDeclare={declarer === ''}
+                        showCards={this.state.viewCards}
+                        onClickDeclare={() => this.setState({showDeclare: true})}
+                        onClickAsk={() => this.setState({asking: true})}
+                        onClickRespond={() => this.setState({responding: true})}
+                    />
+                    {!gameOver && showDeclare && 
+                        <Declare
+                            reset={() => this.setState({ showDeclare: false })}
+                        />}
+                    {!gameOver && declaring && declarer &&
+                        <DecResponse
+                            isDeclarer={this.state.declarer === this.props.name}
+                            name={this.props.name}
+                            guess={this.state.guess}
+                            declarer={this.state.declarer}
+                            roomkey={this.props.roomkey}
+                            index={this.props.index}
+                            minVotes={this.props.yourTeam.length + this.props.otherTeam.length - 1}
+                        />}
+                    {!gameOver && !declaring && asking && 
+                        <Ask reset={() => this.setState({ asking: false })}/>}
+                    {!gameOver && !declaring && responding && 
+                        <Respond reset={() => this.setState({ responding: false })}/>}
+                    <ViewHand
+                        hand={hand}
+                    />
                     <div className="sidebar">
                         <div className="sidebar-label">
                             <span
@@ -223,15 +216,6 @@ class PlayRoom extends Component {
                             all={true}
                             hidden={this.state.sidebar === "chat"}
                         />
-                    </div>
-                    <div className="main-container playroom">                            
-                        {this.props.history &&
-                            <GameHistory
-                                all={false}
-                            />
-                        }
-                        <div className="cards">{cards}</div>
-                        <GameStats/>
                     </div>
                 </div>
             </>

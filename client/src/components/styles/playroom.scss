@@ -116,7 +116,7 @@
             text-align: center;
             color:white;
             padding: 0.2rem 0;
-        
+            border-radius: 5px;
         }
         .team-even {
             background-color: $team-blue;
@@ -136,6 +136,7 @@
     align-content: center;
     margin-bottom: 2rem;
     min-height: 10%;
+    max-height: 25%;
     padding: 10px 20px;
     .history_move {
         justify-content: center;
@@ -165,12 +166,11 @@
     cursor: pointer;
 }
 .inactive-sidebar {
-    color: #888888 !important;
+    opacity: 0.5;
     cursor: pointer;
-    
-    transition: color 0.2s;
+    transition: opacity 0.2s;
     &:hover {
-        color: white !important;
+        opacity: 1 !important;
     }
 }
 

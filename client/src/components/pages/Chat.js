@@ -151,18 +151,18 @@ class Chat extends Component {
           <div className="thing-at-bottom" ref={this.bottom_ref}>
           </div>
         </div>
-        <div className="chat-functions input-btn-wrapper">
+        <div className="chat-functions">
           <input
             type="text"
             value={this.state.curMessage}
             onChange={this.handleOnChange}
-            className="chat-functions_input input-btn-field"
+            className="chat-functions_input"
             placeholder="Send a message"
             onKeyPress={(e) => this.sendMessage(e)}
           />
           <button 
             onClick={() => this.sendMessage(null)} 
-            className="chat-functions_submit btn primary-inverted-btn input-btn-submit"
+            className="chat-functions_submit"
           >
             <div className="send-symbol"></div>
           </button>

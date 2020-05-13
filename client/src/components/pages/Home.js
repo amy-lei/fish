@@ -1,10 +1,8 @@
 import React, { Component } from "react";
 import { Redirect } from 'react-router';
-
-import Header from '../modules/Header';
+import logo from "../../public/logo.svg";
 import NameForm from '../modules/NameForm';
 import RoomForm from '../modules/RoomForm';
-import landing_illustration from "../../public/illustration.svg";
 
 class Home extends Component {
     constructor(props) {
@@ -22,8 +20,8 @@ class Home extends Component {
         }
         return (
         <>
-            <Header gameBegan={false} winner={''}/>
             <div className="home">
+                <img className="home-logo logo" src={logo}/>
                 <div className='home-desc'>
                     <h1 className="home-desc_title">Stay connected <br/> with friends</h1>
                     <p className='home-desc_tagline'>Start your own game or join a friend's using their key!</p>

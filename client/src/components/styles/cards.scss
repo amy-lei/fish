@@ -1,16 +1,23 @@
 .cards {
     display: flex;
     flex-wrap: nowrap;
-    width: 90%;
+    width: 80%;
     margin:0 auto;
+    // padding-left: 2rem;
     justify-content: center;
+    // overflow-x: scroll;
+    &::-webkit-scrollbar {
+        width: 0px;  /* Remove scrollbar space */
+        background: transparent;  /* Optional: just make scrollbar invisible */
+    }
+
 }
 .card{
     transition: 0.5s;
     // width: 13.5%;
     img {
         border-radius: 1rem;
-        box-shadow: -2px 2px 5px 1px rgba(black, 0.1);
+        box-shadow: -2px 2px 5px 1px rgba(black, 0.05);
     }
     
     &:hover {
@@ -24,7 +31,7 @@
 
 }
 
-@for $i from 1 through 20 {
+@for $i from 1 through 25 {
     @if $i < 10 {
         .card-#{$i}:not(:first-child) {
             margin-left: -.75rem * $i - 5.5rem;

@@ -1,4 +1,4 @@
-const rankToVal = {
+export const rankToVal = {
     'ace': 14,
     'two': 2,
     'three': 3,

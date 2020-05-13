@@ -1,14 +1,21 @@
 .header {
-    height: 10vh;
-    padding: 10px 20px 0!important;
+    height: 100vh;
     display: flex;
-    width:100%;
-    justify-content: space-between; 
+    justify-content: center;
+    align-items: flex-start;
+    padding-top: 1rem;
+    width: 7rem;
+    background-color: white;
     &-btns {
-        display:flex;
-        align-items: center;
+        position: absolute;
+        top:50%;
+        left:0;
+        display: flex;
+        flex-direction: column;
+        transform: translateY(-50%);
     }       
     &-btn {
-        margin-left: 1em;
+        border-radius: 0 $radius $radius 0 !important;
+        margin: 0.25rem 0;
     }
 }

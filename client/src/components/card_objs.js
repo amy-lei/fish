@@ -6,7 +6,6 @@ const SUITS = [
   ];
 
 const RANKS = [
-    'ace',
     'two',
     'three',
     'four',
@@ -19,25 +18,34 @@ const RANKS = [
     'jack',
     'queen',
     'king',
+    'ace',
 ];
+
+import { rankToVal } from '../game-utilities';
   
-const generateCards = () => {
-    let cards = [];
-    // generate the 52 normal cards
+const generateHalfSuits = () => {
+    let halfSuits = {};
+
     for (let suit of SUITS) {
         for (let rank of RANKS) {
-            cards.push({
-                rank: rank,
-                suit: suit,
-            });
+            let halfSuit;
+            if (rankToVal[rank] < 8) {
+                halfSuit = 'low_' + suit;
+            } else if (rankToVal[rank] > 8) {
+                halfSuit = 'high_' + suit;
+            } else {
+                halfSuit = 'special';
+            }
+            halfSuit in halfSuits 
+                ? halfSuits[halfSuit].push(rank + '-' + suit)
+                : halfSuits[halfSuit] = [rank + '-' + suit]
         }
     }
-
     // account for the two jokers
-    cards.push({ rank: "joker", suit: "black"});
-    cards.push({ rank: "joker", suit: "red"});
+    halfSuits['special'].push({ rank: "joker", suit: "black"});
+    halfSuits['special'].push({ rank: "joker", suit: "red"});
+    
 
-    return cards;
+    return halfSuits;
 }
-
-export const cards = generateCards();
+export const halfSuits = generateHalfSuits();
