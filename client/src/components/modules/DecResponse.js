@@ -55,7 +55,7 @@ class DecResponse extends Component {
      */
     endDeclare = async () => {
         // check for objections
-        const objections = !this.state.votes.every(vote => vote.agree);
+        const objections = this.state.votes.object > 0;
         const even = this.props.index % 2 === 0; // your team
         const body = {
             even: objections ? !even : even,
@@ -115,7 +115,7 @@ class DecResponse extends Component {
             guess,
             name,
             hand,
-            minVotes,
+            // minVotes,
         } = this.props;
 
         const {
@@ -129,6 +129,7 @@ class DecResponse extends Component {
         let voteButtons;
         let voteResults;
         let instructions;
+        const minVotes = 3;
         if (Object.keys(guess).length === 0) {
             filler = <label className='vote-filler'>
                 {declarer} is guessing
@@ -177,8 +178,8 @@ class DecResponse extends Component {
                 </div>
             } else {
                 voteButtons = <button
-                    className={`primary-btn long-btn ${votes.length !== minVotes && 'disabled-btn'}`}
-                    disabled={votes.length !== minVotes}
+                    className={`primary-btn long-btn ${(votes.agree + votes.object) !== minVotes && 'disabled-btn'}`}
+                    disabled={(votes.agree + votes.object) !== minVotes}
                     onClick={this.endDeclare}
                 >
                     Get Score

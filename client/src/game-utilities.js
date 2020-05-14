@@ -67,7 +67,6 @@ export const canObject = (hand, declare, name) => {
             if (you && !have) return true;
         }
     }
-    console.log('nope')
     return false;
 }
 

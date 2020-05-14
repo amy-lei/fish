@@ -263,9 +263,10 @@ router.post("/out", (req, res) => {
     .then((game)=>{
       game.hands[req.body.index] = [];
       game.players[req.body.index].active = false;
+      const name = game.players[req.body.index].name;
 
       socket.getAllSocketsFromGame(req.body.key).forEach(client => {
-        client.emit("playerOut", {index: req.body.index});
+        client.emit("playerOut", {index: req.body.index, name});
       });
 
       game.save().then((g)=> res.send(g));
