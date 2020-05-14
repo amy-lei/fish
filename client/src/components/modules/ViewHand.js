@@ -23,9 +23,6 @@ class ViewHand extends Component {
         const source = e.dataTransfer.getData("source");
         const droppedCard = currentHand[source];
         currentHand.splice(source, 1);
-        if (destination >= source) {
-            destination = destination - 1;
-        }
         currentHand.splice(destination, 0, droppedCard);
         this.props.updateHand(currentHand);
     };
