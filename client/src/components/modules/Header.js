@@ -16,16 +16,14 @@ class Header extends Component {
             showAsk,
             showRespond,
             showDeclare,
-            onClickDeclare,
-            onClickAsk,
-            onClickRespond,
         } = this.props;
 
         const viewCards = (
             <button 
-                className={`short-btn primary-btn header-btn ${view === 'hand' && 'active-btn'}`}
-                onClick={() => this.props.changeView('hand')}>
-                View Hand
+                className={`short-btn primary-btn header-btn ${!showDeclare && 'disabled-btn'} ${view === 'hand' && 'active-btn'}`}
+                onClick={() => this.props.changeView('hand')}
+                disabled={!showDeclare}>
+                Game
             </button>);
         const declare = (
             <button 

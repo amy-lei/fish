@@ -57,13 +57,13 @@ class Respond extends Component {
             <div className='main-container playroom respond'>
                 <h2 className="playroom-label">Respond to {asker}:</h2>
                 <section className='respond-container'>
-                    <div className='respond-section'>
+                    <div className='playroom-section respond-section'>
                         <label>Your cards:</label>
                         <div className='mini-cards'>
                             {this.createHand(this.props.hand)}
                         </div>
                     </div>
-                    <div className='respond-section'>
+                    <div className='playroom-section respond-section'>
                         <label>
                             {asker} asked for the &nbsp;
                             {this.props.history[this.props.history.length - 1].rank} &nbsp;

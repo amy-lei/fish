@@ -50,25 +50,6 @@ export const separateHalfSuit = (hand, halfSuit) => {
     };
 }
 
-
-/*
-    Returns whether the declare is filled completely,
-    with cards in the same half suit.
-
-    @declare (array): list of guesses(objects)
- */
-export const isValidDeclare = (declare) => {
-    let asked = [];
-    for (let guess of declare) {
-        // make sure nothing is empty 
-        if (guess.player && guess.rank && guess.suit) {
-            if (!sameHalfSuit(declare[0], guess) || hasCard(asked, guess).have) return false;
-            else asked.push(guess);
-        } else return false;
-    }
-    return true;
-}
-
 /*
     Returns whether the declare was correct in 
     the perspective of the specified player
@@ -78,12 +59,15 @@ export const isValidDeclare = (declare) => {
     @name (string): player's name
  */
 export const canObject = (hand, declare, name) => {
-    for (let guess of declare) {
-        let {have} = hasCard(hand, guess);
-        let you = declare.player === name;
-        if (have && !you) return true;
-        if (you && !have) return true;
+    for (let [player, guess] of Object.entries(declare)) {
+        for (let card of guess) {
+            let {have} = hasCard(hand, card);
+            let you = player === name;
+            if (have && !you) return true;
+            if (you && !have) return true;
+        }
     }
+    console.log('nope')
     return false;
 }
 
@@ -95,27 +79,10 @@ export const canObject = (hand, declare, name) => {
     @hand (array): list of cards
     @declare (array): list of guesses 
  */
-export const removeHalfSuit = (hand, declare) => {
-    const base = { rank: declare[0].rank, suit: declare[0].suit }
+export const removeHalfSuit = (hand, halfSuit) => {
     return hand.filter(card => 
-            !sameHalfSuit(card, base)
+                card.halfSuit !== halfSuit
         );
-}
-
-
-/*
-    Returns whether two cards are of the same half suit
-
-    @base (object): card to be compared with
-    @card (object): card that is being checked
- */ 
-const sameHalfSuit = (base, card) => {
-    if (base.rank === "joker" || rankToVal[base.rank] == 8)
-        return card.rank === "joker" || rankToVal[card.rank] === 8;
-    else {
-        const upper = rankToVal[base.rank] > 8;
-        return rankToVal[card.rank] > 8 === upper && card.suit === base.suit
-    }
 }
 
 export const SUITS = [

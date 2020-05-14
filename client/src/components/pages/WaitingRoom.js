@@ -13,39 +13,39 @@ import Chat from "./Chat.js";
 const MAX_PLAYERS = 6;
 const FACES = [':)', '•_•', '=U','°_o',':O','°Д°'];
 
-const FAKE_PEOPLE = [
-    {
-        name: 'a',
-        index: 1,
-        ready: true,
-        active: true,
-    },
-    {
-        name: 'b',
-        index: 2,
-        ready: true,
-        active: true,
-    },
-    {
-        name: 'c',
-        index: 3,
-        ready: true,
-        active: true,
-    },
-    {
-        name: 'd',
-        index: 4,
-        ready: true,
-        active: true,
-    },
-    {
-        name: 'e',
-        index: 5,
-        ready: true,
-        active: true,
-    },
-]
-// const FAKE_PEOPLE = [];
+// const FAKE_PEOPLE = [
+//     {
+//         name: 'a',
+//         index: 1,
+//         ready: true,
+//         active: true,
+//     },
+//     {
+//         name: 'b',
+//         index: 2,
+//         ready: true,
+//         active: true,
+//     },
+//     {
+//         name: 'c',
+//         index: 3,
+//         ready: true,
+//         active: true,
+//     },
+//     {
+//         name: 'd',
+//         index: 4,
+//         ready: true,
+//         active: true,
+//     },
+//     {
+//         name: 'e',
+//         index: 5,
+//         ready: true,
+//         active: true,
+//     },
+// ]
+const FAKE_PEOPLE = [];
 
 class WaitingRoom extends Component {
     constructor(props) {

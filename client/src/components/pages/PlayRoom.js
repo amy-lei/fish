@@ -27,10 +27,11 @@ class PlayRoom extends Component {
         super(props);
         this.state = {
             view: 'hand',
-            guess: [],
             sidebar: "chat",
             declaring: false,
+            guess: {},
             declarer: '',
+            halfSuit: '',
             winner: '',
         };
     }
@@ -78,20 +79,21 @@ class PlayRoom extends Component {
         socket.on("playerOut", who => {
             this.props.playerOut(who.index);
         });
-        
-        // update with the declarer's guess
-        socket.on("declared", info => {
-            this.setState({guess: info.guess});
-        });
 
         socket.on("declaring", (info) => {
             this.setState({
                 declaring: true,
                 declarer: info.player,
-                asking: false,
-                responding: false,
-                showDeclare: info.player === this.props.name,
-            });
+            }, () => {
+                if (this.props.name !== info.player) {
+                    this.setState({ view: 'vote'});
+                }
+            })
+        });
+        
+        // update with the declarer's guess
+        socket.on("declared", info => {
+            this.setState({guess: info.guess, halfSuit: info.halfSuit});
         });
 
         // update game with results of the declare
@@ -99,7 +101,7 @@ class PlayRoom extends Component {
             this.props.removeSuit(
                 this.props.roomkey,
                 this.props.index,
-                update.declare,
+                update.halfSuit,
             );
             const even = this.props.index % 2 === 0;
             const gameOver = this.updateScore(even, update.evenScore, update.oddScore);
@@ -111,9 +113,11 @@ class PlayRoom extends Component {
             }
             // reset declaring states
             this.setState({
+                view: 'hand',
                 declaring: false,
-                showDeclare: false,
+                guess: {},
                 declarer: '',
+                halfSuit: '',
             });
         });
     }
@@ -139,6 +143,8 @@ class PlayRoom extends Component {
             declarer,
             winner,
             view,
+            guess,
+            halfSuit
         } = this.state;
         
         let curView;
@@ -150,7 +156,14 @@ class PlayRoom extends Component {
         } else if (view === 'respond') {
             curView = <Respond reset={(view) => this.setState({view})}/>
         } else if (view === 'declare') {
-            curView = <Declare />
+            curView = <Declare changeView={(view) => this.setState({view})}/>
+        } else if (view === 'vote') {
+            curView = <DecResponse 
+                declarer={declarer}
+                guess={guess}
+                halfSuit={halfSuit}
+                minVotes={this.props.yourTeam.length + this.props.otherTeam.length - 1}
+            />
         }
 
         return (

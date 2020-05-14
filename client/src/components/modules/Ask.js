@@ -1,7 +1,6 @@
 import React, { Component } from "react";
 import { connect } from 'react-redux';
 import { post } from "../../utilities";
-import GuessInput from "./GuessInput.js";
 import { card_svgs } from '../card_svgs';
 import { halfSuits } from '../card_objs';
 
@@ -98,19 +97,19 @@ class Ask extends Component {
             <div className='main-container ask playroom'>
                 <h2 className='playroom-label'> Ask for a card</h2>
                 <section className='ask-container'>
-                    <div className='ask-section ask-section_hand'>
+                    <div className='playroom-section ask-section ask-section_hand'>
                         <label>Select a half-suit from your hand:</label>
                         <div className='mini-cards'>
                             {this.createHand(this.props.hand)}
                         </div>
                     </div>
-                    <div className='ask-section ask-section_suit'>
+                    <div className='playroom-section ask-section ask-section_suit'>
                         <label>Select a card to ask for:</label>
                         <div className='mini-cards'>
                             {this.createHalfSuits()}
                         </div>
                     </div>
-                    <div className='ask-section ask-section_suit'>
+                    <div className='playroom-section ask-section ask-section_suit'>
                         <label>Select to a player to ask:</label>
                         <div className='playroom-options'>
                             {this.createPlayers()}

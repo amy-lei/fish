@@ -12,6 +12,7 @@ const GameSchema = new mongoose.Schema({
         {
             rank: String,
             suit: String,
+            halfSuit: String,
         }
     ]],
     history: {type: [Object], default: []}, 

@@ -1,10 +1,9 @@
 import React, { Component } from "react";
-import { isValidDeclare, separateHalfSuit } from "../../game-utilities";
+import { separateHalfSuit } from "../../game-utilities";
 import { post } from "../../utilities";
 import { connect } from 'react-redux';
 import { card_svgs } from '../card_svgs';
 import { halfSuits } from '../card_objs';
-import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 
 import "../styles/game.scss";
 import "../styles/cards.scss";
@@ -16,9 +15,7 @@ class Declare extends Component {
         this.state = {
             guess: {},
             halfSuit: null,
-            hide: false,
             availableCards: null,
-            ownCards: null,
         };
     }
     
@@ -72,13 +69,13 @@ class Declare extends Component {
 
     // validate the declare before announcing 
     confirm = async () => {
-        if (isValidDeclare(this.state.guess)) {
-            this.setState({invalid: false, declaring: false,});
-            await post("/api/declare", {guess: this.state.guess, key: this.props.roomkey});
-            this.props.reset();
-        } else {
-            this.setState({invalid: true,});
-        }
+        this.setState({invalid: false, declaring: false,});
+        await post("/api/declare", {
+            halfSuit: this.state.halfSuit, 
+            guess: this.state.guess, 
+            key: this.props.roomkey
+        });
+        this.props.changeView('vote');
     }
 
     resetGuesses = (callback) => {
@@ -163,7 +160,7 @@ class Declare extends Component {
 
         return yourTeam.map((player, i) => 
             <div className='declare-column'>
-                <label>{player.name}</label>
+                <p>{player.name}</p>
                 <div 
                     key={i} 
                     className='declare-input_player'
@@ -186,13 +183,13 @@ class Declare extends Component {
             <div className='main-container declare playroom'>
                 <h2 className='playroom-label'>Declare!</h2>
                 <section className='declare-container'>
-                    <div className='declare-section'>
+                    <div className='playroom-section declare-section'>
                         <label>Choose a half-suit:</label>
                         <div className='playroom-options'>
                             {this.createHalfSuitOptions()}
                         </div>
                     </div>
-                    <div className='declare-section declare-input_cards'>
+                    <div className='playroom-section declare-section declare-input_cards'>
                         <label>Drag each card to the player you believe has it</label>
                         <div 
                             className='mini-cards'
@@ -202,11 +199,15 @@ class Declare extends Component {
                             {this.createHalfSuits()}
                         </div>
                     </div>
-                    <div className='declare-section declare-input_players'>
+                    <div className='playroom-section declare-section declare-input_players'>
                         {this.createPlayerColumns()}
                     </div>
                 </section>
-                <button className="btn primary-btn long-btn playroom-btn" onClick={this.confirm}>
+                <button 
+                    className={`btn primary-btn long-btn playroom-btn ${!this.state.availableCards || this.state.availableCards.length > 0 ? 'disabled-btn' : ''}`}
+                    disabled={!this.state.availableCards || this.state.availableCards.length > 0}
+                    onClick={this.confirm}
+                    >
                     Declare
                 </button>
             </div>
