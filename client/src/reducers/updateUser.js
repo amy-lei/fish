@@ -1,6 +1,7 @@
 import { 
     ENTER_GAME,
     UPDATE_INDEX,
+    CHANGE_CREATOR,
  } from '../actions/types';
 
 const initialState = {
@@ -22,6 +23,11 @@ export default (state = initialState, action) => {
                 ...state,
                 index: action.payload,
             };
+        case CHANGE_CREATOR:
+            return {
+                ...state,
+                isCreator: true,
+            }
         default:
             return state;
     }

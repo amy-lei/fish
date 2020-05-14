@@ -2,6 +2,7 @@
 export const ENTER_GAME = 'ENTER_GAME';
 export const SET_ROOM = 'SET_ROOM';
 export const UPDATE_INDEX = 'UPDATE_INDEX';
+export const CHANGE_CREATOR = 'CHANGE_CREATOR';
 
 // actions for updating hand 
 export const REMOVE_CARD = 'REMOVE_CARD';

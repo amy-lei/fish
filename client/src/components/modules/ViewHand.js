@@ -10,8 +10,8 @@ class ViewHand extends Component {
     }
 
     createCards = (hand) => {
-        return hand.map(card => (
-            <div className={`card card-${hand.length}`}>
+        return hand.map((card, i) => (
+            <div key={i} className={`card card-${hand.length}`}>
                 <img src={card_svgs[`${card.rank}-${card.suit}.svg`]}/>
             </div>
         ));
