@@ -11,12 +11,9 @@ class Ask extends Component {
     constructor(props){
         super(props);
         this.state = {
-            recipient: "",
-            rank: "",
-            suit: "",
+            recipient: null,
             selectedCard: null,
             askedCard: null,
-            selectedPlayer: null,
         };
     }
 
@@ -32,9 +29,9 @@ class Ask extends Component {
         };
         const res = await post('/api/ask', body);
         this.setState({
-            recipient: "",
-            rank: "",
-            suit: "",
+            recipient: null,
+            selectedCard: null,
+            askedCard: null,
         });
         this.props.reset('hand');
     }
@@ -118,8 +115,9 @@ class Ask extends Component {
 
                 </section>
                 <button
-                    className='btn primary-btn long-btn playroom-btn'
+                    className={`btn primary-btn long-btn playroom-btn ${!this.state.askedCard || !this.state.recipient ? 'disabled-btn' : ''}`}
                     onClick={this.ask}
+                    disabled={!this.state.askedCard || !this.state.recipient}
                 >
                     Ask
                 </button>
