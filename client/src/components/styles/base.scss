@@ -1,23 +1,17 @@
-@import url('https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,700&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap');
 
 $team-blue: #4D7CFE;
 $team-red: #DA5754;
 $primary: #FE8F6E;
-$primary-shadow: #EC7856;
+$primary-dim: #EC7856;
 $background: #F9FBFF;
 $light-grey: #F7F7FA;
 $grey: #DEDFE9;
-$dark-grey: #C4C4C4;
-$chat-label: #BDC4C1;
+$dark-grey: #BEBDC4;
 
 $out: #BFBDC4;
-$alert: #BC0202;
-$alert-shadow: #C92C32;
-$accept: #50A385;
-$accept-shadow: #3F9475;
-$object: #BF150B;
-$object-shadow: #AD1209;
+$agree: #0FBC9B;
+$object: #DA5754;
 
 $radius: 10px;
 $long: 250px;
@@ -33,7 +27,6 @@ $label-font-weight: 300;
 $bold-font-weight: 600;
 
 $main-font: 'Roboto', sans-serif;
-// $main-font: 'Source Sans Pro', sans-serif;
 
 @mixin btn {
     padding: 12px 30px;
