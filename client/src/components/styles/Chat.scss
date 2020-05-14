@@ -30,7 +30,7 @@
   
   .message {
     display: flex;
-    align-content: center;
+    align-items: center;
     margin-bottom: 1em;
     &_img {
       @include player-logo;
@@ -44,7 +44,7 @@
     &_info {
       align-items: center;
       background-color: $light-grey;
-      border-radius: 15px;
+      border-radius: $radius;
       max-width: 75%;
       min-height: 2em;
       padding: 0.8rem 1.5rem;
@@ -63,7 +63,7 @@
   }
 
   .server-message {
-    color: $grey;
+    color: $dark-grey;
     text-align: center;
     margin-bottom: 0.75em;
   }
@@ -116,8 +116,8 @@
     }
     &:hover {
       .send-symbol:before {
-        border-top: solid 1px $primary-shadow;
-        border-right: solid 1px $primary-shadow;
+        border-top: solid 1px $primary-dim;
+        border-right: solid 1px $primary-dim;
       }
     }
 

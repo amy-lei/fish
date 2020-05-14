@@ -29,15 +29,11 @@ body {
 
 
 .primary-btn {
-    @include solid-btn($primary, $primary-shadow);
+    @include solid-btn($primary, $primary-dim);
 }
 
 .primary-inverted-btn {
     @include inverted-btn($primary);
-}
-
-.alert-btn {
-    @include solid-btn($alert, $alert-shadow);
 }
 
 .long-btn {
@@ -47,7 +43,7 @@ body {
     width: $short;
 }
 .active-btn {
-    @include solid-btn($primary-shadow, $primary-shadow);
+    @include solid-btn($primary-dim, $primary-dim);
     width: $medium;
 }
 

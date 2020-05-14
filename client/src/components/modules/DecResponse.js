@@ -4,7 +4,6 @@ import { canObject } from "../../game-utilities";
 import { socket } from "../../client-socket";
 import { connect } from 'react-redux';
 import { card_svgs } from '../card_svgs';
-import "../styles/declare.scss";
 
 
 class DecResponse extends Component {
@@ -12,7 +11,7 @@ class DecResponse extends Component {
         super(props);
         this.state = {
             lie: false,
-            votes: [],
+            votes: { agree: 0, object: 0 },
             voted: false,
         };
     }
@@ -40,7 +39,6 @@ class DecResponse extends Component {
         else {
             // validate objections first
             if (canObject(hand, guess, name)){
-                console.log('object!');
                 await post("/api/vote", body);
                 this.setState({lie: false});
             } 
@@ -76,8 +74,12 @@ class DecResponse extends Component {
     componentDidMount() {
         // update when someone submits their res to declare
         socket.on("vote", vote => {
+            const { votes } = this.state;
             if (vote.name === this.props.name) this.setState({voted: true});
-            this.setState({votes: this.state.votes.concat(vote)});
+            this.setState({ votes: {
+                agree: vote.agree ? votes.agree + 1 : votes.agree,
+                object: vote.agree ? votes.object : votes.object + 1,
+            }});
         });
     }
     createHand = (hand) => {
@@ -116,14 +118,26 @@ class DecResponse extends Component {
             minVotes,
         } = this.props;
 
+        const {
+            votes,
+            voted,
+            lie,
+        } = this.state;
+
         let filler;
         let guesses;
         let voteButtons;
-        let votes;
+        let voteResults;
+        let instructions;
         if (Object.keys(guess).length === 0) {
             filler = <label className='vote-filler'>
                 {declarer} is guessing
             </label>
+
+            instructions = <p> Please vote once a guess is submitted.
+                All players must agree for {declarer}'s team to earn a point. 
+                (No lying!)
+            </p>
         } else {
             guesses = <>
                 <label>Declaration:</label>
@@ -132,29 +146,30 @@ class DecResponse extends Component {
                 </div>
             </>
             
-            votes = <>
+            voteResults = <>
                 <label>Votes:</label>
-                <div className='vote-responses'>
-                    {this.state.votes.map((vote) => 
-                        <div className='vote-response'>
-                            {vote.name} {vote.agree ? 'agrees' : 'OBJECTED'}
-                        </div>
-                    )}
+                <div className='vote-res_container'>
+                        {Object.keys(votes).map((op) => 
+                        <div className='vote-res_category'>
+                            <label>{op}</label>
+                            <div className={`vote-res_bar vote-res_bar-${votes[op]} ${op}`}></div>
+                            <p className='vote-res_amount'>{votes[op]}</p>
+                       </div>)}
                 </div>
             </>;
 
             if (declarer !== name) {
                 voteButtons = <div className='vote-btns'>
                     <button
-                        className={`primary-btn short-btn vote-btn ${this.state.voted && 'disabled-btn'}`}
-                        disabled={this.state.voted}
+                        className={`primary-btn short-btn vote-btn ${voted && 'disabled-btn'}`}
+                        disabled={voted}
                         onClick={() => this.resToDeclare(true)}
                     >
                         Agree
                     </button>
                     <button
-                        className={`primary-btn short-btn vote-btn ${this.state.voted && 'disabled-btn'}`}
-                        disabled={this.state.voted}
+                        className={`primary-btn short-btn vote-btn ${voted || lie && 'disabled-btn'}`}
+                        disabled={voted || lie}
                         onClick={() => this.resToDeclare(false)}
                     >
                         Object
@@ -162,8 +177,8 @@ class DecResponse extends Component {
                 </div>
             } else {
                 voteButtons = <button
-                    className={`primary-btn long-btn ${this.state.votes.length !== minVotes && 'disabled-btn'}`}
-                    disabled={this.state.votes.length !== minVotes}
+                    className={`primary-btn long-btn ${votes.length !== minVotes && 'disabled-btn'}`}
+                    disabled={votes.length !== minVotes}
                     onClick={this.endDeclare}
                 >
                     Get Score
@@ -175,10 +190,7 @@ class DecResponse extends Component {
             <div className='main-container vote playroom'>
                 <h2 className='playroom-label'>{declarer} Declared</h2>
                 <section className='vote-container'>
-                    <p> Please vote once a guess is submitted.
-                        All players must agree for {declarer}'s team to earn a point. 
-                        (No lying!)
-                    </p>
+                    {instructions}
                     <div className='playroom-section vote-section'>
                         <label>Your cards:</label>
                         <div className='mini-cards'>
@@ -190,7 +202,7 @@ class DecResponse extends Component {
                         {guesses}
                     </div>
                     <div className='playroom-section vote-section'>
-                        {votes}
+                        {voteResults}
                     </div>
                 </section>
                 {voteButtons}

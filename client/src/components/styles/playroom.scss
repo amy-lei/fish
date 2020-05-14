@@ -70,87 +70,6 @@
     }
 }
 
-.header {
-    .declare-btn{
-        @include inverted-btn($primary);
-    }
-    
-    .respond-btn,
-    .ask-btn{
-        @include main-btn($alert);
-        margin-left: 15px;
-    }
-
-}
-
-.popup {
-    position: absolute;
-    top: 50vh;
-    left: 50vw;
-    height: 350px;
-    width: 550px;
-    margin-top: -175px;
-    margin-left: -275px;
-    background: white;
-    z-index: 1000;
-    border-radius: 1rem;
-    padding: 30px 20px;
-
-    display:flex;
-    flex-direction: column;
-    justify-content: space-between;
-    
-    
-    .guess-input_field {
-        -webkit-appearance: none;
-        -moz-appearance: none;
-        appearance: none;       /* Remove default arrow */
-        background-color: white;
-        cursor: pointer;
-
-    }
-
-    .guess-input {
-        width: 100%;
-        display: flex;  
-        justify-content: center;         
-        
-        .guess-input_q {
-            display: flex;
-            justify-content: center;
-            margin-top: 10px;
-            padding: 0 5px;
-            width: 30%;
-
-            .guess-input_field {
-                width: 70%;
-                padding: 0 0 0 20px;
-                text-align: center;
-            }
-        
-            .guess-input_label {
-                text-align: center;
-                padding: 0 10px 5px 0;
-            }
-        }
-    }
-    
-
-    .guess-input-stack {
-        flex-direction: column;
-        .guess-input_q {
-            width: 100%;
-            padding: 10px 0;
-            .guess-input_field {
-                padding: 10px 0 10px 20px;
-            }
-            .guess-input_label {
-                padding: 10px 10px 10px 0;
-            }
-        }
-    }
-
-}
 .primary-btn {
     @include main-btn($primary);
 }
@@ -192,9 +111,18 @@
     justify-content: flex-start;
     align-content: center;
     margin-bottom: 2rem;
-    // min-height: 10%;
-    // max-height: 25%;
     padding: 10px 20px;
+
+    &-main-view {
+        padding-top: 3rem;
+        justify-content: flex-start !important;
+        // align-items: flex-start;
+    }
+    .turn-type {
+        text-align: center;
+        font-weight: 600;
+        padding-bottom: 0.5rem;
+    }
     .history_move {
         justify-content: center;
         margin: 0 0 0.5rem 0;
@@ -213,6 +141,13 @@
             padding-top:1em;
         }
     }
+}
+
+.main-view {
+    width: 100%;
+    text-align: center;
+    background-color: white !important;
+    box-shadow: 2px 2px 5px 1px rgba(black, 0.05);
 }
 
 .more-space {
