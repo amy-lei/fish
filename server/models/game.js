@@ -17,7 +17,7 @@ const GameSchema = new mongoose.Schema({
     ]],
     history: {type: [Object], default: []}, 
     whoseTurn: String,
-    turnType: {type: String, default: "ask"},
+    turnType: {type: String, default: 'ASK'},
     even: {type: Number, default: 0},
     odd: {type: Number, default: 0},
     start: {type: Boolean, default: false},

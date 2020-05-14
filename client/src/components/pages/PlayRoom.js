@@ -61,41 +61,37 @@ class PlayRoom extends Component {
             team.forEach((player) => {
                 mapIndexToPlayer[player.index] = player;
             }));
-        console.log('teams', mapIndexToPlayer);
 
         // if it was an ask, move it to next teammate
         if (turnType === 'ASK') {
-            let nextIndex = (player.index + 2) % 2;
+            let nextIndex = (player.index + 2) % 6;
             while (nextIndex !== player.index) {
                 const nextPlayer = mapIndexToPlayer[nextIndex]
-                if (nextPlayer.active) {
-                    console.log('it is ', nextPlayer.name, 'turn');
+                if (nextPlayer && nextPlayer.active) {
                     this.props.updateTurn(nextPlayer.name, 'ASK');
                     return;
                 } else {
-                    nextIndex = (nextIndex + 2) % 2;
+                    nextIndex = (nextIndex + 2) % 6;
                 }
             }
             return; // force other team to declare
         } else {
             // if it was respond, have prev asker ask again
-            const prevTurn = history[history.length] - 1;
+            const prevTurn = history[history.length - 1];
             let askerIndex = prevTurn.asker.index;
             let nextPlayer = mapIndexToPlayer[askerIndex];
-            if (nextPlayer.active) {
-                console.log('it is ', nextPlayer.name, 'turn');
+            if (nextPlayer && nextPlayer.active) {
                 this.props.updateTurn(nextPlayer.name, 'ASK');
                 return;
             } else {
-                nextIndex = (nextIndex + 2) % 2;
+                nextIndex = (nextIndex + 2) % 6;
                 while (nextIndex !== askerIndex) {
                     nextPlayer = mapIndexToPlayer[nextIndex]
-                    if (nextPlayer.active) {
-                        console.log('it is ', nextPlayer.name, 'turn');
+                    if (nextPlayer && nextPlayer.active) {
                         this.props.updateTurn(nextPlayer.name, 'ASK');
                         return;
                     } else {
-                        nextIndex = (nextIndex + 2) % 2;
+                        nextIndex = (nextIndex + 2) % 6;
                     }
                 }
                 return;
@@ -114,7 +110,6 @@ class PlayRoom extends Component {
         socket.on("respond", update => {
             const turn = update.move.success ? update.move.asker.name: update.move.responder.name;
             if (update.move.success) {
-                console.log('will be transferring', update.move.card);
                 if (update.move.responder.name === this.props.name) {
                     this.props.removeCard(
                         this.props.roomkey,
@@ -133,7 +128,6 @@ class PlayRoom extends Component {
         });
 
         socket.on("playerOut", who => {
-            console.log(`${who.name} out`);
             this.props.playerOut(who.index);
 
             // check if turn is affected / if game is ongoing

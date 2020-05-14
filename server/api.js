@@ -144,6 +144,7 @@ router.post("/start_game", (req, res) => {
       cards = gen_cards(game.players.length);
       game.hands = cards;
       game.start = true;
+      console.log(game.players);
       socket.getAllSocketsFromGame(game.key).forEach(client => {
         client.emit("startGame", {cards: cards});
       });
@@ -164,7 +165,7 @@ router.post("/ask", (req, res) => {
       history = game.history;
       if (history.length === 4) history.shift();
       history.push(move);
-      game.turnType = "respond";
+      game.turnType = 'RESPOND';
       game.whoseTurn = req.body.recipient;
       socket.getAllSocketsFromGame(game.key).forEach(client => {
         client.emit("ask", {history: history, move: move});
@@ -204,7 +205,7 @@ router.post("/respond", (req, res) => {
       } else {
         game.whoseTurn = req.body.responder.name;
       }
-      game.turnType = "ask";
+      game.turnType = 'ASK';
       game.save().then(()=>res.send({}));      
     })
 

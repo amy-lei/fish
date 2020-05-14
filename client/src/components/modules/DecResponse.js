@@ -115,7 +115,7 @@ class DecResponse extends Component {
             guess,
             name,
             hand,
-            // minVotes,
+            minVotes,
         } = this.props;
 
         const {
@@ -129,7 +129,6 @@ class DecResponse extends Component {
         let voteButtons;
         let voteResults;
         let instructions;
-        const minVotes = 2;
         if (Object.keys(guess).length === 0) {
             filler = <label className='vote-filler'>
                 {declarer} is guessing
@@ -167,7 +166,7 @@ class DecResponse extends Component {
                         Agree
                     </button>
                     <button
-                        className={`primary-btn short-btn vote-btn ${voted || lie && 'disabled-btn'}`}
+                        className={`primary-btn short-btn vote-btn ${(voted || lie) && 'disabled-btn'}`}
                         disabled={voted || lie}
                         onClick={() => this.resToDeclare(false)}
                     >
