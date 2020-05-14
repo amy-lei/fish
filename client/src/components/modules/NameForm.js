@@ -57,6 +57,7 @@ class NameForm extends Component {
         this.props.joinGame(name, 0, true);
         this.props.setRoomKey(game.key);
         this.props.updateTurn(name, 'ASK');
+        this.props.setPlayers(game.players);
         this.props.redirect('lobby');
 
     };

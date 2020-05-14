@@ -35,6 +35,7 @@ const removeUser = (socket, key) => {
 const updateGamePlayerList = (user, roomKey) => {
   Game.findOne({key: roomKey})
       .then((game) => {
+        console.log('before', game);
         let playerList = game.players;
         let targetIndex = 0;
         for (let i = 0; i < playerList.length; i++) {
@@ -51,7 +52,14 @@ const updateGamePlayerList = (user, roomKey) => {
           return player;
         });
         game.players = playerList;
+
+        // update turn if creator left 
+        if (targetIndex === 0) {
+          game.whoseTurn = game.players[0].name;
+        }
+
         game.save();
+        console.log('after', game);
         getAllSocketsFromGame(roomKey).forEach(client => {
           client.emit("updatedPlayerList", playerList);
         })
@@ -68,8 +76,7 @@ module.exports = {
         const user = socketToUserMap[socket.id];
         const roomKey = userSocketIdToGameKey[socket.id];
         const otherUserSockets = getAllSocketsFromGame(roomKey);
-        
-        if (otherUserSockets.length === 1) {
+        if (otherUserSockets.length <= 1) {
           removeUser(socket, roomKey);
           delete gameToSocketsMap[roomKey];
           Game.deleteOne({key: roomKey})
@@ -81,7 +88,8 @@ module.exports = {
           Game
           .findOne({key: roomKey})
           .then(g => {
-            if (!g.start) {
+            console.log('server g', g);
+            if (g && !g.start) {
                 removeUser(socket, roomKey);
                 updateGamePlayerList(user, roomKey);
                 otherUserSockets.forEach(client => {

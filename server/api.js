@@ -75,12 +75,16 @@ router.post("/join_room", (req, res) => {
                 }
             }
             const newPlayer = {name: newPlayerName, index: foundGame.players.length, ready: false, active: true};
-            socket.getAllSocketsFromGame(foundGame.key).forEach(client => {
-                client.emit("joinedWaitingRoom", newPlayer);
-            });
             foundGame.players.push(newPlayer);
-            foundGame.save()
-                     .then((game) => res.send({self: newPlayer, game, return: false}));
+            foundGame
+              .save()
+              .then((game) => {
+                socket.getAllSocketsFromGame(game.key).forEach(client => {
+                    client.emit("joinedWaitingRoom", game.players);
+                });
+                res.send({self: newPlayer, game, return: false})
+              });
+            
           }
         });
 });
@@ -144,7 +148,6 @@ router.post("/start_game", (req, res) => {
       cards = gen_cards(game.players.length);
       game.hands = cards;
       game.start = true;
-      console.log(game.players);
       socket.getAllSocketsFromGame(game.key).forEach(client => {
         client.emit("startGame", {cards: cards});
       });
@@ -252,7 +255,7 @@ router.post("/score", (req, res)=> {
                 });
               });
 
-            game.save().then((g) => {console.log(g); res.send({})});
+            game.save().then((g) => {res.send({})});
         });
 });
 
