@@ -1,16 +1,22 @@
+@import './base.scss';
+
 .cards {
     display: flex;
     flex-wrap: nowrap;
-    width: 90%;
+    width: 80%;
     margin:0 auto;
     justify-content: center;
+    &::-webkit-scrollbar {
+        width: 0px;  /* Remove scrollbar space */
+        background: transparent;  /* Optional: just make scrollbar invisible */
+    }
+
 }
 .card{
     transition: 0.5s;
-    // width: 13.5%;
     img {
         border-radius: 1rem;
-        box-shadow: -2px 2px 5px 1px rgba(black, 0.1);
+        box-shadow: -2px 2px 5px 1px rgba(black, 0.05);
     }
     
     &:hover {
@@ -24,7 +30,29 @@
 
 }
 
-@for $i from 1 through 20 {
+.mini-cards {
+    display: flex;
+    flex-wrap: wrap;
+}
+.mini-card {
+    width: 60px;
+    height: 84px;
+    margin-right: 0.25rem; 
+    box-shadow: -2px 2px 5px 1px rgba(black, 0.05);
+    margin-bottom: 0.25rem;
+}
+.placeholder-card {
+    border-radius: 0.25rem;
+    opacity: 0.3;
+    background-color: $grey;
+}
+
+.selected-card {
+    border-radius: 0.25rem;
+    box-shadow: 0 0 15px 1px rgba($primary, 0.25);
+}
+
+@for $i from 1 through 25 {
     @if $i < 10 {
         .card-#{$i}:not(:first-child) {
             margin-left: -.75rem * $i - 5.5rem;

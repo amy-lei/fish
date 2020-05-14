@@ -3,6 +3,7 @@ import { post } from "../../utilities";
 import { canObject } from "../../game-utilities";
 import { socket } from "../../client-socket";
 import { connect } from 'react-redux';
+import { card_svgs } from '../card_svgs';
 import "../styles/declare.scss";
 
 
@@ -23,15 +24,23 @@ class DecResponse extends Component {
         If OBJECT, validate the objection first
      */
     resToDeclare = async (bool) => {
+        const {
+            hand,
+            guess,
+            name,
+            roomkey,
+        } = this.props;
+
         const body = {
-            key: this.props.roomkey,
-            player: this.props.name, 
+            key: roomkey,
+            player: name, 
             agree: bool,
         };
         if (bool) await post("/api/vote", body);
         else {
             // validate objections first
-            if (canObject(this.props.hand, this.props.guess, this.props.name)){
+            if (canObject(hand, guess, name)){
+                console.log('object!');
                 await post("/api/vote", body);
                 this.setState({lie: false});
             } 
@@ -53,7 +62,7 @@ class DecResponse extends Component {
         const body = {
             even: objections ? !even : even,
             key: this.props.roomkey, 
-            declare: this.props.guess
+            halfSuit: this.props.halfSuit,
         };
         // reset declaring states
         this.setState({
@@ -70,67 +79,122 @@ class DecResponse extends Component {
             if (vote.name === this.props.name) this.setState({voted: true});
             this.setState({votes: this.state.votes.concat(vote)});
         });
+    }
+    createHand = (hand) => {
+        return hand.map((card,i) => (
+            <img 
+                key={i}
+                className={`mini-card ${this.state.selectedCard === card && 'selected-card'}`} 
+                src={card_svgs[`${card.rank}-${card.suit}.svg`]}
+                onClick={() => this.setState({selectedCard: card})}    
+            />
+        ));
+    };
 
+    createGuesses = (guess) => {
+        return Object.keys(guess).map((player, i) => 
+            <div key={i} className='vote-guess declare-column'>
+                <p>{player}</p>
+                <div className='declare-input_player'>
+                    {guess[player].map((card, k) => 
+                        <img
+                            key={k}
+                            className='mini-card'
+                            src={card_svgs[`${card.rank}-${card.suit}.svg`]}
+                        />)}
+                </div>
+            </div>
+        );
     }
 
     render() {
         const {
             declarer,
-            name,
             guess,
+            name,
+            hand,
             minVotes,
         } = this.props;
 
-        const declaration = (
-            <div className="declare-name">
-                {declarer} declared!
-            </div>);
-
-        let declaredGuess;
-        if (guess.length === 0) {
-            declaredGuess = <p className="declare-guess_wait">
-            {`${declarer} is making their guess. Communication disabled in the meantime.`}
-            </p>
+        let filler;
+        let guesses;
+        let voteButtons;
+        let votes;
+        if (Object.keys(guess).length === 0) {
+            filler = <label className='vote-filler'>
+                {declarer} is guessing
+            </label>
         } else {
-            declaredGuess = guess.map(combo => (
-                <div className="declare-guess">
-                    {combo.player} has the {combo.rank} {combo.suit}
+            guesses = <>
+                <label>Declaration:</label>
+                <div className='vote-guesses declare-input_players'>
+                    {this.createGuesses(guess)}
                 </div>
-            ));
-        }
-        
-        const votes = this.state.votes.map(vote => 
-            <div className="declare-votes">{vote.name} {vote.agree ? "agees": "OBJECTED"}</div>)
+            </>
+            
+            votes = <>
+                <label>Votes:</label>
+                <div className='vote-responses'>
+                    {this.state.votes.map((vote) => 
+                        <div className='vote-response'>
+                            {vote.name} {vote.agree ? 'agrees' : 'OBJECTED'}
+                        </div>
+                    )}
+                </div>
+            </>;
 
-        let finish;
-            if (declarer === name && this.state.votes.length === minVotes) {
-                finish = (<button className="btn primary-btn" onClick={this.endDeclare}>Finish</button>);
+            if (declarer !== name) {
+                voteButtons = <div className='vote-btns'>
+                    <button
+                        className={`primary-btn short-btn vote-btn ${this.state.voted && 'disabled-btn'}`}
+                        disabled={this.state.voted}
+                        onClick={() => this.resToDeclare(true)}
+                    >
+                        Agree
+                    </button>
+                    <button
+                        className={`primary-btn short-btn vote-btn ${this.state.voted && 'disabled-btn'}`}
+                        disabled={this.state.voted}
+                        onClick={() => this.resToDeclare(false)}
+                    >
+                        Object
+                    </button>
+                </div>
+            } else {
+                voteButtons = <button
+                    className={`primary-btn long-btn ${this.state.votes.length !== minVotes && 'disabled-btn'}`}
+                    disabled={this.state.votes.length !== minVotes}
+                    onClick={this.endDeclare}
+                >
+                    Get Score
+                </button>
             }
-    
+        }
+
         return (
-            <div className="sidebar declare">
-                {declaration}
-                <div className="declare-guesses">
-                    {declaredGuess}
-                </div>
-                {!(declarer === name) && guess.length !== 0 && !this.state.voted && 
-                (<div className="declare-vote_instruction">
-                    Press OBJECT if you see a contradiction. ACCEPT otherwise.
-                    <div className="declare-vote_btns">
-                        <button className="btn accept-btn"onClick={()=> this.resToDeclare(true)}>
-                            Accept
-                        </button>
-                        <button className="btn object-btn"onClick={() => this.resToDeclare(false)}>
-                            Object
-                        </button>
+            <div className='main-container vote playroom'>
+                <h2 className='playroom-label'>{declarer} Declared</h2>
+                <section className='vote-container'>
+                    <p> Please vote once a guess is submitted.
+                        All players must agree for {declarer}'s team to earn a point. 
+                        (No lying!)
+                    </p>
+                    <div className='playroom-section vote-section'>
+                        <label>Your cards:</label>
+                        <div className='mini-cards'>
+                            {this.createHand(hand)}
+                        </div>
                     </div>
-                    <span className="warning">{this.state.lie && "Dont lie!!!!"}</span>
-                </div>
-                )}
-                <div className="declare-votes-container">
-                    {votes}
-                </div>
-                {finish}
+                    <div className='playroom-section vote-section'>
+                        {filler}
+                        {guesses}
+                    </div>
+                    <div className='playroom-section vote-section'>
+                        {votes}
+                    </div>
+                </section>
+                {voteButtons}
+
             </div>
         )
     }

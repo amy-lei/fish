@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import Header from '../modules/Header';
+import logo from "../../public/header_logo.svg";
 import { post } from "../../utilities";
 import { socket } from "../../client-socket";
 import { connect } from 'react-redux';
@@ -13,13 +13,47 @@ import Chat from "./Chat.js";
 const MAX_PLAYERS = 6;
 const FACES = [':)', '•_•', '=U','°_o',':O','°Д°'];
 
+// const FAKE_PEOPLE = [
+//     {
+//         name: 'a',
+//         index: 1,
+//         ready: true,
+//         active: true,
+//     },
+//     {
+//         name: 'b',
+//         index: 2,
+//         ready: true,
+//         active: true,
+//     },
+//     {
+//         name: 'c',
+//         index: 3,
+//         ready: true,
+//         active: true,
+//     },
+//     {
+//         name: 'd',
+//         index: 4,
+//         ready: true,
+//         active: true,
+//     },
+//     {
+//         name: 'e',
+//         index: 5,
+//         ready: true,
+//         active: true,
+//     },
+// ]
+const FAKE_PEOPLE = [];
+
 class WaitingRoom extends Component {
     constructor(props) {
         super(props);
         this.state = {
             redirect: false,
             isReady: false,
-            players: this.props.isCreator ? [{name:this.props.name, index: 0, ready: true, active: true}] : this.props.players,
+            players: this.props.isCreator ? [{name:this.props.name, index: 0, ready: true, active: true}].concat(FAKE_PEOPLE) : this.props.players,
             index: this.props.index,
         };
         this.key_ref = React.createRef();
@@ -126,18 +160,9 @@ class WaitingRoom extends Component {
         const disableStart = !(players.every(player => player.ready) && players.length === MAX_PLAYERS);
         return (
         <>
-            <Header gameBegan={false} winner=''/>
             <div className="container">
-                <div className="sidebar chat-container">
-                    <div className="sidebar-label" style={{cursor: "default"}}>
-                        <div className="sidebar-label_options">Chat History</div>
-                    </div>
-                    <Chat
-                        index={index}
-                        name={name}
-                        roomkey={roomkey}
-                        hidden={false}
-                    />
+                <div className='header'>
+                    <img className='header-logo logo' src={logo}/>
                 </div>
                 <div className="main-container waiting-room">
                     <div className="waiting-room_top">
@@ -158,7 +183,7 @@ class WaitingRoom extends Component {
                             isCreator ?
                             <button
                                 onClick={this.start}
-                                className={`btn long-btn ${disableStart ? "disabled-start" : "primary-btn"}`}
+                                className={`btn long-btn ${disableStart ? "disabled-btn" : "primary-btn"}`}
                                 disabled={disableStart}
                             >
                                 Start Game
@@ -191,6 +216,17 @@ class WaitingRoom extends Component {
                             </div>
                         ))}
                     </div>
+                </div>
+                <div className="sidebar chat-container">
+                    <div className="sidebar-label" style={{cursor: "default"}}>
+                        <div className="sidebar-label_options">Chat History</div>
+                    </div>
+                    <Chat
+                        index={index}
+                        name={name}
+                        roomkey={roomkey}
+                        hidden={false}
+                    />
                 </div>
             </div>
         </>

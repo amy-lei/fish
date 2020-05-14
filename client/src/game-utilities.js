@@ -1,4 +1,4 @@
-const rankToVal = {
+export const rankToVal = {
     'ace': 14,
     'two': 2,
     'three': 3,
@@ -22,42 +22,32 @@ const rankToVal = {
  */
 export const hasCard = (hand, target) => {
     for(let card of hand) 
-        if (card.rank === target.rank && card.suit === target.suit) return true;
-    return false;        
+        if (card.rank === target.rank && card.suit === target.suit) 
+            return {
+                card,
+                have: true,
+            };
+    return {
+        card: null,
+        have: false,
+    };        
 }
 
-
 /*
-    Returns whether the player has a card in the halfsuit 
-
-    @hand (array): list of cards
-    @target (object): a card in the desired halfsuit
- */
-export const isValidAsk = (hand, target) => {
-    if (!hasCard(hand, target)) {
-        for (let card of hand) 
-            if (sameHalfSuit(target, card)) return true;
+*/
+export const separateHalfSuit = (hand, halfSuit) => {
+    const ownCards = new Set();
+    for(let c of hand) {
+        const {card, have} = hasCard(halfSuit, c);
+        if (have) {
+            ownCards.add(card);
+        }
     }
-    return false;
-}
-
-
-/*
-    Returns whether the declare is filled completely,
-    with cards in the same half suit.
-
-    @declare (array): list of guesses(objects)
- */
-export const isValidDeclare = (declare) => {
-    let asked = [];
-    for (let guess of declare) {
-        // make sure nothing is empty 
-        if (guess.player && guess.rank && guess.suit) {
-            if (!sameHalfSuit(declare[0], guess) || hasCard(asked, guess)) return false;
-            else asked.push(guess);
-        } else return false;
-    }
-    return true;
+    
+    return {
+        ownCards,
+        availableCards: halfSuit.filter(card => !ownCards.has(card)),
+    };
 }
 
 /*
@@ -69,12 +59,15 @@ export const isValidDeclare = (declare) => {
     @name (string): player's name
  */
 export const canObject = (hand, declare, name) => {
-    for (let guess of declare) {
-        let have = hasCard(hand, guess);
-        let you = declare.player === name;
-        if (have && !you) return true;
-        if (you && !have) return true;
+    for (let [player, guess] of Object.entries(declare)) {
+        for (let card of guess) {
+            let {have} = hasCard(hand, card);
+            let you = player === name;
+            if (have && !you) return true;
+            if (you && !have) return true;
+        }
     }
+    console.log('nope')
     return false;
 }
 
@@ -86,27 +79,10 @@ export const canObject = (hand, declare, name) => {
     @hand (array): list of cards
     @declare (array): list of guesses 
  */
-export const removeHalfSuit = (hand, declare) => {
-    const base = { rank: declare[0].rank, suit: declare[0].suit }
+export const removeHalfSuit = (hand, halfSuit) => {
     return hand.filter(card => 
-            !sameHalfSuit(card, base)
+                card.halfSuit !== halfSuit
         );
-}
-
-
-/*
-    Returns whether two cards are of the same half suit
-
-    @base (object): card to be compared with
-    @card (object): card that is being checked
- */ 
-const sameHalfSuit = (base, card) => {
-    if (base.rank === "joker" || rankToVal[base.rank] == 8)
-        return card.rank === "joker" || rankToVal[card.rank] === 8;
-    else {
-        const upper = rankToVal[base.rank] > 8;
-        return rankToVal[card.rank] > 8 === upper && card.suit === base.suit
-    }
 }
 
 export const SUITS = [

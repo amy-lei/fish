@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import { connect } from 'react-redux';
 import { hasCard } from "../../game-utilities";
 import { post } from "../../utilities";
+import { card_svgs } from '../card_svgs';
 
 class Respond extends Component {
     constructor(props){
@@ -37,31 +38,51 @@ class Respond extends Component {
         this.setState({
             response: "",
         });
-        this.props.reset();
+        this.props.reset('hand');
     }
+
+    createHand = (hand) => {
+        return hand.map((card,i) => (
+            <img 
+                key={i}
+                className={`mini-card`} 
+                src={card_svgs[`${card.rank}-${card.suit}.svg`]}
+            />
+        ));
+    };
 
     render() {
         const asker = this.props.history.length !== 0 ? this.props.history[this.props.history.length - 1].asker.name : '';
         return (
-            <div className={`popup`}>
-                <button
-                    className="close-btn"
-                    onClick={this.props.reset}
+            <div className='main-container playroom respond'>
+                <h2 className="playroom-label">Respond to {asker}:</h2>
+                <section className='respond-container'>
+                    <div className='playroom-section respond-section'>
+                        <label>Your cards:</label>
+                        <div className='mini-cards'>
+                            {this.createHand(this.props.hand)}
+                        </div>
+                    </div>
+                    <div className='playroom-section respond-section'>
+                        <label>
+                            {asker} asked for the &nbsp;
+                            {this.props.history[this.props.history.length - 1].rank} &nbsp;
+                            {this.props.history[this.props.history.length - 1].suit}
+                            .Respond with a message:
+                        </label>
+                        <input 
+                            className="respond-input"
+                            type="text"
+                            onChange={(e) => this.setState({response: e.target.value})}
+                            value={this.state.response}
+                        />
+                    </div>
+                </section>
+                <button 
+                    className="btn primary-btn long-btn playroom-btn" 
+                    onClick={this.respond}
                 >
-                    X
-                </button>
-                <div className="respond">
-                    <div className="respond-label">Respond to {asker}:</div>
-                    
-                    <input 
-                        className="respond-input"
-                        type="text"
-                        onChange={(e) => this.setState({response: e.target.value})}
-                        value={this.state.response}
-                    />
-                </div>
-                <button className="btn primary-btn" onClick={this.respond}>
-                    Send
+                    Respond
                 </button>
             </div>
         );

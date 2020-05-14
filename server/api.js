@@ -221,7 +221,8 @@ router.post("/pause", (req,res)=> {
 
 router.post("/declare", (req, res)=> {
     socket.getAllSocketsFromGame(req.body.key).forEach(client => {
-        client.emit("declared", {guess: req.body.guess});
+        client.emit("declared", 
+          {guess: req.body.guess, halfSuit: req.body.halfSuit});
       });
     res.send({});
 });
@@ -240,15 +241,15 @@ router.post("/score", (req, res)=> {
             if (req.body.even) game.even += 1;
             else game.odd += 1;
             
-            const updatedHands = game.hands.map(hand => removeHalfSuit(hand, req.body.declare));
+            const updatedHands = game.hands.map(hand => removeHalfSuit(hand, req.body.halfSuit));
             game.hands = updatedHands;
 
             socket.getAllSocketsFromGame(req.body.key).forEach(client => {
                 client.emit("updateScore", {
                   even: req.body.even, 
-                  declare: req.body.declare,
                   evenScore: game.even,
                   oddScore: game.odd,
+                  halfSuit: req.body.halfSuit,
                 });
               });
 

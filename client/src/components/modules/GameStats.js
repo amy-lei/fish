@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import { connect } from 'react-redux';
 
-const PARITY_TO_TEAM = { "even": "BLUE", "odd": "RED" };
+const PARITY_TO_TEAM = { "even": "Blue", "odd": "Red" };
 
 class GameStats extends Component {
     constructor(props){
@@ -34,9 +34,9 @@ class GameStats extends Component {
             <div className="stats_team-name">
                 {Object.keys(PARITY_TO_TEAM).map(parity => (
                     <span> 
-                        TEAM {PARITY_TO_TEAM[parity]} 
+                        Team {PARITY_TO_TEAM[parity]} 
                         {userParity === parity 
-                            ? `(YOU): ${this.props.scores.yourTeam}`
+                            ? ` (You): ${this.props.scores.yourTeam}`
                             : `: ${this.props.scores.otherTeam}`}
                     </span>                
                 ))}

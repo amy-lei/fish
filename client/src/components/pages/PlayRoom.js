@@ -5,10 +5,9 @@ import Ask from "../modules/Ask.js";
 import Respond from "../modules/Respond.js";
 import Declare from "../modules/Declare.js";
 import DecResponse from "../modules/DecResponse.js";
-import GameStats from '../modules/GameStats';
 import GameHistory from '../modules/GameHistory';
+import ViewHand from '../modules/ViewHand';
 import Header from '../modules/Header';
-import { card_svgs } from "../card_svgs.js";
 import { connect } from 'react-redux';
 import { Redirect } from 'react-router';
 import {
@@ -27,27 +26,15 @@ class PlayRoom extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            guess: [],
+            view: 'hand',
             sidebar: "chat",
-            asking: false,
             declaring: false,
-            showDeclare: false,
-            responding: false,
+            guess: {},
             declarer: '',
+            halfSuit: '',
             winner: '',
         };
     }
-
-    /*
-     visualize your current hand
-     */
-    createCards = (hand) => {
-        return hand.map(card => (
-            <div className={`card card-${hand.length}`}>
-                <img src={card_svgs[`${card.rank}-${card.suit}.svg`]}/>
-            </div>
-        ));
-    };
 
     // Update your score if true, others if false
     updateScore = (even, evenScore, oddScore) => {
@@ -92,20 +79,21 @@ class PlayRoom extends Component {
         socket.on("playerOut", who => {
             this.props.playerOut(who.index);
         });
-        
-        // update with the declarer's guess
-        socket.on("declared", info => {
-            this.setState({guess: info.guess});
-        });
 
         socket.on("declaring", (info) => {
             this.setState({
                 declaring: true,
                 declarer: info.player,
-                asking: false,
-                responding: false,
-                showDeclare: info.player === this.props.name,
-            });
+            }, () => {
+                if (this.props.name !== info.player) {
+                    this.setState({ view: 'vote'});
+                }
+            })
+        });
+        
+        // update with the declarer's guess
+        socket.on("declared", info => {
+            this.setState({guess: info.guess, halfSuit: info.halfSuit});
         });
 
         // update game with results of the declare
@@ -113,7 +101,7 @@ class PlayRoom extends Component {
             this.props.removeSuit(
                 this.props.roomkey,
                 this.props.index,
-                update.declare,
+                update.halfSuit,
             );
             const even = this.props.index % 2 === 0;
             const gameOver = this.updateScore(even, update.evenScore, update.oddScore);
@@ -125,9 +113,11 @@ class PlayRoom extends Component {
             }
             // reset declaring states
             this.setState({
+                view: 'hand',
                 declaring: false,
-                showDeclare: false,
+                guess: {},
                 declarer: '',
+                halfSuit: '',
             });
         });
     }
@@ -149,53 +139,60 @@ class PlayRoom extends Component {
             name,
         } = this.props;
         const { 
-            asking,
-            responding,
             declaring,
             declarer,
-            showDeclare,
             winner,
+            view,
+            guess,
+            halfSuit
         } = this.state;
         
-        let cards = "Loading cards";
-        if (hand) { cards = this.createCards(hand); }
-        const gameOver = this.props.winner !== '';
+        let curView;
+        const gameOver = winner !== '';
+        if (gameOver || view === 'hand') {
+            curView = <ViewHand hand={hand}/>
+        } else if (view === 'ask') {
+            curView = <Ask reset={(view) => this.setState({view})}/>
+        } else if (view === 'respond') {
+            curView = <Respond reset={(view) => this.setState({view})}/>
+        } else if (view === 'declare') {
+            curView = <Declare changeView={(view) => this.setState({view})}/>
+        } else if (view === 'vote') {
+            curView = <DecResponse 
+                declarer={declarer}
+                guess={guess}
+                halfSuit={halfSuit}
+                minVotes={this.props.yourTeam.length + this.props.otherTeam.length - 1}
+            />
+        }
+
         return (
             <>
-                <Header
-                    winner={winner}
-                    gameBegan={true}
-                    showAsk={!declaring 
-                        && turnType === 'ASK'
-                        && whoseTurn === name}
-                    showRespond={!declaring
-                        && turnType === 'RESPOND'
-                        && whoseTurn === name}
-                    showDeclare={declarer === ''}
-                    onClickDeclare={() => this.setState({showDeclare: true})}
-                    onClickAsk={() => this.setState({asking: true})}
-                    onClickRespond={() => this.setState({responding: true})}
-                />
-                {!gameOver && showDeclare && 
-                    <Declare
-                        reset={() => this.setState({ showDeclare: false })}
-                    />}
-                {!gameOver && declaring && declarer &&
-                    <DecResponse
-                        isDeclarer={this.state.declarer === this.props.name}
-                        name={this.props.name}
-                        guess={this.state.guess}
-                        declarer={this.state.declarer}
-                        roomkey={this.props.roomkey}
-                        index={this.props.index}
-                        minVotes={this.props.yourTeam.length + this.props.otherTeam.length - 1}
-                    />}
-                {!gameOver && !declaring && asking && 
-                    <Ask reset={() => this.setState({ asking: false })}/>}
-                {!gameOver && !declaring && responding && 
-                    <Respond reset={() => this.setState({ responding: false })}/>}
-                <div className={`overlay ${showDeclare || this.props.asking || this.props.responding ? "" : "hidden"}`}></div>
                 <div className="container">
+                    <Header
+                        winner={winner}
+                        view={view}
+                        gameBegan={true}
+                        showAsk={!declaring 
+                            && turnType === 'ASK'
+                            && whoseTurn === name}
+                        showRespond={!declaring
+                            && turnType === 'RESPOND'
+                            && whoseTurn === name}
+                        showDeclare={declarer === ''}
+                        changeView={(view) => this.setState({view})}
+                    />
+                    {curView}
+                    {/* {!gameOver && declaring && declarer &&
+                        <DecResponse
+                            isDeclarer={this.state.declarer === this.props.name}
+                            name={this.props.name}
+                            guess={this.state.guess}
+                            declarer={this.state.declarer}
+                            roomkey={this.props.roomkey}
+                            index={this.props.index}
+                            minVotes={this.props.yourTeam.length + this.props.otherTeam.length - 1}
+                        />} */}
                     <div className="sidebar">
                         <div className="sidebar-label">
                             <span
@@ -223,15 +220,6 @@ class PlayRoom extends Component {
                             all={true}
                             hidden={this.state.sidebar === "chat"}
                         />
-                    </div>
-                    <div className="main-container playroom">                            
-                        {this.props.history &&
-                            <GameHistory
-                                all={false}
-                            />
-                        }
-                        <div className="cards">{cards}</div>
-                        <GameStats/>
                     </div>
                 </div>
             </>

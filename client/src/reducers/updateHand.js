@@ -27,7 +27,7 @@ export default (state = initialState, action) => {
                 );
             break;
         case REMOVE_HALF_SUIT:
-            hand = removeHalfSuit(state, action.payload.declare);
+            hand = removeHalfSuit(state, action.payload.halfSuit);
             break;
         default:
             return state;

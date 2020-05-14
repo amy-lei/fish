@@ -1,8 +1,8 @@
 import React, { Component } from "react";
-import { isValidAsk } from "../../game-utilities";
 import { connect } from 'react-redux';
 import { post } from "../../utilities";
-import GuessInput from "./GuessInput.js";
+import { card_svgs } from '../card_svgs';
+import { halfSuits } from '../card_objs';
 
 import "../styles/game.scss";
 import "../styles/cards.scss";
@@ -11,72 +11,119 @@ class Ask extends Component {
     constructor(props){
         super(props);
         this.state = {
-            invalid: false,
             recipient: "",
             rank: "",
             suit: "",
+            selectedCard: null,
+            askedCard: null,
+            selectedPlayer: null,
         };
     }
 
-    /*  
-        Validate ask before posting,
-        and reset states related to ask
-    */
     ask = async() => {
-        const { recipient, rank, suit } = this.state;
-        const { hand, roomkey, name, index } = this.props;
-        
-        if (isValidAsk(hand, {rank, suit})) {
-            const body = {
-                key: roomkey,
-                asker: { name, index },
-                recipient, 
-                rank,
-                suit,
-            };
-            const res = await post('/api/ask', body);
-            this.setState({
-                invalid: false,
-                recipient: "",
-                rank: "",
-                suit: "",
-            });
-            this.props.reset();
-        } else this.setState({ invalid: true });
+        const { recipient, askedCard } = this.state;
+        const { roomkey, name, index } = this.props;
+        const body = {
+            key: roomkey,
+            asker: { name, index },
+            recipient, 
+            rank: askedCard.rank,
+            suit: askedCard.suit,
+        };
+        const res = await post('/api/ask', body);
+        this.setState({
+            recipient: "",
+            rank: "",
+            suit: "",
+        });
+        this.props.reset('hand');
+    }
+
+    createHand = (hand) => {
+        return hand.map((card,i) => (
+            <img 
+                key={i}
+                className={`mini-card ${this.state.selectedCard === card && 'selected-card'}`} 
+                src={card_svgs[`${card.rank}-${card.suit}.svg`]}
+                onClick={() => this.setState({selectedCard: card})}    
+            />
+        ));
+    };
+
+    createHalfSuits = () => {
+        const { selectedCard } = this.state;
+        if (selectedCard) {
+            return halfSuits[selectedCard.halfSuit]
+                .filter((card) => 
+                    !(card.rank === selectedCard.rank && card.suit === selectedCard.suit) 
+                )
+                .map((card,i) => (
+                    <img 
+                        key={i}
+                        className={`mini-card ${this.state.askedCard === card && 'selected-card'}`} 
+                        src={card_svgs[`${card.rank}-${card.suit}.svg`]}
+                        onClick={() => this.setState({askedCard: card})}    
+                    />
+                ));
+        } else {
+            const cards = [];
+            for (let i = 0; i < 6; i++) {
+                cards.push(<div key={i} className='mini-card placeholder-card'></div>);
+            }
+            return cards;
+        }
+    }
+
+    createPlayers = () => {
+        const { otherTeam } = this.props;
+        return otherTeam.map((player) => {
+            let onClick;
+            if (player.active) {
+                onClick = () => this.setState({ recipient: player.name })
+            } else {
+                onClick = () => {};
+            }
+            return (<div 
+                className={`playroom-option player ${this.state.recipient === player.name && 'selected-card'} ${!player.active && 'out'}`}
+                onClick={onClick}
+            >
+                 {player.name} {player.active ? '' : '(OUT)'}
+            </div>)}
+        );
     }
 
     render() {
         return (
-            <div className="popup">
+            <div className='main-container ask playroom'>
+                <h2 className='playroom-label'> Ask for a card</h2>
+                <section className='ask-container'>
+                    <div className='playroom-section ask-section ask-section_hand'>
+                        <label>Select a half-suit from your hand:</label>
+                        <div className='mini-cards'>
+                            {this.createHand(this.props.hand)}
+                        </div>
+                    </div>
+                    <div className='playroom-section ask-section ask-section_suit'>
+                        <label>Select a card to ask for:</label>
+                        <div className='mini-cards'>
+                            {this.createHalfSuits()}
+                        </div>
+                    </div>
+                    <div className='playroom-section ask-section ask-section_suit'>
+                        <label>Select to a player to ask:</label>
+                        <div className='playroom-options'>
+                            {this.createPlayers()}
+                        </div>
+                    </div>
+
+                </section>
                 <button
-                    className="close-btn"
-                    onClick={this.props.reset}
+                    className='btn primary-btn long-btn playroom-btn'
+                    onClick={this.ask}
                 >
-                    X
+                    Ask
                 </button>
-                <GuessInput
-                    players={this.props.otherTeam.filter(player => player.active)}
-                    who={this.state.recipient}
-                    rank={this.state.rank}
-                    suit={this.state.suit}
-                    updateWho={(val) => this.setState({recipient: val})}
-                    updateRank={(val) => this.setState({rank: val})}
-                    updateSuit={(val) => this.setState({suit: val})}
-                    validate={() => true}
-                    column={true}
-                    reset={this.props.reset}
-                />
-                {this.state.recipient && this.state.rank && this.state.suit &&
-                    (<button 
-                        className="btn primary-btn"
-                        onClick={this.ask}
-                        >Ask</button>)}
-
-                {this.state.invalid && 
-                    <span className="warning">Invalid Ask</span>
-                }
             </div>
-
         );
     }
 }

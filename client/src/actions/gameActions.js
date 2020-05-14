@@ -40,10 +40,10 @@ export const addCard = (rank, suit) => (dispatch) => {
     });
 }
 
-export const removeSuit = (roomkey, index, declare) => (dispatch) => {
+export const removeSuit = (roomkey, index, halfSuit) => (dispatch) => {
     dispatch({
         type: REMOVE_HALF_SUIT,
-        payload: { roomkey, index, declare },
+        payload: { roomkey, index, halfSuit },
     });
 }
 
