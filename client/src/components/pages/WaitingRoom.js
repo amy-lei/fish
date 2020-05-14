@@ -3,14 +3,16 @@ import logo from "../../public/header_logo.svg";
 import { post } from "../../utilities";
 import { socket } from "../../client-socket";
 import { connect } from 'react-redux';
+import { updateIndex } from '../../actions/userActions';
 import { 
+    setPlayers,
     setHand,
     setTeams,
  } from '../../actions/gameActions';
 import { Redirect } from 'react-router'; 
 import Chat from "./Chat.js";
 
-const MAX_PLAYERS = 6;
+const MAX_PLAYERS = 4;
 const FACES = [':)', '•_•', '=U','°_o',':O','°Д°'];
 
 // const FAKE_PEOPLE = [
@@ -51,31 +53,49 @@ class WaitingRoom extends Component {
     constructor(props) {
         super(props);
         this.state = {
+            name: this.props.name,
             redirect: false,
             isReady: false,
-            players: this.props.isCreator ? [{name:this.props.name, index: 0, ready: true, active: true}].concat(FAKE_PEOPLE) : this.props.players,
+            // players: this.props.isCreator ? [{name:this.props.name, index: 0, ready: true, active: true}].concat(this.props.players) : this.props.players,
+            players: this.props.players,
             index: this.props.index,
         };
         this.key_ref = React.createRef();
+
+        // update when someone leaves
+        socket.on("updatedPlayerList", (update) => {
+            const { playerList, targetIndex } = update;
+            console.log('before', this.state.players);
+            console.log('given', playerList, targetIndex);
+            console.log('your name', this.props.name);
+            console.log('your name via state', this.state.name);
+            console.log('your index', this.props.index);
+            console.log('your index via state', this.state.index);
+            this.setState({
+                players: playerList,
+                // index: playerList.filter((player) => player.name === this.props.name)[0].index, //gets the new index of the player
+            }, () => {
+                this.props.setPlayers(this.state.players);
+                // console.log('after', this.state.players)
+                // this.props.updateIndex(this.state.index);
+            });
+        });
     };
 
     componentDidMount() {
         const { index, players } = this.state;
 
         // update when someone joins
-        socket.on("joinedWaitingRoom", (newName) => {
+        socket.on("joinedWaitingRoom", (newList) => {
+            console.log('started with',players);
             this.setState({
-                players: players.concat(newName)
+                players: newList
+            }, () => {
+                this.props.setPlayers(newList);
+                console.log('now', this.state.players)
             });
         });
 
-        // update when someone leaves
-        socket.on("updatedPlayerList", (list) => {
-            this.setState({
-                players: list,
-                index: list.filter((player) => player.name === this.props.name)[0].index, //gets the new index of the player
-            });
-        });
 
         // set up game when someone hits start 
         socket.on("startGame", (info) => {
@@ -111,6 +131,8 @@ class WaitingRoom extends Component {
         and update your hand
      */
     setUpGame = () => {
+        console.log(this.state.index);
+        console.log(this.props.name);
         let otherTeam = [];
         let yourTeam = [];
         const parity = this.state.index % 2;
@@ -245,6 +267,8 @@ const mapStateToProps = (state) => ({
 const mapDispatchToProps = {
     setHand,
     setTeams,
+    updateIndex,
+    setPlayers,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(WaitingRoom);

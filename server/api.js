@@ -50,6 +50,7 @@ router.post("/join_room", (req, res) => {
     Game.findOne({key: requestedRoomKey})
         .then((foundGame) => {
           socket.addUser(foundGame.key, socket.getSocketFromSocketID(req.body.socketid), playerName);
+          console.log('join start', foundGame);
           if (foundGame.start) {
             let targetPlayer;
             for (let player of foundGame.players){
@@ -75,12 +76,18 @@ router.post("/join_room", (req, res) => {
                 }
             }
             const newPlayer = {name: newPlayerName, index: foundGame.players.length, ready: false, active: true};
-            socket.getAllSocketsFromGame(foundGame.key).forEach(client => {
-                client.emit("joinedWaitingRoom", newPlayer);
-            });
+            console.log('before join', foundGame.players);
             foundGame.players.push(newPlayer);
-            foundGame.save()
-                     .then((game) => res.send({self: newPlayer, game, return: false}));
+            foundGame
+              .save()
+              .then((game) => {
+                socket.getAllSocketsFromGame(game.key).forEach(client => {
+                    client.emit("joinedWaitingRoom", game.players);
+                });
+                console.log('after', foundGame.players);
+                res.send({self: newPlayer, game, return: false})
+              });
+            
           }
         });
 });
