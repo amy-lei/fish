@@ -1,4 +1,4 @@
-const SIZE = 54;
+// const SIZE = 20;
 const SUITS = [
     'heart', 
     'diamond', 
@@ -56,7 +56,7 @@ const generateCards = (n) => {
     }
 
     // account for the two jokers
-    cards.push({ rank: "joker", suit: "black", halfSuit: 'special '});
+    cards.push({ rank: "joker", suit: "black", halfSuit: 'special'});
     cards.push({ rank: "joker", suit: "red", halfSuit: 'special'});
 
     let output = [];

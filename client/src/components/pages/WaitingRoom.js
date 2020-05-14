@@ -18,13 +18,13 @@ const FACES = [':)', '•_•', '=U','°_o',':O','°Д°'];
 //         name: 'a',
 //         index: 1,
 //         ready: true,
-//         active: true,
+//         active: false,
 //     },
 //     {
 //         name: 'b',
 //         index: 2,
 //         ready: true,
-//         active: true,
+//         active: false,
 //     },
 //     {
 //         name: 'c',
@@ -42,7 +42,7 @@ const FACES = [':)', '•_•', '=U','°_o',':O','°Д°'];
 //         name: 'e',
 //         index: 5,
 //         ready: true,
-//         active: true,
+//         active: false,
 //     },
 // ]
 const FAKE_PEOPLE = [];

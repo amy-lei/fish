@@ -3,6 +3,7 @@ import { connect } from 'react-redux';
 import { post } from "../../utilities";
 import { card_svgs } from '../card_svgs';
 import { halfSuits } from '../card_objs';
+import { hasCard } from '../../game-utilities'; 
 
 import "../styles/game.scss";
 import "../styles/cards.scss";
@@ -11,12 +12,9 @@ class Ask extends Component {
     constructor(props){
         super(props);
         this.state = {
-            recipient: "",
-            rank: "",
-            suit: "",
+            recipient: null,
             selectedCard: null,
             askedCard: null,
-            selectedPlayer: null,
         };
     }
 
@@ -27,14 +25,13 @@ class Ask extends Component {
             key: roomkey,
             asker: { name, index },
             recipient, 
-            rank: askedCard.rank,
-            suit: askedCard.suit,
+            card: askedCard,
         };
         const res = await post('/api/ask', body);
         this.setState({
-            recipient: "",
-            rank: "",
-            suit: "",
+            recipient: null,
+            selectedCard: null,
+            askedCard: null,
         });
         this.props.reset('hand');
     }
@@ -52,10 +49,12 @@ class Ask extends Component {
 
     createHalfSuits = () => {
         const { selectedCard } = this.state;
+        const { hand } = this.props;
         if (selectedCard) {
             return halfSuits[selectedCard.halfSuit]
                 .filter((card) => 
                     !(card.rank === selectedCard.rank && card.suit === selectedCard.suit) 
+                    && !hasCard(hand, card).have
                 )
                 .map((card,i) => (
                     <img 
@@ -118,8 +117,9 @@ class Ask extends Component {
 
                 </section>
                 <button
-                    className='btn primary-btn long-btn playroom-btn'
+                    className={`btn primary-btn long-btn playroom-btn ${!this.state.askedCard || !this.state.recipient ? 'disabled-btn' : ''}`}
                     onClick={this.ask}
+                    disabled={!this.state.askedCard || !this.state.recipient}
                 >
                     Ask
                 </button>

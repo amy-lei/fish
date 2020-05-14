@@ -46,6 +46,59 @@ class PlayRoom extends Component {
         return evenScore === WIN || oddScore === WIN;
     }
 
+    // TODO: refactor this!!!!!
+    adjustTurn = (player) => {
+        const {
+            turnType,
+            yourTeam,
+            otherTeam,
+            history,
+        } = this.props;
+        
+        // find the team the player is in
+        const mapIndexToPlayer = {};
+        [otherTeam, yourTeam].forEach((team) => 
+            team.forEach((player) => {
+                mapIndexToPlayer[player.index] = player;
+            }));
+
+        // if it was an ask, move it to next teammate
+        if (turnType === 'ASK') {
+            let nextIndex = (player.index + 2) % 6;
+            while (nextIndex !== player.index) {
+                const nextPlayer = mapIndexToPlayer[nextIndex]
+                if (nextPlayer && nextPlayer.active) {
+                    this.props.updateTurn(nextPlayer.name, 'ASK');
+                    return;
+                } else {
+                    nextIndex = (nextIndex + 2) % 6;
+                }
+            }
+            return; // force other team to declare
+        } else {
+            // if it was respond, have prev asker ask again
+            const prevTurn = history[history.length - 1];
+            let askerIndex = prevTurn.asker.index;
+            let nextPlayer = mapIndexToPlayer[askerIndex];
+            if (nextPlayer && nextPlayer.active) {
+                this.props.updateTurn(nextPlayer.name, 'ASK');
+                return;
+            } else {
+                nextIndex = (nextIndex + 2) % 6;
+                while (nextIndex !== askerIndex) {
+                    nextPlayer = mapIndexToPlayer[nextIndex]
+                    if (nextPlayer && nextPlayer.active) {
+                        this.props.updateTurn(nextPlayer.name, 'ASK');
+                        return;
+                    } else {
+                        nextIndex = (nextIndex + 2) % 6;
+                    }
+                }
+                return;
+            }
+        }
+    }
+
     componentDidMount() {
         // update history and update turn after an ask
         socket.on("ask", update => {
@@ -61,13 +114,11 @@ class PlayRoom extends Component {
                     this.props.removeCard(
                         this.props.roomkey,
                         this.props.index,
-                        update.move.rank,
-                        update.move.suit,
+                        update.move.card,
                     );
                 } else if (update.move.asker.name === this.props.name) {
                     this.props.addCard(
-                        update.move.rank,
-                        update.move.suit,
+                        update.move.card,
                     )
                 }
             }
@@ -78,6 +129,12 @@ class PlayRoom extends Component {
 
         socket.on("playerOut", who => {
             this.props.playerOut(who.index);
+
+            // check if turn is affected / if game is ongoing
+            if (who.name === this.props.whoseTurn 
+                && this.state.winner === '') {
+                this.adjustTurn(who);
+            }
         });
 
         socket.on("declaring", (info) => {
@@ -183,16 +240,6 @@ class PlayRoom extends Component {
                         changeView={(view) => this.setState({view})}
                     />
                     {curView}
-                    {/* {!gameOver && declaring && declarer &&
-                        <DecResponse
-                            isDeclarer={this.state.declarer === this.props.name}
-                            name={this.props.name}
-                            guess={this.state.guess}
-                            declarer={this.state.declarer}
-                            roomkey={this.props.roomkey}
-                            index={this.props.index}
-                            minVotes={this.props.yourTeam.length + this.props.otherTeam.length - 1}
-                        />} */}
                     <div className="sidebar">
                         <div className="sidebar-label">
                             <span
@@ -209,7 +256,6 @@ class PlayRoom extends Component {
                                 Ask History
                             </span>
                         </div>
-
                         <Chat
                             name={this.props.name}
                             index={this.props.index}

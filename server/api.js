@@ -144,6 +144,7 @@ router.post("/start_game", (req, res) => {
       cards = gen_cards(game.players.length);
       game.hands = cards;
       game.start = true;
+      console.log(game.players);
       socket.getAllSocketsFromGame(game.key).forEach(client => {
         client.emit("startGame", {cards: cards});
       });
@@ -156,8 +157,7 @@ router.post("/ask", (req, res) => {
     type: 'ASK',
     asker: req.body.asker,
     recipient: req.body.recipient,
-    rank: req.body.rank,
-    suit: req.body.suit,
+    card: req.body.card,
   };
   Game
     .findOne({key: req.body.key})
@@ -165,7 +165,7 @@ router.post("/ask", (req, res) => {
       history = game.history;
       if (history.length === 4) history.shift();
       history.push(move);
-      game.turnType = "respond";
+      game.turnType = 'RESPOND';
       game.whoseTurn = req.body.recipient;
       socket.getAllSocketsFromGame(game.key).forEach(client => {
         client.emit("ask", {history: history, move: move});
@@ -182,8 +182,7 @@ router.post("/respond", (req, res) => {
     asker: req.body.asker,
     response: req.body.response,
     success: req.body.success,
-    rank: req.body.card.rank,
-    suit: req.body.card.suit,
+    card: req.body.card,
   };
   Game
     .findOne({key: req.body.key})
@@ -198,15 +197,15 @@ router.post("/respond", (req, res) => {
       if (move.success) {
             // remove from responder
             newHand = game.hands[move.responder.index].filter(card => 
-                !(card.rank === move.rank && card.suit === move.suit));
+                !(card.rank === move.card.rank && card.suit === move.card.suit));
             game.hands[move.responder.index] = newHand;
             // add to asker
-            game.hands[move.asker.index].push({rank: move.rank, suit: move.suit});
+            game.hands[move.asker.index].push(move.card);
             game.whoseTurn = req.body.asker.name;
       } else {
         game.whoseTurn = req.body.responder.name;
       }
-      game.turnType = "ask";
+      game.turnType = 'ASK';
       game.save().then(()=>res.send({}));      
     })
 
@@ -263,9 +262,10 @@ router.post("/out", (req, res) => {
     .then((game)=>{
       game.hands[req.body.index] = [];
       game.players[req.body.index].active = false;
+      const name = game.players[req.body.index].name;
 
       socket.getAllSocketsFromGame(req.body.key).forEach(client => {
-        client.emit("playerOut", {index: req.body.index});
+        client.emit("playerOut", {index: req.body.index, name});
       });
 
       game.save().then((g)=> res.send(g));

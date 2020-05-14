@@ -55,7 +55,7 @@ class DecResponse extends Component {
      */
     endDeclare = async () => {
         // check for objections
-        const objections = !this.state.votes.every(vote => vote.agree);
+        const objections = this.state.votes.object > 0;
         const even = this.props.index % 2 === 0; // your team
         const body = {
             even: objections ? !even : even,
@@ -146,8 +146,7 @@ class DecResponse extends Component {
                 </div>
             </>
             
-            voteResults = <>
-                <label>Votes:</label>
+            voteResults = 
                 <div className='vote-res_container'>
                         {Object.keys(votes).map((op) => 
                         <div className='vote-res_category'>
@@ -155,8 +154,7 @@ class DecResponse extends Component {
                             <div className={`vote-res_bar vote-res_bar-${votes[op]} ${op}`}></div>
                             <p className='vote-res_amount'>{votes[op]}</p>
                        </div>)}
-                </div>
-            </>;
+                </div>;
 
             if (declarer !== name) {
                 voteButtons = <div className='vote-btns'>
@@ -168,7 +166,7 @@ class DecResponse extends Component {
                         Agree
                     </button>
                     <button
-                        className={`primary-btn short-btn vote-btn ${voted || lie && 'disabled-btn'}`}
+                        className={`primary-btn short-btn vote-btn ${(voted || lie) && 'disabled-btn'}`}
                         disabled={voted || lie}
                         onClick={() => this.resToDeclare(false)}
                     >
@@ -177,8 +175,8 @@ class DecResponse extends Component {
                 </div>
             } else {
                 voteButtons = <button
-                    className={`primary-btn long-btn ${votes.length !== minVotes && 'disabled-btn'}`}
-                    disabled={votes.length !== minVotes}
+                    className={`primary-btn long-btn ${(votes.agree + votes.object) !== minVotes && 'disabled-btn'}`}
+                    disabled={(votes.agree + votes.object) !== minVotes}
                     onClick={this.endDeclare}
                 >
                     Get Score

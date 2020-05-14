@@ -26,17 +26,17 @@ export const updateTurn = (player, turnType) => (dispatch) => {
     });
 }
 
-export const removeCard = (roomkey, index, rank, suit) => (dispatch) => {
+export const removeCard = (roomkey, index, card) => (dispatch) => {
     dispatch({
         type: REMOVE_CARD,
-        payload: { roomkey, index, rank, suit },
+        payload: { roomkey, index, card },
     });
 }
 
-export const addCard = (rank, suit) => (dispatch) => {
+export const addCard = (card) => (dispatch) => {
     dispatch({
         type: ADD_CARD,
-        payload: { rank, suit },
+        payload: card,
     });
 }
 
