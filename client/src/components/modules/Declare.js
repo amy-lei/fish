@@ -14,27 +14,61 @@ class Declare extends Component {
     constructor(props){
         super(props);
         this.state = {
-            guess: [],
+            guess: {},
             halfSuit: null,
             hide: false,
             availableCards: null,
             ownCards: null,
         };
     }
-    /*
-        STEP 0 of declaring: 
-
-        Alert other players that you are declaring
-        to pause them from asking/responding
-     */
-    declaring = () => {
-        this.setState({
-            showInput: true,
-            declaring: true,
-        });
-        
-        post("/api/pause", {key: this.props.roomkey, player: this.props.name});
+    
+    onDragStart = (e, rank, suit, source) => {
+        e.dataTransfer.setData('rank', rank);
+        e.dataTransfer.setData('suit', suit);
+        e.dataTransfer.setData('source', source);
     }
+
+    onDragOver = (e) => {
+        e.preventDefault();
+    }
+
+    onDrop = (e, name) => {
+        const rank = e.dataTransfer.getData('rank');
+        const suit = e.dataTransfer.getData('suit');
+        const source = e.dataTransfer.getData('source');
+        
+        // location did not change
+        if (name === source || name === 'cards') {
+            return; 
+        }
+        
+        let draggedCard; 
+        const filteredCards = [];
+        const guess = {...this.state.guess};
+        let availableCards;
+        const sourceList = source === 'cards' ? this.state.availableCards : this.state.guess[source];
+        for (let card of sourceList) {
+            if (card.rank === rank && card.suit === suit) {
+                draggedCard = card;
+            } else {
+                filteredCards.push(card);
+            }
+        }
+
+        if (source === 'cards') {
+            availableCards = filteredCards;
+        } else {
+            availableCards = this.state.availableCards;
+            guess[source] = filteredCards;
+        }
+
+        guess[name] = this.state.guess[name].concat(draggedCard);        
+        this.setState({
+            availableCards,
+            guess,
+        });
+    }
+
 
     // validate the declare before announcing 
     confirm = async () => {
@@ -47,23 +81,30 @@ class Declare extends Component {
         }
     }
 
-    componentDidMount() {
-        let guess = [];
-        for (let i = 0; i< 6; i++) {
-            guess.push({player: "", rank: "", suit: ""});
+    resetGuesses = (callback) => {
+        const { yourTeam } = this.props;
+        const guess = {};
+        for (let player of yourTeam) {
+            guess[player.name] = [];
         }
-        this.setState({guess});
-        post("/api/pause", {key: this.props.roomkey, player: this.props.name});
-
+        this.setState({ guess }, callback);
     }
 
+    componentDidMount() {
+        this.resetGuesses(() => {});
+        post("/api/pause", {key: this.props.roomkey, player: this.props.name});
+    }
+
+    
     createHand = (hand) => {
         return hand.map((card,i) => (
-            <img 
-                key={i}
-                className={`mini-card ${this.state.selectedCard === card && 'selected-card'}`} 
-                src={card_svgs[`${card.rank}-${card.suit}.svg`]}
-            />
+            <div draggable={true}>
+                <img 
+                    key={i}
+                    className={`mini-card ${this.state.selectedCard === card && 'selected-card'}`} 
+                    src={card_svgs[`${card.rank}-${card.suit}.svg`]}
+                />
+            </div>
         ));
     };
 
@@ -74,8 +115,8 @@ class Declare extends Component {
                 className={`playroom-option halfsuit ${this.state.halfSuit === halfSuit && 'selected-card'}`}
                 value={halfSuit}
                 onClick={() => {
-                    this.setState({halfSuit})
-                    this.splitHand(halfSuit)
+                    this.setState({halfSuit});
+                    this.splitHand(halfSuit);
                 }}
             >
                 {halfSuit.replace('_', ' ')}
@@ -84,9 +125,13 @@ class Declare extends Component {
     }
 
     splitHand = (halfSuit) => {
-        const { hand } = this.props;
-        const { availableCards, ownCards } = separateHalfSuit(hand, halfSuits[halfSuit]);
-        this.setState({ availableCards, ownCards });
+        this.resetGuesses(() => {
+            const { name, hand } = this.props;
+            const { availableCards, ownCards } = separateHalfSuit(hand, halfSuits[halfSuit]);
+            const guess = {...this.state.guess};
+            guess[name] = this.state.guess[name].concat([...ownCards]);
+            this.setState({ availableCards, guess });
+        });
     }
 
     createHalfSuits = () => {
@@ -94,11 +139,14 @@ class Declare extends Component {
         if (availableCards && availableCards.length > 0) {
             return availableCards
                 .map((card,i) => (
-                    <img 
-                        key={i}
-                        className={`mini-card`} 
-                        src={card_svgs[`${card.rank}-${card.suit}.svg`]}
-                    />
+                    <div draggable>
+                        <img 
+                            key={i}
+                            className={`mini-card`} 
+                            src={card_svgs[`${card.rank}-${card.suit}.svg`]}
+                            onDragStart={(e) => this.onDragStart(e, card.rank, card.suit, 'cards')}
+                        />
+                    </div>
                 ));
         } else {
             const cards = [];
@@ -110,19 +158,24 @@ class Declare extends Component {
     }
 
     createPlayerColumns = () => {
-        const { yourTeam, name } = this.props;
-        const { ownCards } = this.state;
+        const { yourTeam } = this.props;
+        const { guess } = this.state;
 
         return yourTeam.map((player, i) => 
             <div className='declare-column'>
                 <label>{player.name}</label>
-                <div key={i} className='declare-input_player'>
-                    {ownCards && player.name === name 
-                        && [...ownCards].map((card, i) =>
+                <div 
+                    key={i} 
+                    className='declare-input_player'
+                    onDragOver={(e) => this.onDragOver(e)}
+                    onDrop={(e) => this.onDrop(e, player.name)}
+                >
+                    {guess[player.name] && guess[player.name].map((card, i) =>
                         <img 
                             key={i}
                             className={`mini-card`} 
                             src={card_svgs[`${card.rank}-${card.suit}.svg`]}
+                            onDragStart={(e) => this.onDragStart(e, card.rank, card.suit, player.name)}
                         />)} 
                 </div>
             </div>
@@ -141,7 +194,11 @@ class Declare extends Component {
                     </div>
                     <div className='declare-section declare-input_cards'>
                         <label>Drag each card to the player you believe has it</label>
-                        <div className='mini-cards'>
+                        <div 
+                            className='mini-cards'
+                            onDragOver={(e) => this.onDragOver(e)}
+                            onDrop={(e) => this.onDrop(e, 'cards')}
+                        >
                             {this.createHalfSuits()}
                         </div>
                     </div>
@@ -153,27 +210,7 @@ class Declare extends Component {
                     Declare
                 </button>
             </div>
-        )
-
-        return(
-            <>            
-                {this.state.declaring &&
-                    <button
-                        className="btn primary-btn show-cards-btn"
-                        onClick={() => this.setState({hide: !this.state.hide})}
-                    >
-                        {!this.state.hide ? "View Cards" : "Resume Declare"}
-                    </button>
-                }
-            <div className={`popup ${this.state.hide ? "hidden" : ""}`}>
-                {!this.state.showInput && !this.state.declaring ? confirmation : <div className="declare-inputs">{inputs}</div>}
-                {this.state.showInput && 
-                    <button className="btn primary-btn" onClick={this.confirm}>
-                        Declare
-                    </button>}
-                {this.state.invalid && "invalid declare!!!"}
-            </div></>);
-
+        );
     }
 }
 
