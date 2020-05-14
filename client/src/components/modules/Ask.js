@@ -3,6 +3,7 @@ import { connect } from 'react-redux';
 import { post } from "../../utilities";
 import { card_svgs } from '../card_svgs';
 import { halfSuits } from '../card_objs';
+import { hasCard } from '../../game-utilities'; 
 
 import "../styles/game.scss";
 import "../styles/cards.scss";
@@ -24,8 +25,7 @@ class Ask extends Component {
             key: roomkey,
             asker: { name, index },
             recipient, 
-            rank: askedCard.rank,
-            suit: askedCard.suit,
+            card: askedCard,
         };
         const res = await post('/api/ask', body);
         this.setState({
@@ -49,10 +49,12 @@ class Ask extends Component {
 
     createHalfSuits = () => {
         const { selectedCard } = this.state;
+        const { hand } = this.props;
         if (selectedCard) {
             return halfSuits[selectedCard.halfSuit]
                 .filter((card) => 
                     !(card.rank === selectedCard.rank && card.suit === selectedCard.suit) 
+                    && !hasCard(hand, card).have
                 )
                 .map((card,i) => (
                     <img 

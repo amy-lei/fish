@@ -114,17 +114,16 @@ class PlayRoom extends Component {
         socket.on("respond", update => {
             const turn = update.move.success ? update.move.asker.name: update.move.responder.name;
             if (update.move.success) {
+                console.log('will be transferring', update.move.card);
                 if (update.move.responder.name === this.props.name) {
                     this.props.removeCard(
                         this.props.roomkey,
                         this.props.index,
-                        update.move.rank,
-                        update.move.suit,
+                        update.move.card,
                     );
                 } else if (update.move.asker.name === this.props.name) {
                     this.props.addCard(
-                        update.move.rank,
-                        update.move.suit,
+                        update.move.card,
                     )
                 }
             }

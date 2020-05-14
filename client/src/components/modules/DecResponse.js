@@ -129,7 +129,7 @@ class DecResponse extends Component {
         let voteButtons;
         let voteResults;
         let instructions;
-        const minVotes = 3;
+        const minVotes = 2;
         if (Object.keys(guess).length === 0) {
             filler = <label className='vote-filler'>
                 {declarer} is guessing
@@ -147,8 +147,7 @@ class DecResponse extends Component {
                 </div>
             </>
             
-            voteResults = <>
-                <label>Votes:</label>
+            voteResults = 
                 <div className='vote-res_container'>
                         {Object.keys(votes).map((op) => 
                         <div className='vote-res_category'>
@@ -156,8 +155,7 @@ class DecResponse extends Component {
                             <div className={`vote-res_bar vote-res_bar-${votes[op]} ${op}`}></div>
                             <p className='vote-res_amount'>{votes[op]}</p>
                        </div>)}
-                </div>
-            </>;
+                </div>;
 
             if (declarer !== name) {
                 voteButtons = <div className='vote-btns'>

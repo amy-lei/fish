@@ -156,8 +156,7 @@ router.post("/ask", (req, res) => {
     type: 'ASK',
     asker: req.body.asker,
     recipient: req.body.recipient,
-    rank: req.body.rank,
-    suit: req.body.suit,
+    card: req.body.card,
   };
   Game
     .findOne({key: req.body.key})
@@ -182,8 +181,7 @@ router.post("/respond", (req, res) => {
     asker: req.body.asker,
     response: req.body.response,
     success: req.body.success,
-    rank: req.body.card.rank,
-    suit: req.body.card.suit,
+    card: req.body.card,
   };
   Game
     .findOne({key: req.body.key})
@@ -198,10 +196,10 @@ router.post("/respond", (req, res) => {
       if (move.success) {
             // remove from responder
             newHand = game.hands[move.responder.index].filter(card => 
-                !(card.rank === move.rank && card.suit === move.suit));
+                !(card.rank === move.card.rank && card.suit === move.card.suit));
             game.hands[move.responder.index] = newHand;
             // add to asker
-            game.hands[move.asker.index].push({rank: move.rank, suit: move.suit});
+            game.hands[move.asker.index].push(move.card);
             game.whoseTurn = req.body.asker.name;
       } else {
         game.whoseTurn = req.body.responder.name;

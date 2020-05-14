@@ -14,16 +14,13 @@ export default (state = initialState, action) => {
         case INIT_HAND:
             return action.payload;
         case ADD_CARD:
-            hand = [...state, {
-                rank: action.payload.rank,
-                suit: action.payload.suit,
-            }];
+            hand = [...state, action.payload];
             return hand
 
         case REMOVE_CARD:
             hand = state.filter(card => 
-                !(card.rank === action.payload.rank 
-                    && card.suit === action.payload.suit)
+                !(card.rank === action.payload.card.rank 
+                    && card.suit === action.payload.card.suit)
                 );
             break;
         case REMOVE_HALF_SUIT:

@@ -10,7 +10,7 @@ import {
 import { Redirect } from 'react-router'; 
 import Chat from "./Chat.js";
 
-const MAX_PLAYERS = 4;
+const MAX_PLAYERS = 3;
 const FACES = [':)', '•_•', '=U','°_o',':O','°Д°'];
 
 // const FAKE_PEOPLE = [

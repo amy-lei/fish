@@ -23,7 +23,7 @@ class GameHistory extends Component {
                                 {move.asker.name} asked 
                             </div>
                             <div className="message_info-content history_move-what">
-                                {move.recipient} do you have the {move.rank} {move.suit}?
+                                {move.recipient} do you have the {move.card.rank} {move.card.suit}?
                             </div>
                         </div>
                     </div>
@@ -47,7 +47,7 @@ class GameHistory extends Component {
                             </div>
                         </div>
                         <div className="server-message history_move-result">
-                            {move.responder.name} {result} have the {move.rank} {move.suit}
+                            {move.responder.name} {result} have the {move.card.rank} {move.card.suit}
                         </div>
                     </>
                 );

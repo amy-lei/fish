@@ -24,14 +24,15 @@ class Respond extends Component {
             index, 
             roomkey } = this.props;
         const lastAsk = history[history.length - 1]
-        const card = { rank: lastAsk.rank, suit: lastAsk.suit };
-        const success = hasCard(hand, card);
+        const card = lastAsk.card;
+        console.log('passed thru?', card);
+        const { have } = hasCard(hand, card);
         const body = {
             key: roomkey,
             responder: {name, index},
             asker: lastAsk.asker,
             response: this.state.response,
-            success,
+            success: have,
             card,
         };
         await post("/api/respond", body);
@@ -66,8 +67,8 @@ class Respond extends Component {
                     <div className='playroom-section respond-section'>
                         <label>
                             {asker} asked for the &nbsp;
-                            {this.props.history[this.props.history.length - 1].rank} &nbsp;
-                            {this.props.history[this.props.history.length - 1].suit}
+                            {this.props.history[this.props.history.length - 1].card.rank} &nbsp;
+                            {this.props.history[this.props.history.length - 1].card.suit}
                             .Respond with a message:
                         </label>
                         <input 
