@@ -7,15 +7,29 @@ class ViewHand extends Component {
     constructor(props) {
         super(props);
         this.state = {
+            source: -1,
+            hand: this.props.hand,
         };
     }
 
     onDragStart = (e, index) => {
         e.dataTransfer.setData('source', index);
+        this.setState({ source: index });
     };
 
     onDragOver = (e, index) => {
         e.preventDefault();
+        const { source, hand } = this.state;
+        if (source !== index) {
+            let currentHand = hand.slice();
+            const card = currentHand[source];
+            currentHand.splice(source, 1);
+            currentHand.splice(index, 0, card);
+            this.setState({
+                hand: currentHand,
+                source: index,
+            });
+        }
     };
 
     onDrop = (e, destination) => {
@@ -25,6 +39,7 @@ class ViewHand extends Component {
         currentHand.splice(source, 1);
         currentHand.splice(destination, 0, droppedCard);
         this.props.updateHand(currentHand);
+        this.setState({ hand: currentHand, source: -1 });
     };
 
     createCards = (hand) => {
@@ -47,7 +62,7 @@ class ViewHand extends Component {
             <div className='main-container playroom'>
                 <GameHistory all={false}/>
                 <div className='cards'>
-                    {this.createCards(this.props.hand)}
+                    {this.createCards(this.state.hand)}
                 </div>
                 <GameStats/>
             </div>
