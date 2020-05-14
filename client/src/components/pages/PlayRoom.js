@@ -18,6 +18,7 @@ import {
     removeSuit,
     playerOut,
     updateHistory,
+    setHand,
 } from '../../actions/gameActions';
 
 const WIN = 5; // FIX WHEN LAUNCH!!!
@@ -194,6 +195,7 @@ class PlayRoom extends Component {
             turnType,
             whoseTurn,
             name,
+            setHand,
         } = this.props;
         const { 
             declaring,
@@ -207,7 +209,7 @@ class PlayRoom extends Component {
         let curView;
         const gameOver = winner !== '';
         if (gameOver || view === 'hand') {
-            curView = <ViewHand hand={hand}/>
+            curView = <ViewHand hand={hand} updateHand={setHand}/>
         } else if (view === 'ask') {
             curView = <Ask reset={(view) => this.setState({view})}/>
         } else if (view === 'respond') {
@@ -293,6 +295,7 @@ const mapDispatchToProps = {
     removeSuit,
     playerOut,
     updateHistory,
+    setHand,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(PlayRoom);
