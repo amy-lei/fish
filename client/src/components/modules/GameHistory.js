@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import { connect } from 'react-redux';
+import { nameOfCard } from '../../game-utilities';
 
 const FACES = [':)', '•_•', '=U','°_o',':O','°Д°'];
 
@@ -23,7 +24,7 @@ class GameHistory extends Component {
                                 {move.asker.name} asked 
                             </div>
                             <div className="message_info-content history_move-what">
-                                {move.recipient} do you have the {move.card.rank} {move.card.suit}?
+                                {move.recipient} do you have the {nameOfCard(move.card)}?
                             </div>
                         </div>
                     </div>
@@ -47,7 +48,7 @@ class GameHistory extends Component {
                             </div>
                         </div>
                         <div className="server-message history_move-result">
-                            {move.responder.name} {result} have the {move.card.rank} {move.card.suit}
+                            {move.responder.name} {result} have the {nameOfCard(move.card)}
                         </div>
                     </>
                 );

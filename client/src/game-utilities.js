@@ -84,6 +84,14 @@ export const removeHalfSuit = (hand, halfSuit) => {
         );
 }
 
+export const nameOfCard = (card) => {
+    if (card.rank in rankToVal) {
+        return card.rank + ' of ' + card.suit;
+    } else {
+        return card.suit + ' ' + card.rank;
+    }
+}
+
 export const SUITS = [
     'heart', 
     'diamond', 
