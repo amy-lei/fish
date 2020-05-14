@@ -5,7 +5,6 @@ import { socket } from "../../client-socket";
 import { connect } from 'react-redux';
 import { card_svgs } from '../card_svgs';
 
-
 class DecResponse extends Component {
     constructor(props){
         super(props);

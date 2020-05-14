@@ -5,10 +5,6 @@ import { connect } from 'react-redux';
 import { card_svgs } from '../card_svgs';
 import { halfSuits } from '../card_objs';
 
-import "../styles/game.scss";
-import "../styles/cards.scss";
-import "../styles/declare.scss";
-
 class Declare extends Component {
     constructor(props){
         super(props);
