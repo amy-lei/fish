@@ -12,7 +12,7 @@ import {
 import { Redirect } from 'react-router'; 
 import Chat from "./Chat.js";
 
-const MAX_PLAYERS = 4;
+const MAX_PLAYERS = 5;
 const FACES = [':)', '•_•', '=U','°_o',':O','°Д°'];
 
 // const FAKE_PEOPLE = [
@@ -62,44 +62,34 @@ class WaitingRoom extends Component {
         };
         this.key_ref = React.createRef();
 
-        // update when someone leaves
-        socket.on("updatedPlayerList", (update) => {
-            const { playerList, targetIndex } = update;
-            console.log('before', this.state.players);
-            console.log('given', playerList, targetIndex);
-            console.log('your name', this.props.name);
-            console.log('your name via state', this.state.name);
-            console.log('your index', this.props.index);
-            console.log('your index via state', this.state.index);
-            this.setState({
-                players: playerList,
-                // index: playerList.filter((player) => player.name === this.props.name)[0].index, //gets the new index of the player
-            }, () => {
-                this.props.setPlayers(this.state.players);
-                // console.log('after', this.state.players)
-                // this.props.updateIndex(this.state.index);
-            });
-        });
+
     };
 
     componentDidMount() {
-        const { index, players } = this.state;
+        // update when someone leaves
+        socket.on("updatedPlayerList", (list) => {
+            this.setState({
+                players: list,
+            });
+            this.props.setPlayers(list);
+            const filteredPlayers = list.filter((player) => player.name === this.props.name);
+            if (filteredPlayers.length > 0) {
+                const newIndex = filteredPlayers[0].index;
+                this.setState({ index: newIndex });
+                this.props.updateIndex(newIndex);
+            }
+        });
 
         // update when someone joins
-        socket.on("joinedWaitingRoom", (newList) => {
-            console.log('started with',players);
-            this.setState({
-                players: newList
-            }, () => {
-                this.props.setPlayers(newList);
-                console.log('now', this.state.players)
-            });
+        socket.on("joinedWaitingRoom", (list) => {
+            this.setState({ players: list });
+            this.props.setPlayers(list);
         });
 
 
         // set up game when someone hits start 
         socket.on("startGame", (info) => {
-            this.props.setHand(info.cards[index || 0]);
+            this.props.setHand(info.cards[this.props.index || 0]);
             this.setUpGame();
             this.setState({ redirect: true });
         });
@@ -131,8 +121,6 @@ class WaitingRoom extends Component {
         and update your hand
      */
     setUpGame = () => {
-        console.log(this.state.index);
-        console.log(this.props.name);
         let otherTeam = [];
         let yourTeam = [];
         const parity = this.state.index % 2;

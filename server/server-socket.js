@@ -55,7 +55,7 @@ const updateGamePlayerList = (user, roomKey) => {
         game.save();
         console.log('after', game.players);
         getAllSocketsFromGame(roomKey).forEach(client => {
-          client.emit("updatedPlayerList", {playerList, targetIndex});
+          client.emit("updatedPlayerList", playerList);
         })
       })
 };

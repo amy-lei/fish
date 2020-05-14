@@ -25,7 +25,6 @@ class Respond extends Component {
             roomkey } = this.props;
         const lastAsk = history[history.length - 1]
         const card = lastAsk.card;
-        console.log('passed thru?', card);
         const { have } = hasCard(hand, card);
         const body = {
             key: roomkey,

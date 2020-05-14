@@ -5,14 +5,13 @@ import {
 
 const initialState = {
     name: '',
-    index: 0,
+    index: null,
     isCreator: false,
 };
 
 export default (state = initialState, action) => {
     switch (action.type) {
         case ENTER_GAME:
-            console.log('aciton ', action.payload);
             return {
                 name: action.payload.name,
                 index: action.payload.index,
@@ -21,7 +20,7 @@ export default (state = initialState, action) => {
         case UPDATE_INDEX:
             return {
                 ...state,
-                index: action.payload.index,
+                index: action.payload,
             };
         default:
             return state;
