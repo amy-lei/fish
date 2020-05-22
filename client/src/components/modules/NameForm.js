@@ -130,6 +130,12 @@ class NameForm extends Component {
                         Join
                     </button>
                 </div>
+                <button
+                    onClick={() => this.props.goBack()}
+                    className="btn primary-btn long-btn"
+                >
+                    Back
+                </button>
             </>
         )
     }

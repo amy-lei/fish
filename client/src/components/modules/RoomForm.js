@@ -16,7 +16,7 @@ class RoomForm extends Component {
     createRoom = () => {
         this.props.changeView();
         this.props.updateCreator();
-    }
+    };
 
     keyChange = (e) => {
         this.setState({

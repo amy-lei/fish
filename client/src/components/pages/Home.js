@@ -35,6 +35,7 @@ class Home extends Component {
                             : <NameForm
                                 isCreator={this.state.isCreator}
                                 redirect={(room) => this.setState({ redirect: room })}
+                                goBack={() => this.setState({ view: "room" })}
                             />
                         }
                     </div>
