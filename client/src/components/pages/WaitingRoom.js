@@ -61,8 +61,6 @@ class WaitingRoom extends Component {
             index: this.props.index,
         };
         this.key_ref = React.createRef();
-
-
     };
 
     componentDidMount() {

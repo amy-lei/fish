@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import { connect } from 'react-redux';
-import { hasCard } from "../../game-utilities";
+import { hasCard, nameOfCard } from "../../game-utilities";
 import { post } from "../../utilities";
 import { card_svgs } from '../card_svgs';
 
@@ -65,10 +65,8 @@ class Respond extends Component {
                     </div>
                     <div className='playroom-section respond-section'>
                         <label>
-                            {asker} asked for the &nbsp;
-                            {this.props.history[this.props.history.length - 1].card.rank} &nbsp;
-                            {this.props.history[this.props.history.length - 1].card.suit}
-                            .Respond with a message:
+                            {asker} asked for the {nameOfCard(this.props.history[this.props.history.length - 1].card)}
+                            . Respond with a message:
                         </label>
                         <input 
                             className="respond-input"

@@ -27,7 +27,7 @@ class Chat extends Component {
     socket.on("joinedWaitingRoom", (newPlayer) => {
       const joinedMessage = {
         sender_name: "server",
-        content: newPlayer.name + " has joined the room.",
+        content: newPlayer[newPlayer.length - 1].name + " has joined the room.",
       };
       this.setState({
         allMessages: this.state.allMessages.concat(joinedMessage),
