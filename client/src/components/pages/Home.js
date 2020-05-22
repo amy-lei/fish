@@ -40,7 +40,6 @@ class Home extends Component {
                     </div>
 
                 </div>
-                {/* <img className='home-illustration' src={landing_illustration}/> */}
             </div>
         </>)
     }

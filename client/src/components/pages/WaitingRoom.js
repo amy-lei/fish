@@ -13,7 +13,7 @@ import {
 import { Redirect } from 'react-router'; 
 import Chat from "./Chat.js";
 
-const MAX_PLAYERS = 6;
+const MAX_PLAYERS = 2;
 const FACES = [':)', '•_•', '=U','°_o',':O','°Д°'];
 
 // const FAKE_PEOPLE = [
@@ -61,8 +61,6 @@ class WaitingRoom extends Component {
             index: this.props.index,
         };
         this.key_ref = React.createRef();
-
-
     };
 
     componentDidMount() {
