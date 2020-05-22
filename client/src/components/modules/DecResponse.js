@@ -9,16 +9,15 @@ class DecResponse extends Component {
     constructor(props){
         super(props);
         this.state = {
-            lie: false,
+            lieAboutAccept: false,
+            lieAboutObject: false,
             votes: { agree: 0, object: 0 },
             voted: false,
         };
     }
     /*
         STEP 1 of declaring: 
-
-        Submit your response to the declare
-        and alert others. 
+        Submit response to the declare and alert others. 
         If OBJECT, validate the objection first
      */
     resToDeclare = async (bool) => {
@@ -34,22 +33,23 @@ class DecResponse extends Component {
             player: name, 
             agree: bool,
         };
-        if (bool) await post("/api/vote", body);
+        if (bool) {
+            if (!canObject(hand, guess, name)) await post("/api/vote", body);
+            else this.setState({ lieAboutAccept: true });
+        }
         else {
             // validate objections first
             if (canObject(hand, guess, name)){
                 await post("/api/vote", body);
-                this.setState({lie: false});
+                this.setState({lieAboutObject: false});
             } 
-            else this.setState({lie:true}); 
+            else this.setState({lieAboutObject:true}); 
         }
     }
     /*
         STEP 2 of declaring:
-
         Once everyone has voted, check for any objections
-        (which results in other team gaining the point). 
-        Announce results.
+        (which results in other team gaining the point) and announce results.
 
      */
     endDeclare = async () => {
@@ -63,7 +63,7 @@ class DecResponse extends Component {
         };
         // reset declaring states
         this.setState({
-            lie: false,
+            lieAboutObject: false,
             voted: false,
             votes: [],
         });
@@ -120,7 +120,8 @@ class DecResponse extends Component {
         const {
             votes,
             voted,
-            lie,
+            lieAboutObject,
+            lieAboutAccept,
         } = this.state;
 
         let filler;
@@ -133,9 +134,9 @@ class DecResponse extends Component {
                 {declarer} is guessing
             </label>
 
-            instructions = <p> Please vote once a guess is submitted.
+            instructions = <p> Please vote once a guess is submitted. 
+                (No lying! Both buttons will be there for show.)
                 All players must agree for {declarer}'s team to earn a point. 
-                (No lying!)
             </p>
         } else {
             guesses = <>
@@ -158,15 +159,15 @@ class DecResponse extends Component {
             if (declarer !== name) {
                 voteButtons = <div className='vote-btns'>
                     <button
-                        className={`primary-btn short-btn vote-btn ${voted && 'disabled-btn'}`}
-                        disabled={voted}
+                        className={`primary-btn short-btn vote-btn ${(voted || lieAboutAccept) && 'disabled-btn'}`}
+                        disabled={voted || lieAboutAccept}
                         onClick={() => this.resToDeclare(true)}
                     >
                         Agree
                     </button>
                     <button
-                        className={`primary-btn short-btn vote-btn ${(voted || lie) && 'disabled-btn'}`}
-                        disabled={voted || lie}
+                        className={`primary-btn short-btn vote-btn ${(voted || lieAboutObject) && 'disabled-btn'}`}
+                        disabled={voted || lieAboutObject}
                         onClick={() => this.resToDeclare(false)}
                     >
                         Object
@@ -182,7 +183,10 @@ class DecResponse extends Component {
                 </button>
             }
         }
-
+        let lieWarning;
+        if ((lieAboutAccept || lieAboutObject) && !voted ) {
+            lieWarning = <p className='warning'>Don't lie! Please vote again, but correctly.</p>
+        }
         return (
             <div className='main-container vote playroom'>
                 <h2 className='playroom-label'>{declarer} Declared</h2>
@@ -203,7 +207,7 @@ class DecResponse extends Component {
                     </div>
                 </section>
                 {voteButtons}
-
+                {lieWarning}
             </div>
         )
     }
