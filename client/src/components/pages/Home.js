@@ -3,6 +3,7 @@ import { Redirect } from 'react-router';
 import logo from "../../public/logo.svg";
 import NameForm from '../modules/NameForm';
 import RoomForm from '../modules/RoomForm';
+import Help from '../modules/Help'
 
 class Home extends Component {
     constructor(props) {
@@ -11,6 +12,7 @@ class Home extends Component {
             redirect: '',
             isCreator: false,
             view: "room",
+            showHelp: false,
         }
     }
 
@@ -41,6 +43,13 @@ class Home extends Component {
                     </div>
 
                 </div>
+                <button className='help-button' onClick={() => this.setState({ showHelp: true })}>
+                    ?
+                </button>
+                {
+                    this.state.showHelp
+                    && <Help closeHelp={() => this.setState({ showHelp: false })}/>
+                }
                 {/* <img className='home-illustration' src={landing_illustration}/> */}
             </div>
         </>)
