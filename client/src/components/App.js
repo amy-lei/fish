@@ -21,7 +21,7 @@ class App extends Component {
     return (
       <GlobalStore>
         <Router>
-          <Suspense fallback={Loading}>
+          <Suspense fallback={<Loading/>}>
             <Route 
               exact path='/' 
               component={Home}
