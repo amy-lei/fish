@@ -4,7 +4,7 @@ import { post } from '../utilities';
 import { splitPlayers } from '../game-utilities';
 
 const Context = React.createContext({});
-const WIN = 1; // FIX WHEN LAUNCH!!!
+const WIN = 5; // FIX WHEN LAUNCH!!!
 
 /*
   Store for game constants that only need to be initialized
