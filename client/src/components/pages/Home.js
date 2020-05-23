@@ -9,7 +9,6 @@ class Home extends Component {
         super(props);
         this.state = {
             redirect: '',
-            isCreator: false,
             view: "room",
         }
     }
@@ -30,10 +29,8 @@ class Home extends Component {
                             this.state.view === "room"
                             ? <RoomForm
                                 changeView={() => this.setState({view: "name"})}
-                                updateCreator={() => this.setState({ isCreator: true })}
                             />
                             : <NameForm
-                                isCreator={this.state.isCreator}
                                 redirect={(room) => this.setState({ redirect: room })}
                             />
                         }

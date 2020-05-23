@@ -167,11 +167,6 @@
     }
 }
 
-.disabled-btn {
-    @include solid-btn($out, $out);
-    cursor: not-allowed !important;
-}
-
 .hidden {
     display:none !important;
 }

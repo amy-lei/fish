@@ -1,20 +1,23 @@
 import React, { Component } from "react";
-import { connect } from 'react-redux';
+import GlobalContext from '../../context/GlobalContext';
 import { nameOfCard } from '../../game-utilities';
 
 const FACES = [':)', '•_•', '=U','°_o',':O','°Д°'];
 
 class GameHistory extends Component {
+
+    static contextType = GlobalContext; 
+    
     constructor(props){
         super(props);
         this.state = {};
     }
 
     createHistory = (history, all) => {
-        return history.map(move => {
+        return history.map((move, i) => {
             if (move.type === 'ASK')
                 return (
-                    <div className={`message history_move ${all? "left":""}`}>
+                    <div key={i} className={`message history_move ${all? "left":""}`}>
                         <div className={`message_img ${
                             move.asker.index % 2 == 0? 'team-even' : 'team-odd'}`}>
                             {FACES[move.asker.index]} 
@@ -32,7 +35,7 @@ class GameHistory extends Component {
             else {
                 const result = move.success ? "did" : "did not";
                 return (
-                    <>
+                    <React.Fragment key={i}>
                         <div className={`message history_move ${all?"left":""}`}>
                             <div className={`message_img ${
                                 move.responder.index % 2 == 0? 'team-even' : 'team-odd'}`}>
@@ -50,7 +53,7 @@ class GameHistory extends Component {
                         <div className="server-message history_move-result">
                             {move.responder.name} {result} have the {nameOfCard(move.card)}
                         </div>
-                    </>
+                    </React.Fragment>
                 );
             }
         });
@@ -63,12 +66,12 @@ class GameHistory extends Component {
     }
 
     render() {
+        const { all } = this.props;
         const {
             history,
-            all,
             whoseTurn,
             turnType,
-        } = this.props;
+        } = this.context;
         const historyInfo = this.createHistory(history, all);
 
         return (
@@ -82,10 +85,4 @@ class GameHistory extends Component {
     }
 }
 
-const mapStatesToProps = (state) => ({
-    history: state.history,
-    whoseTurn: state.turnInfo.whoseTurn,
-    turnType: state.turnInfo.turnType,
-});
-
-export default connect(mapStatesToProps)(GameHistory);
+export default GameHistory;

@@ -1,19 +1,12 @@
 import React, { Component } from "react";
 import { post } from "../../utilities";
-import { connect } from 'react-redux';
-import { joinGame } from '../../actions/userActions';
 import { socket } from "../../client-socket";
-import { 
-    setRoomKey,
-    updateTurn,
-    updateHistory,
-    declareResults,
-    setTeams,
-    setPlayers,
-} from '../../actions/gameActions';
-
+import GlobalContext from '../../context/GlobalContext';
 
 class NameForm extends Component {
+
+    static contextType = GlobalContext;
+
     constructor(props) {
         super(props);
         this.state = {
@@ -37,7 +30,7 @@ class NameForm extends Component {
         if (!e || e.key === "Enter") {
             this.setState({clickedButton: true}, 
                 () => {
-                    this.props.isCreator 
+                    this.context.isCreator 
                         ? this.createRoom(name)
                             : this.enterRoom(name)
                 });
@@ -54,12 +47,8 @@ class NameForm extends Component {
             socketid: socket.id,
         };
         const game = await post('/api/create_room', body);
-        this.props.joinGame(name, 0, true);
-        this.props.setRoomKey(game.key);
-        this.props.updateTurn(name, 'ASK');
-        this.props.setPlayers(game.players);
+        this.context.createRoom(name, game);
         this.props.redirect('lobby');
-
     };
 
     enterRoom = async (name) => {
@@ -69,44 +58,16 @@ class NameForm extends Component {
         }
         const body = {
             playerName: name,
-            room_key: this.props.roomkey,
+            room_key: this.context.roomkey,
             socketid: socket.id,
         };
         const roomInfo = await post('/api/join_room', body);
-        const game = roomInfo.game;
-        const self = roomInfo.self;
-        if (roomInfo.return) {
-            const otherTeam = [];
-            const yourTeam = [];
-            let yourScore;
-            let otherScore;
-            const parity = info.self.index % 2;
-            game.players.forEach((player) => {
-                if (player.index % 2 === parity) yourTeam.push(player);
-                else otherTeam.push(player);
-            });
-            if (parity) {
-                yourScore = game.even;
-                otherScore = game.odd;
-            } else {
-                yourScore = game.odd;
-                otherScore = game.even;
-            }
-            this.props.setTeams(yourTeam, otherTeam);
-            this.props.declareResults(yourScore, otherScore);
-            this.props.updateHistory(game.history);
+        this.context.enterRoom(roomInfo);
+        if (roomInfo.game.start) {
             this.props.redirect('play');
         } else {
-            this.setState({
-                page: "waiting_room",
-                isCreator: false,
-                info: game,
-            });
-            this.props.setPlayers(game.players);
             this.props.redirect('lobby');
         }
-        this.props.updateTurn(game.whoseTurn, game.turnType);
-        this.props.joinGame(self.name, self.index, false);
     }
 
     render() {
@@ -135,18 +96,4 @@ class NameForm extends Component {
     }
 }
 
-const mapStateToProps = (state) => ({
-    roomkey: state.roomkey,
-});
-
-const mapDispatchToProps = {
-    setRoomKey,
-    updateTurn,
-    updateHistory,
-    declareResults,
-    setPlayers,
-    setTeams,
-    joinGame,
-}
-
-export default connect(mapStateToProps, mapDispatchToProps)(NameForm);
+export default NameForm;

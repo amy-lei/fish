@@ -2,10 +2,11 @@ import React, { Component } from "react";
 import { post } from "../../utilities";
 import { canObject } from "../../game-utilities";
 import { socket } from "../../client-socket";
-import { connect } from 'react-redux';
 import { card_svgs } from '../card_svgs';
+import GlobalContext from '../../context/GlobalContext';
 
 class DecResponse extends Component {
+    static contextType = GlobalContext;
     constructor(props){
         super(props);
         this.state = {
@@ -26,7 +27,7 @@ class DecResponse extends Component {
             guess,
             name,
             roomkey,
-        } = this.props;
+        } = this.context;
 
         const body = {
             key: roomkey,
@@ -39,7 +40,7 @@ class DecResponse extends Component {
         }
         else {
             // validate objections first
-            if (canObject(hand, guess, name)){
+            if (canObject(hand, this.props.guess, name)){
                 await post("/api/vote", body);
                 this.setState({lieAboutObject: false});
             } 
@@ -55,10 +56,10 @@ class DecResponse extends Component {
     endDeclare = async () => {
         // check for objections
         const objections = this.state.votes.object > 0;
-        const even = this.props.index % 2 === 0; // your team
+        const even = this.context.index % 2 === 0; // your team
         const body = {
             even: objections ? !even : even,
-            key: this.props.roomkey, 
+            key: this.context.roomkey, 
             halfSuit: this.props.halfSuit,
         };
         // reset declaring states
@@ -74,7 +75,7 @@ class DecResponse extends Component {
         // update when someone submits their res to declare
         socket.on("vote", vote => {
             const { votes } = this.state;
-            if (vote.name === this.props.name) this.setState({voted: true});
+            if (vote.name === this.context.name) this.setState({ voted: true });
             this.setState({ votes: {
                 agree: vote.agree ? votes.agree + 1 : votes.agree,
                 object: vote.agree ? votes.object : votes.object + 1,
@@ -112,17 +113,15 @@ class DecResponse extends Component {
         const {
             declarer,
             guess,
-            name,
-            hand,
             minVotes,
         } = this.props;
-
         const {
             votes,
             voted,
             lieAboutObject,
             lieAboutAccept,
         } = this.state;
+        const { name, hand } = this.context;
 
         let filler;
         let guesses;
@@ -148,8 +147,8 @@ class DecResponse extends Component {
             
             voteResults = 
                 <div className='vote-res_container'>
-                        {Object.keys(votes).map((op) => 
-                        <div className='vote-res_category'>
+                        {Object.keys(votes).map((op, i) => 
+                        <div key={i} className='vote-res_category'>
                             <label>{op}</label>
                             <div className={`vote-res_bar vote-res_bar-${votes[op]} ${op}`}></div>
                             <p className='vote-res_amount'>{votes[op]}</p>
@@ -213,11 +212,4 @@ class DecResponse extends Component {
     }
 }
 
-const mapStateToProps = (state) => ({
-    name: state.user.name,
-    index: state.user.index,
-    roomkey: state.roomkey,
-    hand: state.hand,
-});
-
-export default connect(mapStateToProps)(DecResponse);
+export default DecResponse;
