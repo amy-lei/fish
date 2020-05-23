@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import { post } from "../../utilities";
 import { connect } from 'react-redux';
 import { joinGame } from '../../actions/userActions';
+import GlobalContext from '../../context/GlobalContext';
 import { socket } from "../../client-socket";
 import { 
     setRoomKey,
@@ -14,6 +15,9 @@ import {
 
 
 class NameForm extends Component {
+
+    static contextType = GlobalContext;
+
     constructor(props) {
         super(props);
         this.state = {
@@ -37,7 +41,7 @@ class NameForm extends Component {
         if (!e || e.key === "Enter") {
             this.setState({clickedButton: true}, 
                 () => {
-                    this.props.isCreator 
+                    this.context.isCreator 
                         ? this.createRoom(name)
                             : this.enterRoom(name)
                 });
@@ -59,6 +63,9 @@ class NameForm extends Component {
         this.props.updateTurn(name, 'ASK');
         this.props.setPlayers(game.players);
         this.props.redirect('lobby');
+
+        this.context.setRoomKey(game.key);
+        this.context.updateSelf(name, 0);
 
     };
 
@@ -107,6 +114,8 @@ class NameForm extends Component {
         }
         this.props.updateTurn(game.whoseTurn, game.turnType);
         this.props.joinGame(self.name, self.index, false);
+        this.context.updateSelf(self.name, self.index);
+        
     }
 
     render() {

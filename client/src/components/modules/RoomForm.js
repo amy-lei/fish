@@ -2,8 +2,12 @@ import React, { Component } from "react";
 import { post } from "../../utilities";
 import { connect } from 'react-redux';
 import { setRoomKey } from '../../actions/gameActions';
+import GlobalContext from '../../context/GlobalContext';
 
 class RoomForm extends Component {
+    
+    static contextType = GlobalContext;
+
     constructor(props) {
         super(props);
         this.state = {
@@ -16,6 +20,7 @@ class RoomForm extends Component {
     createRoom = () => {
         this.props.changeView();
         this.props.updateCreator();
+        this.context.toggleCreator(true);
     }
 
     keyChange = (e) => {
@@ -33,6 +38,8 @@ class RoomForm extends Component {
         if (canJoin) {
             this.props.setRoomKey(roomKey);
             this.props.changeView();
+            this.context.setRoomKey(roomKey);
+            this.context.toggleCreator(false);
         }
         else {
             this.setState({roomKeyError: true})

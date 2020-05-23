@@ -12,8 +12,9 @@ import {
  } from '../../actions/gameActions';
 import { Redirect } from 'react-router'; 
 import Chat from "./Chat.js";
+import GlobalContext from '../../context/GlobalContext';
 
-const MAX_PLAYERS = 6;
+const MAX_PLAYERS = 2;
 const FACES = [':)', '•_•', '=U','°_o',':O','°Д°'];
 
 // const FAKE_PEOPLE = [
@@ -51,6 +52,9 @@ const FACES = [':)', '•_•', '=U','°_o',':O','°Д°'];
 const FAKE_PEOPLE = [];
 
 class WaitingRoom extends Component {
+
+    static contextType = GlobalContext;
+
     constructor(props) {
         super(props);
         this.state = {
@@ -70,6 +74,10 @@ class WaitingRoom extends Component {
                 players: list,
             });
             this.props.setPlayers(list);
+            console.log('contextname', this.context.name);
+            console.log('contextindex',this.context.index);
+            console.log('context', list.filter((player) => player.name === this.context.name))
+            console.log('redux', list.filter((player) => player.name === this.props.name))
             const filteredPlayers = list.filter((player) => player.name === this.props.name);
             // find and update index
             if (filteredPlayers.length > 0) {

@@ -8,6 +8,7 @@ import DecResponse from "../modules/DecResponse.js";
 import GameHistory from '../modules/GameHistory';
 import ViewHand from '../modules/ViewHand';
 import Header from '../modules/Header';
+import GlobalContext from '../../context/GlobalContext';
 import { connect } from 'react-redux';
 import { Redirect } from 'react-router';
 import {
@@ -24,6 +25,9 @@ import {
 const WIN = 5; // FIX WHEN LAUNCH!!!
 
 class PlayRoom extends Component {
+    
+    static contextType = GlobalContext;
+
     constructor(props) {
         super(props);
         this.state = {
@@ -109,6 +113,8 @@ class PlayRoom extends Component {
 
         // update turn and hand if successful
         socket.on("respond", update => {
+            console.log('redux', this.props.index);
+            console.log('context', this.context.index);
             const turn = update.move.success ? update.move.asker.name: update.move.responder.name;
             if (update.move.success) {
                 if (update.move.responder.name === this.props.name) {
