@@ -38,12 +38,29 @@ router.post("/chat", (req, res) => {
     });
 });
 
-// return whether a game with the given key exists
+// return whether a game with the given key exists/has room
 router.post("/check_room", (req, res) => {
     const requested_key = req.body.roomkey;
     Game.find({key: requested_key})
         .then((foundGame) => {
-            res.send(foundGame.length === 1);
+            if (foundGame.length === 1) {
+                if (foundGame[0].players.length === 6) {
+                    res.send({
+                        canJoin: false,
+                        reason: 'Room is already full',
+                    });
+                } else {
+                    res.send({
+                        canJoin: true,
+                        reason: '',
+                    });
+                }
+            } else {
+                res.send({
+                    canJoin: false,
+                    reason: 'Invalid room key',
+                });
+            }
         });
 });
 
