@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import GlobalContext from '../../context/GlobalContext';
 import { nameOfCard } from '../../game-utilities';
 
+const PARITY_TO_TEAM = { "even": "BLUE", "odd": "RED" };
 const FACES = [':)', '•_•', '=U','°_o',':O','°Д°'];
 
 class GameHistory extends Component {
@@ -60,6 +61,11 @@ class GameHistory extends Component {
     }
 
     createTurnInfo = (whoseTurn, turnType) => {
+        if (this.context.winner !== '') {
+            return <label className='turn-type'>
+                {`GAME OVER! Team ${PARITY_TO_TEAM[this.context.winner]} won!`}
+            </label>
+        }
         return <label className='turn-type'>
             {`It is ${whoseTurn}'s turn to ${turnType}`}
         </label>

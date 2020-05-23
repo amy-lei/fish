@@ -24,7 +24,6 @@ class DecResponse extends Component {
     resToDeclare = async (bool) => {
         const {
             hand,
-            guess,
             name,
             roomkey,
         } = this.context;
@@ -35,7 +34,7 @@ class DecResponse extends Component {
             agree: bool,
         };
         if (bool) {
-            if (!canObject(hand, guess, name)) await post("/api/vote", body);
+            if (!canObject(hand, this.props.guess, name)) await post("/api/vote", body);
             else this.setState({ lieAboutAccept: true });
         }
         else {

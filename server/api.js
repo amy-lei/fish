@@ -275,6 +275,7 @@ router.post("/score", (req, res)=> {
             game.hands.forEach((hand, i) => {
                 const newHand = removeHalfSuit(hand, req.body.halfSuit);
                 updatedHands.push(newHand);
+                game.players[i].numOfCards = newHand.length;
                 if (newHand.length === 0) {
                     game.players[i].active = false;
                 }

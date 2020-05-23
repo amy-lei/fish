@@ -4,7 +4,7 @@ import { post } from '../utilities';
 import { splitPlayers } from '../game-utilities';
 
 const Context = React.createContext({});
-const WIN = 5; // FIX WHEN LAUNCH!!!
+const WIN = 1; // FIX WHEN LAUNCH!!!
 
 /*
   Store for game constants that only need to be initialized
@@ -114,7 +114,6 @@ export class GlobalStore extends Component {
         // find the team the player is in
         const mapIndexToPlayer = {};
         [otherTeam, yourTeam].forEach((team) => {
-            console.log(team);
             team.forEach((player) => {
                 mapIndexToPlayer[player.index] = player;
             })});
@@ -170,7 +169,6 @@ export class GlobalStore extends Component {
       send alert to others that you're out
     */
     announceOut = () => {
-        console.log('out');
         const body = {
             key: this.state.roomkey,
             index: this.state.index,
@@ -192,7 +190,6 @@ export class GlobalStore extends Component {
         socket.on('updatedPlayerList', (list) => {
             this.setState({ players: list });
             const self = list.find((player) => player.name === this.state.name);
-            console.log('found', self);            
             if (self) {
                 this.setState({ index: self.index });
                 
@@ -209,8 +206,8 @@ export class GlobalStore extends Component {
 
         // update hand and teams when game starts
         socket.on('startGame', (info) => {
-            const { players, index } = this.state;
-            const { yourTeam, otherTeam } = splitPlayers(players, index);
+            const { index } = this.state;
+            const { yourTeam, otherTeam } = splitPlayers(info.players, index);
             this.setState({
                 hand: info.cards[index],
                 yourTeam, 

@@ -78,19 +78,6 @@ export const canObject = (hand, declare, name) => {
 }
 
 /*
-    Returns the hand with all of specified 
-    half suit removed 
-
-    @hand (array): list of cards
-    @declare (array): list of guesses 
- */
-export const removeHalfSuit = (hand, halfSuit) => {
-    return hand.filter(card => 
-                card.halfSuit !== halfSuit
-        );
-}
-
-/*
     Returns the proper naming of the card
     Normal cards will be (rank) of (suit)
     Jokers will be (suit) (rank)

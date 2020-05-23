@@ -1,7 +1,6 @@
 import React, { Component } from "react";
 import logo from "../../public/header_logo.svg";
 
-const PARITY_TO_TEAM = { "even": "BLUE", "odd": "RED" };
 
 class Header extends Component {
     constructor(props) {
@@ -17,6 +16,7 @@ class Header extends Component {
             showRespond,
             showDeclare,
         } = this.props;
+        const gameOver = winner !== '';
 
         const viewCards = (
             <button 
@@ -27,9 +27,9 @@ class Header extends Component {
             </button>);
         const declare = (
             <button 
-                className={`short-btn primary-btn header-btn ${!showDeclare && 'disabled-btn'} ${view === 'declare' && 'active-btn'}`}
+                className={`short-btn primary-btn header-btn ${(!showDeclare || gameOver) && 'disabled-btn'} ${view === 'declare' && 'active-btn'}`}
                 onClick={() => this.props.changeView('declare')}
-                disabled={!showDeclare}>
+                disabled={!showDeclare || gameOver}>
                 Declare
                 {view !== 'declare' 
                 && <span className='tooltip tooltip-left'>You cannot back out of a declare once you begin</span>
@@ -37,31 +37,27 @@ class Header extends Component {
             </button>);
         const ask = (
             <button 
-                className={`short-btn primary-btn header-btn ${!showAsk && 'disabled-btn'} ${view === 'ask' && 'active-btn'}`}
+                className={`short-btn primary-btn header-btn ${(!showAsk || gameOver) && 'disabled-btn'} ${view === 'ask' && 'active-btn'}`}
                 onClick={() => this.props.changeView('ask')}
-                disabled={!showAsk}>
+                disabled={!showAsk || gameOver}>
                     Ask
             </button>);
         const respond = (
             <button 
-                className={`short-btn primary-btn header-btn ${!showRespond && 'disabled-btn'} ${view === 'respond' && 'active-btn'}`}
+                className={`short-btn primary-btn header-btn ${(!showRespond || gameOver) && 'disabled-btn'} ${view === 'respond' && 'active-btn'}`}
                 onClick={() => this.props.changeView('respond')}
-                disabled={!showRespond}>
+                disabled={!showRespond || gameOver}>
                     Respond
             </button>);
         
-        const gameOver = winner !== '';
-        let buttons;
-        if (!gameOver) {
-            buttons = (
-                <div className="header-btns">
-                    {viewCards}
-                    {declare}
-                    {ask}
-                    {respond}
-                </div>
-            );
-        }
+        const buttons = (
+            <div className="header-btns">
+                {viewCards}
+                {declare}
+                {ask}
+                {respond}
+            </div>
+        );
 
         return (
             <div className="header"> 
