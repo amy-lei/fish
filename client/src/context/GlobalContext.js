@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { socket } from '../client-socket';
+import { post } from '../utilities';
 import { splitPlayers } from '../game-utilities';
 
 const Context = React.createContext({});
@@ -13,9 +14,10 @@ export class GlobalStore extends Component {
     state = {
         name: '',
         index: 0,
-        isReady: false,
         roomkey: '',
+        isReady: false,
         isCreator: false,
+        hand: [],
         players: [],
         turnType: 'ASK',
         whoseTurn: '',
@@ -100,7 +102,8 @@ export class GlobalStore extends Component {
 
       @player (object): player who ran out of cards
     */
-   adjustTurn = (player) => {
+
+    adjustTurn = (player) => {
         const {
             turnType,
             yourTeam,
@@ -110,52 +113,22 @@ export class GlobalStore extends Component {
         
         // find the team the player is in
         const mapIndexToPlayer = {};
-        [otherTeam, yourTeam].forEach((team) => 
+        [otherTeam, yourTeam].forEach((team) => {
+            console.log(team);
             team.forEach((player) => {
                 mapIndexToPlayer[player.index] = player;
-            }));
-        
-        let originalIndex;
-        let nextIndex;
-        let nextPlayer;
-        if (turnType === 'RESPOND') {
-            const prevTurn = history[history.length - 1];
-            originalIndex = prevTurn.asker.index;
-            nextPlayer = mapIndexToPlayer[originalIndex];
-            if (nextPlayer && nextPlayer.active) {
-                this.setState({
-                    whoseTurn: nextPlayer.name,
-                    turnType: 'ASK',
-                });
-                return;
-            }
-            nextIndex = (nextPlayer.index + 2) % 6;
-        } else {
-            originalIndex = player.index;
-            nextIndex = (player.index + 2) % 6;
-        }
+            })});
 
-        while (nextIndex !== originalIndex) {
-            nextPlayer = mapIndexToPlayer[nextIndex];
-            if (nextPlayer && nextIndex.active) {
-                this.setState({
-                    turnType: 'ASK',
-                    whoseTurn: nextPlayer.name,
-                });
-                return;
-            }
-            nextIndex = (nextIndex + 2) % 6;
-        }
-        return;
-
-        
         // if it was an ask, move it to next teammate
         if (turnType === 'ASK') {
             let nextIndex = (player.index + 2) % 6;
             while (nextIndex !== player.index) {
                 const nextPlayer = mapIndexToPlayer[nextIndex]
                 if (nextPlayer && nextPlayer.active) {
-                    this.props.updateTurn(nextPlayer.name, 'ASK');
+                    this.setState({ 
+                        whoseTurn: nextPlayer.name,
+                        turnType: 'ASK',
+                    });
                     return;
                 } else {
                     nextIndex = (nextIndex + 2) % 6;
@@ -168,14 +141,20 @@ export class GlobalStore extends Component {
             let askerIndex = prevTurn.asker.index;
             let nextPlayer = mapIndexToPlayer[askerIndex];
             if (nextPlayer && nextPlayer.active) {
-                this.props.updateTurn(nextPlayer.name, 'ASK');
+                this.setState({ 
+                    whoseTurn: nextPlayer.name,
+                    turnType: 'ASK',
+                });
                 return;
             } else {
                 nextIndex = (nextIndex + 2) % 6;
                 while (nextIndex !== askerIndex) {
                     nextPlayer = mapIndexToPlayer[nextIndex]
                     if (nextPlayer && nextPlayer.active) {
-                        this.props.updateTurn(nextPlayer.name, 'ASK');
+                        this.setState({ 
+                            whoseTurn: nextPlayer.name,
+                            turnType: 'ASK',
+                        });
                         return;
                     } else {
                         nextIndex = (nextIndex + 2) % 6;
@@ -190,24 +169,13 @@ export class GlobalStore extends Component {
       If hand is empty, it is your turn, and game is ongoing,
       send alert to others that you're out
     */
-    updateStanding = () => {
-        const { 
-            hand, 
-            whoseTurn, 
-            winner,
-            roomkey,
-            index,
-        } = this.state;
-
-        if (hand.length === 0 
-            && whoseTurn === name
-            && winner === '') {
-                const body = {
-                    key: roomkey,
-                    index,
-                }
-                post('/api/out', body);
+    announceOut = () => {
+        console.log('out');
+        const body = {
+            key: this.state.roomkey,
+            index: this.state.index,
         }
+        post('/api/out', body);
     }
 
     componentDidMount() {
@@ -278,7 +246,12 @@ export class GlobalStore extends Component {
                 hand: game.hands[this.state.index],
                 yourTeam,
                 otherTeam,
-            }, this.updateStanding);
+            }, () => {
+                if (this.state.hand.length === 0 
+                    && this.state.whoseTurn === this.state.name
+                    && this.state.winner === '') {
+                        this.announceOut();
+            }});
         });
 
         // update whose turn if original player out
@@ -293,7 +266,12 @@ export class GlobalStore extends Component {
                 yourTeam, 
                 otherTeam,
                 hand: update.g.hands[this.state.index],
-            }, this.updateStanding);
+            }, () => {
+                if (this.state.hand.length === 0 
+                    && this.state.whoseTurn === this.state.name
+                    && this.state.winner === '') {
+                        this.announceOut();
+            }});
 
             const even = this.state.index % 2 === 0;
             const gameOver = this.updateScore(even, update.g.even, update.g.odd);
@@ -315,6 +293,7 @@ export class GlobalStore extends Component {
                 setRoomKey: (roomkey) => this.setState({ roomkey }),
                 toggleCreator: (isCreator) => this.setState({ isCreator, isReady: isCreator }),
                 toggleReady: (isReady) => this.setState({ isReady }),
+                setHand: (hand) => this.setState({ hand }),
                 enterRoom: this.enterRoom,
                 createRoom: this.createRoom,
             }}

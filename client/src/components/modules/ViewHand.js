@@ -2,14 +2,23 @@ import React, { Component } from "react";
 import { card_svgs } from '../card_svgs';
 import GameStats from './GameStats';
 import GameHistory from './GameHistory';
+import GlobalContext from '../../context/GlobalContext';
+import { socket } from '../../client-socket';
 
 class ViewHand extends Component {
+    static contextType = GlobalContext;
     constructor(props) {
         super(props);
         this.state = {
             source: -1,
-            hand: this.props.hand,
+            hand: [],
         };
+    }
+    componentDidMount() {
+        this.setState({ hand: this.context.hand });
+        socket.on('respond', (game) => {
+            this.setState({ hand: game.hands[this.context.index] });
+        });
     }
 
     onDragStart = (e, index) => {
@@ -33,12 +42,12 @@ class ViewHand extends Component {
     };
 
     onDrop = (e, destination) => {
-        let currentHand = this.props.hand.slice();
+        let currentHand = this.context.hand.slice();
         const source = e.dataTransfer.getData("source");
         const droppedCard = currentHand[source];
         currentHand.splice(source, 1);
         currentHand.splice(destination, 0, droppedCard);
-        this.props.updateHand(currentHand);
+        this.context.setHand(currentHand);
         this.setState({ hand: currentHand, source: -1 });
     };
 

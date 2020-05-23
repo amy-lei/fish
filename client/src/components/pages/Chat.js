@@ -65,17 +65,16 @@ class Chat extends Component {
     });
 
     // update turn and hand if successful
-    socket.on("respond", update => {
-        if (!update.move.success) {
-          const turnUpdate = {
-            sender_name: "server",
-            content: `It is ${update.move.responder.name}'s turn to ask.`,
-          };
-          this.setState({
-            allMessages: this.state.allMessages.concat(turnUpdate),
-          });
-        }
-    });
+    socket.on("respond", game => {
+        const turnUpdate = {
+          sender_name: "server",
+          content: `It is ${game.whoseTurn}'s turn to ask.`,
+        };
+        this.setState({
+          allMessages: this.state.allMessages.concat(turnUpdate),
+        });
+      }
+    );
   }
 
   componentDidUpdate () {
