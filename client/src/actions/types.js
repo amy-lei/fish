@@ -14,6 +14,7 @@ export const INIT_HAND = 'INIT_HAND';
 export const PLAYER_OUT = 'PLAYER_OUT';
 export const SET_TEAMS = 'SET_TEAMS';
 export const SET_PLAYERS = 'SET_PLAYERS';
+export const UPDATE_NUM_CARDS = 'UPDATE_NUM_CARDS';
 
 // actions for updating game state
 export const UPDATE_TURN = 'UPDATE_TURN';

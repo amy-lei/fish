@@ -109,6 +109,7 @@ class PlayRoom extends Component {
 
         // update turn and hand if successful
         socket.on("respond", update => {
+            console.log(update.g);
             const turn = update.move.success ? update.move.asker.name: update.move.responder.name;
             if (update.move.success) {
                 if (update.move.responder.name === this.props.name) {

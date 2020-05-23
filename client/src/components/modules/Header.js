@@ -32,7 +32,7 @@ class Header extends Component {
                 disabled={!showDeclare}>
                 Declare
                 {view !== 'declare' 
-                && <span className='tooltip'>You cannot back out of a declare once you begin</span>
+                && <span className='tooltip tooltip-left'>You cannot back out of a declare once you begin</span>
                 }
             </button>);
         const ask = (

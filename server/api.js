@@ -12,6 +12,7 @@ const router = express.Router();
 //initialize socket
 const socket = require("./server-socket");
 
+// get all chat messages from a given room
 router.get("/chat", (req, res) => {
   Message
     .find({key: req.query.room_key})
@@ -21,6 +22,7 @@ router.get("/chat", (req, res) => {
     });
 });
 
+// post a new message in the chat
 router.post("/chat", (req, res) => {
     const mes = new Message({
         sender_index: req.body.sender_index,
@@ -36,6 +38,7 @@ router.post("/chat", (req, res) => {
     });
 });
 
+// return whether a game with the given key exists
 router.post("/check_room", (req, res) => {
     const requested_key = req.body.roomKey;
     Game.find({key: requested_key})
@@ -44,12 +47,14 @@ router.post("/check_room", (req, res) => {
         });
 });
 
+// adds user to existing game or set user to active 
 router.post("/join_room", (req, res) => {
     const requestedRoomKey = req.body.room_key;
     const playerName = req.body.playerName;
     Game.findOne({key: requestedRoomKey})
         .then((foundGame) => {
           socket.addUser(foundGame.key, socket.getSocketFromSocketID(req.body.socketid), playerName);
+          // joining an ongoing game 
           if (foundGame.start) {
             let targetPlayer;
             for (let player of foundGame.players){
@@ -64,6 +69,7 @@ router.post("/join_room", (req, res) => {
               res.send({self: targetPlayer, game, return: true, ...g});
             });
           } else {
+            // join the lobby with other players
             const allPlayerNames = foundGame.players.map((player) => player.name);
             let newPlayerName = playerName;
             for (let i = 2; i < 7; i++) {
@@ -74,7 +80,11 @@ router.post("/join_room", (req, res) => {
                     newPlayerName = playerName + `${i}`;
                 }
             }
-            const newPlayer = {name: newPlayerName, index: foundGame.players.length, ready: false, active: true};
+            const newPlayer = {
+              name: newPlayerName, 
+              index: foundGame.players.length, 
+              ready: false, active: true
+            };
             foundGame.players.push(newPlayer);
             foundGame
               .save()
@@ -97,6 +107,7 @@ router.post("/create_room", (req, res) => {
             const existingRoomKeys = games.map((game) => game.key);
             const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
             let roomKey = "";
+            // create a unique 4-digit key
             while (true) {
                 for (let i = 0; i < 4; i++){
                     roomKey = roomKey.concat(chars[Math.floor(Math.random() * 36)]);
@@ -145,13 +156,23 @@ router.post("/start_game", (req, res) => {
   Game
     .findOne({ key: req.body.key })
     .then((game) => {
+      // split deck
       cards = gen_cards(game.players.length);
       game.hands = cards;
       game.start = true;
-      socket.getAllSocketsFromGame(game.key).forEach(client => {
-        client.emit("startGame", {cards: cards});
-      });
-      game.save().then(() => res.send(cards));
+      // update players 
+      for (let player of game.players) {
+        player.numOfCards = cards[player.index].length;
+      }
+      
+      game
+        .save()
+        .then((g) => {
+          socket.getAllSocketsFromGame(game.key).forEach(client => {
+            client.emit("startGame", { cards, players: g.players });
+          });
+          res.send(cards);
+        });
     });
 });
 
@@ -190,26 +211,34 @@ router.post("/respond", (req, res) => {
   Game
     .findOne({key: req.body.key})
     .then(game => {
+      // add move to history
       history = game.history;
       if (history.length == 4) history.shift();
       history.push(move);
-      socket.getAllSocketsFromGame(game.key).forEach(client => {
-        client.emit("respond", {history: history, move: move});
-      });
 
+      // update hands and num of cards if ask was successful 
       if (move.success) {
             // remove from responder
             newHand = game.hands[move.responder.index].filter(card => 
                 !(card.rank === move.card.rank && card.suit === move.card.suit));
             game.hands[move.responder.index] = newHand;
+            game.players[move.responder.index].numOfCards--;
             // add to asker
             game.hands[move.asker.index].push(move.card);
+            game.players[move.asker.index].numOfCards++;
             game.whoseTurn = req.body.asker.name;
       } else {
         game.whoseTurn = req.body.responder.name;
       }
       game.turnType = 'ASK';
-      game.save().then(()=>res.send({}));      
+      game
+        .save()
+        .then((g) => {
+          socket.getAllSocketsFromGame(game.key).forEach(client => {
+            client.emit("respond", { history, move, g });
+          });
+          res.send({})
+        });      
     })
 
 });

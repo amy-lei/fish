@@ -96,7 +96,7 @@ class WaitingRoom extends Component {
         // set up game and hand when game begins
         socket.on("startGame", (info) => {
             this.props.setHand(info.cards[this.props.index || 0]);
-            this.setUpGame();
+            this.setUpGame(info.cards);
             this.setState({ redirect: true });
         });
 
@@ -123,14 +123,15 @@ class WaitingRoom extends Component {
     };
 
     /*
-        Split players into team by their index
-        and update your hand
+        Split players into team by their index, 
+        update their num of cards, and update your hand
      */
-    setUpGame = () => {
+    setUpGame = (cards) => {
         let otherTeam = [];
         let yourTeam = [];
         const parity = this.state.index % 2;
         this.state.players.forEach((player) => {
+            player.numOfCards = cards[player.index].length;
             if (player.index % 2 === parity) yourTeam.push(player);
             else otherTeam.push(player);
         });
