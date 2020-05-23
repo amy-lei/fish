@@ -2,16 +2,9 @@ import React, { Component } from "react";
 import logo from "../../public/header_logo.svg";
 import { post } from "../../utilities";
 import { socket } from "../../client-socket";
-import { connect } from 'react-redux';
-import { updateIndex, changeCreator } from '../../actions/userActions';
-import { 
-    setPlayers,
-    setHand,
-    setTeams,
-    updateTurn,
- } from '../../actions/gameActions';
 import { Redirect } from 'react-router'; 
 import Chat from "./Chat.js";
+import GlobalContext from '../../context/GlobalContext';
 
 const MAX_PLAYERS = 6;
 const FACES = [':)', '•_•', '=U','°_o',':O','°Д°'];
@@ -48,94 +41,38 @@ const FACES = [':)', '•_•', '=U','°_o',':O','°Д°'];
 //         active: false,
 //     },
 // ]
-const FAKE_PEOPLE = [];
 
 class WaitingRoom extends Component {
+
+    static contextType = GlobalContext;
+
     constructor(props) {
         super(props);
         this.state = {
-            name: this.props.name,
             redirect: false,
-            isReady: false,
-            players: this.props.players,
-            index: this.props.index,
         };
         this.key_ref = React.createRef();
     };
 
     componentDidMount() {
-        // update player list and index when someone leaves
-        socket.on("updatedPlayerList", (list) => {
-            this.setState({
-                players: list,
-            });
-            this.props.setPlayers(list);
-            const filteredPlayers = list.filter((player) => player.name === this.props.name);
-            // find and update index
-            if (filteredPlayers.length > 0) {
-                const index = filteredPlayers[0].index;
-                this.setState({ index });
-                this.props.updateIndex(index);
-
-                // swap creator if necessary
-                if (index === 0) {
-                    this.ready(true);
-                    this.props.changeCreator();
-                    this.props.updateTurn(this.props.name, 'ASK');
-                }
-            }
-        });
-
-        // update player list when someone joins
-        socket.on("joinedWaitingRoom", (players) => {
-            this.setState({ players });
-            this.props.setPlayers(players);
-        });
-
-
-        // set up game and hand when game begins
-        socket.on("startGame", (info) => {
-            this.props.setHand(info.cards[this.props.index || 0]);
-            this.setUpGame();
+        socket.on('startGame', (info) => {
             this.setState({ redirect: true });
-        });
-
-        // updates ready or unready state
-        socket.on("ready", (readyInfo) => {
-            this.setState({players: readyInfo.playerList});
         });
     }
 
     start = async () => {
-        const body = {key: this.props.roomkey};
+        const body = {key: this.context.roomkey};
         await post("/api/start_game", body);
-        this.setUpGame();
     };
 
     ready = async (isReady) => {
-        this.setState({ isReady });
+        this.context.toggleReady(isReady);
         const body = {
-            key: this.props.roomkey,
-            playerName: this.props.name,
+            key: this.context.roomkey,
+            playerName: this.context.name,
             isReady,
         };
         const _ = await post("/api/ready", body);
-    };
-
-    /*
-        Split players into team by their index
-        and update your hand
-     */
-    setUpGame = () => {
-        let otherTeam = [];
-        let yourTeam = [];
-        const parity = this.state.index % 2;
-        this.state.players.forEach((player) => {
-            if (player.index % 2 === parity) yourTeam.push(player);
-            else otherTeam.push(player);
-        });
-        this.props.setTeams(yourTeam, otherTeam);
-
     };
 
     copyKey = () => {
@@ -149,26 +86,23 @@ class WaitingRoom extends Component {
     };
 
     render() {
+        const {
+            name,
+            index,
+            roomkey, 
+            players, 
+            isCreator,
+            isReady,
+        } = this.context;
+
         // only render if user inputed name and key
-        if (!(this.props.name || this.props.roomkey)) {
+        if (!(name || roomkey)) {
             return <Redirect to='/'/>;
         }
 
         if (this.state.redirect) {
             return <Redirect to='/play'/>;
         }
-
-        const {
-            name,
-            roomkey,
-            isCreator,
-        } = this.props;
-
-        const {
-            index,
-            isReady,
-            players
-        } = this.state;
 
         const placeholderPlayers = [...Array(6 - players.length).keys()].map((num) => (
             {name: `placeholder${num}`, index: -1, ready: false, active: false}
@@ -216,11 +150,11 @@ class WaitingRoom extends Component {
                         }
                     </div>
                     <div className="waiting-room_players">
-                        {this.state.players.concat(placeholderPlayers).map((player, k) => (
+                        {players.concat(placeholderPlayers).map((player, k) => (
                             <div key={k} className="player">
                                 <div className={`player-img ${player.index === -1 ? 'placeholder' 
                                                             : player.index % 2 === 0 
-                                                            ? 'team-even' : 'team-odd'} ${player.name === this.props.name && "YOU"}`}
+                                                            ? 'team-even' : 'team-odd'} ${player.name === name && "YOU"}`}
                                 >
                                     {FACES[player.index]}
                                 </div>
@@ -250,21 +184,4 @@ class WaitingRoom extends Component {
     }
 }
 
-const mapStateToProps = (state) => ({
-    name: state.user.name,
-    index: state.user.index,
-    isCreator: state.user.isCreator,
-    roomkey: state.roomkey,
-    players: state.players,
-});
-
-const mapDispatchToProps = {
-    setHand,
-    setTeams,
-    updateIndex,
-    setPlayers,
-    changeCreator,
-    updateTurn,
-};
-
-export default connect(mapStateToProps, mapDispatchToProps)(WaitingRoom);
+export default WaitingRoom;

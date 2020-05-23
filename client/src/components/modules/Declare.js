@@ -1,11 +1,12 @@
 import React, { Component } from "react";
 import { separateHalfSuit } from "../../game-utilities";
 import { post } from "../../utilities";
-import { connect } from 'react-redux';
 import { card_svgs } from '../card_svgs';
 import { halfSuits } from '../card_objs';
+import GlobalContext from '../../context/GlobalContext';
 
 class Declare extends Component {
+    static contextType = GlobalContext;
     constructor(props){
         super(props);
         this.state = {
@@ -69,13 +70,13 @@ class Declare extends Component {
         await post("/api/declare", {
             halfSuit: this.state.halfSuit, 
             guess: this.state.guess, 
-            key: this.props.roomkey
+            key: this.context.roomkey
         });
         this.props.changeView('vote');
     }
 
     resetGuesses = (callback) => {
-        const { yourTeam } = this.props;
+        const { yourTeam } = this.context;
         const guess = {};
         for (let player of yourTeam) {
             guess[player.name] = [];
@@ -85,10 +86,9 @@ class Declare extends Component {
 
     componentDidMount() {
         this.resetGuesses(() => {});
-        post("/api/pause", {key: this.props.roomkey, player: this.props.name});
+        post("/api/pause", {key: this.context.roomkey, player: this.context.name});
     }
 
-    
     createHand = (hand) => {
         return hand.map((card,i) => (
             <div draggable={true}>
@@ -119,7 +119,7 @@ class Declare extends Component {
 
     splitHand = (halfSuit) => {
         this.resetGuesses(() => {
-            const { name, hand } = this.props;
+            const { name, hand } = this.context;
             const { availableCards, ownCards } = separateHalfSuit(hand, halfSuits[halfSuit]);
             const guess = {...this.state.guess};
             guess[name] = this.state.guess[name].concat([...ownCards]);
@@ -151,14 +151,13 @@ class Declare extends Component {
     }
 
     createPlayerColumns = () => {
-        const { yourTeam } = this.props;
+        const { yourTeam } = this.context;
         const { guess } = this.state;
 
         return yourTeam.map((player, i) => 
-            <div className='declare-column'>
+            <div key={i} className='declare-column'>
                 <p>{player.name}</p>
                 <div 
-                    key={i} 
                     className='declare-input_player'
                     onDragOver={(e) => this.onDragOver(e)}
                     onDrop={(e) => this.onDrop(e, player.name)}
@@ -211,12 +210,4 @@ class Declare extends Component {
     }
 }
 
-const mapStateToProps = (state) => ({
-    name: state.user.name,
-    index: state.user.index,
-    hand: state.hand,
-    roomkey: state.roomkey,
-    yourTeam: state.teams.yourTeam,
-});
-
-export default connect(mapStateToProps)(Declare);
+export default Declare;

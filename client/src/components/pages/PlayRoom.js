@@ -8,22 +8,13 @@ import DecResponse from "../modules/DecResponse.js";
 import GameHistory from '../modules/GameHistory';
 import ViewHand from '../modules/ViewHand';
 import Header from '../modules/Header';
-import { connect } from 'react-redux';
+import GlobalContext from '../../context/GlobalContext';
 import { Redirect } from 'react-router';
-import {
-    declareResults,
-    updateTurn,
-    addCard,
-    removeCard,
-    removeSuit,
-    playerOut,
-    updateHistory,
-    setHand,
-} from '../../actions/gameActions';
-
-const WIN = 5; // FIX WHEN LAUNCH!!!
 
 class PlayRoom extends Component {
+    
+    static contextType = GlobalContext;
+
     constructor(props) {
         super(props);
         this.state = {
@@ -37,17 +28,6 @@ class PlayRoom extends Component {
         };
     }
 
-    // Update your score if true, others if false
-    updateScore = (even, evenScore, oddScore) => {
-        if (even) {
-            this.props.declareResults(evenScore, oddScore);
-        } else {
-            this.props.declareResults(oddScore, evenScore);
-        }
-        return evenScore === WIN || oddScore === WIN;
-    }
-
-    // TODO: refactor this!!!!!
     adjustTurn = (player) => {
         const {
             turnType,
@@ -101,49 +81,13 @@ class PlayRoom extends Component {
     }
 
     componentDidMount() {
-        // update history and update turn after an ask
-        socket.on("ask", update => {
-            this.props.updateHistory(update.history);
-            this.props.updateTurn(update.move.recipient, 'RESPOND');
-        });
-
-        // update turn and hand if successful
-        socket.on("respond", update => {
-            const turn = update.move.success ? update.move.asker.name: update.move.responder.name;
-            if (update.move.success) {
-                if (update.move.responder.name === this.props.name) {
-                    this.props.removeCard(
-                        this.props.roomkey,
-                        this.props.index,
-                        update.move.card,
-                    );
-                } else if (update.move.asker.name === this.props.name) {
-                    this.props.addCard(
-                        update.move.card,
-                    )
-                }
-            }
-            // update history
-            this.props.updateHistory(update.history);
-            this.props.updateTurn(turn, 'ASK');
-        });
-
-        socket.on("playerOut", who => {
-            this.props.playerOut(who.index);
-
-            // check if turn is affected / if game is ongoing
-            if (who.name === this.props.whoseTurn 
-                && this.state.winner === '') {
-                this.adjustTurn(who);
-            }
-        });
-
+        // pause game for non declarers
         socket.on("declaring", (info) => {
             this.setState({
                 declaring: true,
                 declarer: info.player,
             }, () => {
-                if (this.props.name !== info.player) {
+                if (this.context.name !== info.player) {
                     this.setState({ view: 'vote'});
                 }
             })
@@ -156,19 +100,6 @@ class PlayRoom extends Component {
 
         // update game with results of the declare
         socket.on("updateScore", update => {
-            this.props.removeSuit(
-                this.props.roomkey,
-                this.props.index,
-                update.halfSuit,
-            );
-            const even = this.props.index % 2 === 0;
-            const gameOver = this.updateScore(even, update.evenScore, update.oddScore);
-            
-            if (gameOver) {
-                this.setState({
-                    winner: update.even ? "even" : "odd",
-                });
-            }
             // reset declaring states
             this.setState({
                 view: 'hand',
@@ -181,47 +112,57 @@ class PlayRoom extends Component {
     }
 
     changeSidebar = (type) => {
-        this.setState({sidebar: type})
+        this.setState({ sidebar: type })
     };
 
+    changeView = (view) => {
+        this.setState({ view });
+    }
+
     render() {
+        const {
+            name, 
+            index,
+            hand,
+            roomkey,
+            turnType,
+            whoseTurn,
+            yourTeam,
+            otherTeam,
+        } = this.context;
+
         // prevent users from skipping waiting room/homepage
-        if (!this.props.name || !this.props.roomkey || !this.props.otherTeam) {
+        if (!name || !roomkey || !hand) {
             return <Redirect to='/'/>;
         }
 
-        const { 
-            hand,
-            turnType,
-            whoseTurn,
-            name,
-            setHand,
-        } = this.props;
         const { 
             declaring,
             declarer,
             winner,
             view,
             guess,
-            halfSuit
+            halfSuit,
+            sidebar,
         } = this.state;
         
         let curView;
         const gameOver = winner !== '';
         if (gameOver || view === 'hand') {
-            curView = <ViewHand hand={hand} updateHand={setHand}/>
+            // TODO: update hand currently placeholder!!
+            curView = <ViewHand />
         } else if (view === 'ask') {
-            curView = <Ask reset={(view) => this.setState({view})}/>
+            curView = <Ask reset={this.changeView}/>
         } else if (view === 'respond') {
-            curView = <Respond reset={(view) => this.setState({view})}/>
+            curView = <Respond reset={this.changeView}/>
         } else if (view === 'declare') {
-            curView = <Declare changeView={(view) => this.setState({view})}/>
+            curView = <Declare changeView={this.changeView}/>
         } else if (view === 'vote') {
             curView = <DecResponse 
                 declarer={declarer}
                 guess={guess}
                 halfSuit={halfSuit}
-                minVotes={this.props.yourTeam.length + this.props.otherTeam.length - 1}
+                minVotes={yourTeam.length + otherTeam.length - 1}
             />
         }
 
@@ -239,34 +180,34 @@ class PlayRoom extends Component {
                             && turnType === 'RESPOND'
                             && whoseTurn === name}
                         showDeclare={declarer === ''}
-                        changeView={(view) => this.setState({view})}
+                        changeView={this.changeView}
                     />
                     {curView}
                     <div className="sidebar">
                         <div className="sidebar-label">
                             <span
-                                className={`sidebar-label_options ${this.state.sidebar === "chat" ? "active-sidebar" : "inactive-sidebar"}`}
+                                className={`sidebar-label_options ${sidebar === "chat" ? "active-sidebar" : "inactive-sidebar"}`}
                                 onClick={() => this.changeSidebar("chat")}
                             >
                                 Chat Room
                             </span>
                             <span className={"divider"}>|</span>
                             <span
-                                className={`sidebar-label_options ${this.state.sidebar === "ask" ? "active-sidebar" : "inactive-sidebar"}`}
+                                className={`sidebar-label_options ${sidebar === "ask" ? "active-sidebar" : "inactive-sidebar"}`}
                                 onClick={() => this.changeSidebar("ask")}
                             >
                                 Ask History
                             </span>
                         </div>
                         <Chat
-                            name={this.props.name}
-                            index={this.props.index}
-                            roomkey={this.props.roomkey}
-                            hidden={this.state.sidebar !== "chat"}
+                            name={name}
+                            index={index}
+                            roomkey={roomkey}
+                            hidden={sidebar !== "chat"}
                         />
                         <GameHistory
                             all={true}
-                            hidden={this.state.sidebar === "chat"}
+                            hidden={sidebar === "chat"}
                         />
                     </div>
                 </div>
@@ -275,27 +216,4 @@ class PlayRoom extends Component {
     }
 }
 
-const mapStateToProps = (state) => ({
-    name: state.user.name,
-    index: state.user.index,
-    roomkey: state.roomkey,
-    hand: state.hand,
-    yourTeam: state.teams.yourTeam,
-    otherTeam: state.teams.otherTeam,
-    history: state.history,
-    turnType: state.turnInfo.turnType,
-    whoseTurn: state.turnInfo.whoseTurn,
-});
-
-const mapDispatchToProps = {
-    declareResults,
-    updateTurn,
-    addCard,
-    removeCard,
-    removeSuit,
-    playerOut,
-    updateHistory,
-    setHand,
-};
-
-export default connect(mapStateToProps, mapDispatchToProps)(PlayRoom);
+export default PlayRoom;

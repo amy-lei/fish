@@ -3,9 +3,8 @@ import {
   BrowserRouter as Router, 
   Route,
 } from "react-router-dom";
-import store from '../store';
-import { Provider } from 'react-redux';
 import Loading from "./pages/Loading";
+import { GlobalStore } from '../context/GlobalContext';
 import './styles/App.scss';
 
 const Home = lazy(() => import('./pages/Home'));
@@ -20,9 +19,9 @@ class App extends Component {
 
   render() {
     return (
-      <Provider store={store}>
+      <GlobalStore>
         <Router>
-          <Suspense fallback={Loading}>
+          <Suspense fallback={<Loading/>}>
             <Route 
               exact path='/' 
               component={Home}
@@ -37,7 +36,7 @@ class App extends Component {
             />
           </Suspense>
         </Router>
-      </Provider>
+      </GlobalStore>
     );
   }
 }

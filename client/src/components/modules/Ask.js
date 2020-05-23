@@ -1,14 +1,14 @@
 import React, { Component } from "react";
-import { connect } from 'react-redux';
 import { post } from "../../utilities";
 import { card_svgs } from '../card_svgs';
 import { halfSuits } from '../card_objs';
 import { hasCard } from '../../game-utilities'; 
-
-import "../styles/game.scss";
-import "../styles/cards.scss";
+import GlobalContext from '../../context/GlobalContext';
 
 class Ask extends Component {
+
+    static contextType = GlobalContext;
+
     constructor(props){
         super(props);
         this.state = {
@@ -20,7 +20,7 @@ class Ask extends Component {
 
     ask = async() => {
         const { recipient, askedCard } = this.state;
-        const { roomkey, name, index } = this.props;
+        const { roomkey, name, index } = this.context;
         const body = {
             key: roomkey,
             asker: { name, index },
@@ -48,8 +48,8 @@ class Ask extends Component {
     };
 
     createHalfSuits = () => {
-        const { selectedCard } = this.state;
-        const { hand } = this.props;
+        const { selectedCard, askedCard } = this.state;
+        const { hand } = this.context;
         if (selectedCard) {
             return halfSuits[selectedCard.halfSuit]
                 .filter((card) => 
@@ -59,7 +59,7 @@ class Ask extends Component {
                 .map((card,i) => (
                     <img 
                         key={i}
-                        className={`mini-card ${this.state.askedCard === card && 'selected-card'}`} 
+                        className={`mini-card ${askedCard === card && 'selected-card'}`} 
                         src={card_svgs[`${card.rank}-${card.suit}.svg`]}
                         onClick={() => this.setState({askedCard: card})}    
                     />
@@ -74,8 +74,8 @@ class Ask extends Component {
     }
 
     createPlayers = () => {
-        const { otherTeam } = this.props;
-        return otherTeam.map((player) => {
+        const { otherTeam } = this.context;
+        return otherTeam.map((player, i) => {
             let onClick;
             if (player.active) {
                 onClick = () => this.setState({ recipient: player.name })
@@ -83,6 +83,7 @@ class Ask extends Component {
                 onClick = () => {};
             }
             return (<div 
+                key={i}
                 className={`playroom-option player ${this.state.recipient === player.name && 'selected-card'} ${!player.active && 'out'}`}
                 onClick={onClick}
             >
@@ -99,7 +100,7 @@ class Ask extends Component {
                     <div className='playroom-section ask-section ask-section_hand'>
                         <label>Select a half-suit from your hand:</label>
                         <div className='mini-cards'>
-                            {this.createHand(this.props.hand)}
+                            {this.createHand(this.context.hand)}
                         </div>
                     </div>
                     <div className='playroom-section ask-section ask-section_suit'>
@@ -128,12 +129,4 @@ class Ask extends Component {
     }
 }
 
-const mapStateToProps = (state) => ({
-    name: state.user.name,
-    index: state.user.index,
-    roomkey: state.roomkey,
-    hand: state.hand,
-    otherTeam: state.teams.otherTeam,
-});
-
-export default connect(mapStateToProps, {})(Ask);
+export default Ask;

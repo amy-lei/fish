@@ -92,29 +92,24 @@ export const nameOfCard = (card) => {
     }
 }
 
-export const SUITS = [
-    'heart', 
-    'diamond', 
-    'spade', 
-    'club',
-  ];
-export const JOKER_SUITS = [
-    'red',
-    'black',
-];
-export const RANKS = [
-    'ace',
-    'two',
-    'three',
-    'four',
-    'five',
-    'six',
-    'seven',
-    'eight',
-    'nine',
-    'ten',
-    'jack',
-    'queen',
-    'king',
-    'joker',
-];
+/*
+  Returns an object mapping to list of players on user's team
+  and list of players on the other team
+
+  @players (array): list of all players
+  @index (int): index of current user 
+*/
+export const splitPlayers = (players, index) => {
+    let otherTeam = [];
+    let yourTeam = [];
+    const parity = index % 2;
+    players.forEach((player) => {
+        if (player.index % 2 === parity) {
+            yourTeam.push(player);
+        } else {
+            otherTeam.push(player);
+        }
+    });
+
+    return { yourTeam, otherTeam };
+}

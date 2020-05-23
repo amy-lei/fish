@@ -1,10 +1,12 @@
 import React, { Component } from "react";
-import { connect } from 'react-redux';
 import { hasCard, nameOfCard } from "../../game-utilities";
 import { post } from "../../utilities";
 import { card_svgs } from '../card_svgs';
+import GlobalContext from '../../context/GlobalContext';
 
 class Respond extends Component {
+    static contextType = GlobalContext;
+
     constructor(props){
         super(props);
         this.state = {
@@ -22,7 +24,7 @@ class Respond extends Component {
             hand, 
             name, 
             index, 
-            roomkey } = this.props;
+            roomkey } = this.context;
         const lastAsk = history[history.length - 1]
         const card = lastAsk.card;
         const { have } = hasCard(hand, card);
@@ -52,7 +54,12 @@ class Respond extends Component {
     };
 
     render() {
-        const asker = this.props.history.length !== 0 ? this.props.history[this.props.history.length - 1].asker.name : '';
+        const {
+            history,
+            hand,
+        } = this.context;
+
+        const asker = history.length !== 0 ? history[history.length - 1].asker.name : '';
         return (
             <div className='main-container playroom respond'>
                 <h2 className="playroom-label">Respond to {asker}:</h2>
@@ -60,12 +67,12 @@ class Respond extends Component {
                     <div className='playroom-section respond-section'>
                         <label>Your cards:</label>
                         <div className='mini-cards'>
-                            {this.createHand(this.props.hand)}
+                            {this.createHand(hand)}
                         </div>
                     </div>
                     <div className='playroom-section respond-section'>
                         <label>
-                            {asker} asked for the {nameOfCard(this.props.history[this.props.history.length - 1].card)}
+                            {asker} asked for the {nameOfCard(history[history.length - 1].card)}
                             . Respond with a message:
                         </label>
                         <input 
@@ -87,13 +94,4 @@ class Respond extends Component {
     }
 }
 
-const mapStatesToProps = (state) => ({
-    name: state.user.name,
-    index: state.user.index,
-    roomkey: state.roomkey,
-    hand: state.hand,
-    history: state.history,
-});
-
-
-export default connect(mapStatesToProps)(Respond);
+export default Respond;

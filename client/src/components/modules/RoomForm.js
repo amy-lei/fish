@@ -1,13 +1,15 @@
 import React, { Component } from "react";
 import { post } from "../../utilities";
-import { connect } from 'react-redux';
-import { setRoomKey } from '../../actions/gameActions';
+import GlobalContext from '../../context/GlobalContext';
 
 class RoomForm extends Component {
+    
+    static contextType = GlobalContext;
+
     constructor(props) {
         super(props);
         this.state = {
-            roomKey: "",
+            roomkey: "",
             wantToJoinRoom: false,
             roomKeyError: false,
         };
@@ -15,24 +17,25 @@ class RoomForm extends Component {
 
     createRoom = () => {
         this.props.changeView();
-        this.props.updateCreator();
+        this.context.toggleCreator(true);
     }
 
     keyChange = (e) => {
         this.setState({
-            roomKey: e.target.value.toUpperCase(),
+            roomkey: e.target.value.toUpperCase(),
         });
     };
 
     checkRoom = async (e) => {
-        const { roomKey } = this.state;
-        if ((e && e.key !== "Enter") || roomKey.trim() === "") { return; }
+        const { roomkey } = this.state;
+        if ((e && e.key !== "Enter") || roomkey.trim() === "") { return; }
         
-        const body = { roomKey, };
+        const body = { roomkey };
         const canJoin = await post("/api/check_room", body);
         if (canJoin) {
-            this.props.setRoomKey(roomKey);
             this.props.changeView();
+            this.context.setRoomKey(roomkey);
+            this.context.toggleCreator(false);
         }
         else {
             this.setState({roomKeyError: true})
@@ -59,7 +62,7 @@ class RoomForm extends Component {
                     <input
                         className="input-btn-field room-key-input"
                         type="text"
-                        value={this.state.roomKey}
+                        value={this.state.roomkey}
                         maxLength={4}
                         placeholder="Enter room key"
                         onChange={(e) => this.keyChange(e)}
@@ -83,8 +86,4 @@ class RoomForm extends Component {
     }
 }
 
-const mapDispatchToProps = {
-    setRoomKey,
-}
-
-export default connect(null, mapDispatchToProps)(RoomForm)
+export default RoomForm;
