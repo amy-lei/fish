@@ -34,6 +34,11 @@ export const hasCard = (hand, target) => {
 }
 
 /*
+    Returns an object that separates the cards in the 
+    given half suit from the rest
+
+    @hand (array): list of cards
+    @halfSuit (string): target halfsuit
 */
 export const separateHalfSuit = (hand, halfSuit) => {
     const ownCards = new Set();
@@ -51,8 +56,10 @@ export const separateHalfSuit = (hand, halfSuit) => {
 }
 
 /*
-    Returns whether the declare was correct in 
-    the perspective of the specified player
+    Returns the player can object to the declare or not.
+    This means having the cards that the declarer claimed
+    the user had or having cards that another player was
+    assumed to have had. 
 
     @hand (array): player's list of cards
     @declare (array): list of guesses
@@ -70,20 +77,13 @@ export const canObject = (hand, declare, name) => {
     return false;
 }
 
-
 /*
-    Returns the hand with all of specified 
-    half suit removed 
-
-    @hand (array): list of cards
-    @declare (array): list of guesses 
- */
-export const removeHalfSuit = (hand, halfSuit) => {
-    return hand.filter(card => 
-                card.halfSuit !== halfSuit
-        );
-}
-
+    Returns the proper naming of the card
+    Normal cards will be (rank) of (suit)
+    Jokers will be (suit) (rank)
+    
+    @card (object): card to be named
+*/
 export const nameOfCard = (card) => {
     if (card.rank in rankToVal) {
         return card.rank + ' of ' + card.suit;

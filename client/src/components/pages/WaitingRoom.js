@@ -6,7 +6,7 @@ import { Redirect } from 'react-router';
 import Chat from "./Chat.js";
 import GlobalContext from '../../context/GlobalContext';
 
-const MAX_PLAYERS = 6;
+const MAX_PLAYERS = 2;
 const FACES = [':)', '•_•', '=U','°_o',':O','°Д°'];
 
 // const FAKE_PEOPLE = [

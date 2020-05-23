@@ -24,7 +24,6 @@ class PlayRoom extends Component {
             guess: {},
             declarer: '',
             halfSuit: '',
-            winner: '',
         };
     }
 
@@ -129,6 +128,7 @@ class PlayRoom extends Component {
             whoseTurn,
             yourTeam,
             otherTeam,
+            winner,
         } = this.context;
 
         // prevent users from skipping waiting room/homepage
@@ -139,7 +139,6 @@ class PlayRoom extends Component {
         const { 
             declaring,
             declarer,
-            winner,
             view,
             guess,
             halfSuit,
@@ -149,7 +148,6 @@ class PlayRoom extends Component {
         let curView;
         const gameOver = winner !== '';
         if (gameOver || view === 'hand') {
-            // TODO: update hand currently placeholder!!
             curView = <ViewHand />
         } else if (view === 'ask') {
             curView = <Ask reset={this.changeView}/>

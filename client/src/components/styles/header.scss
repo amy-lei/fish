@@ -21,6 +21,9 @@
     }
 }
 
+/*
+Credits to W3 for tooltip styling
+*/
 .tooltip {
     font-size: 14px;
     visibility: hidden;
@@ -35,18 +38,45 @@
     z-index: 1000;
     top: -5px;
     left: 110%;
-  }
-  
-  .tooltip::after {
-    content: "";
-    position: absolute;
+
+    &::after {
+      content: "";
+      position: absolute;
+      border-width: 10px;
+      border-style: solid;
+    }
+}
+
+.tooltip-left {
+  top: -5px;
+  left: 110%;
+  &::after {
     top: 50%;
     right: 100%;
     margin-top: -10px;
-    border-width: 10px;
-    border-style: solid;
     border-color: transparent rgba(black, 0.75) transparent transparent;
   }
-  .header-btn:hover .tooltip {
-    visibility: visible;
+}
+.tooltip-bottom {
+  bottom: 200%;
+  left: 50%;
+  margin-left: -60px;
+  &::after {
+    top: 100%;
+    left: 50%;
+    margin-left: -5px;
+    border-color: rgba(black, 0.75) transparent transparent transparent;
   }
+}
+
+.num-cards-left {
+  width: 10em;
+}
+
+.header-btn:hover .tooltip {
+  visibility: visible;
+}
+
+.stats_player:hover .tooltip {
+  visibility: visible;
+}
