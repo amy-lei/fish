@@ -12,6 +12,7 @@ class NameForm extends Component {
         this.state = {
             name: "",
             clickedButton: false,
+            error: '',
         };
     };
 
@@ -62,12 +63,28 @@ class NameForm extends Component {
             socketid: socket.id,
         };
         const roomInfo = await post('/api/join_room', body);
-        this.context.enterRoom(roomInfo);
-        if (roomInfo.game.start) {
-            this.props.redirect('play');
+        if (roomInfo.error) {
+            this.setState({ 
+                error: roomInfo.error,
+                clickedButton: false,
+            });
+            return;
         } else {
-            this.props.redirect('lobby');
+            this.context.enterRoom(roomInfo);
+            if (roomInfo.game.start) {
+                this.props.redirect('play');
+            } else {
+                this.props.redirect('lobby');
+            }
         }
+    }
+
+    generateError = () => {
+        const { error } = this.state;
+        if (error !== '') {
+            return <label> {error}</label>
+        }
+        return ''
     }
 
     render() {
@@ -91,6 +108,7 @@ class NameForm extends Component {
                         Join
                     </button>
                 </div>
+                {this.generateError()}
             </>
         )
     }

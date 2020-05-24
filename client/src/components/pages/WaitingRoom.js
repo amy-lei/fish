@@ -5,42 +5,7 @@ import { socket } from "../../client-socket";
 import { Redirect } from 'react-router'; 
 import Chat from "./Chat.js";
 import GlobalContext from '../../context/GlobalContext';
-
-const MAX_PLAYERS = 6;
-const FACES = [':)', '•_•', '=U','°_o',':O','°Д°'];
-
-// const FAKE_PEOPLE = [
-//     {
-//         name: 'a',
-//         index: 1,
-//         ready: true,
-//         active: false,
-//     },
-//     {
-//         name: 'b',
-//         index: 2,
-//         ready: true,
-//         active: false,
-//     },
-//     {
-//         name: 'c',
-//         index: 3,
-//         ready: true,
-//         active: true,
-//     },
-//     {
-//         name: 'd',
-//         index: 4,
-//         ready: true,
-//         active: true,
-//     },
-//     {
-//         name: 'e',
-//         index: 5,
-//         ready: true,
-//         active: false,
-//     },
-// ]
+import { MAX_PLAYERS, FACES, FAKE_PEOPLE } from '../../game_constants';
 
 class WaitingRoom extends Component {
 

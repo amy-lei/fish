@@ -2,8 +2,7 @@ import React, { Component } from "react";
 
 import { get, post } from "../../utilities";
 import { socket } from "../../client-socket.js";
-
-const FACES = [':)', '•_•', '=U','°_o',':O','°Д°'];
+import { FACES } from '../../game_constants';
 
 class Chat extends Component {
   constructor(props) {

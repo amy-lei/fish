@@ -11,7 +11,7 @@ class RoomForm extends Component {
         this.state = {
             roomkey: "",
             wantToJoinRoom: false,
-            roomKeyError: false,
+            roomKeyError: '',
         };
     }
 
@@ -31,14 +31,17 @@ class RoomForm extends Component {
         if ((e && e.key !== "Enter") || roomkey.trim() === "") { return; }
         
         const body = { roomkey };
-        const canJoin = await post("/api/check_room", body);
+        const { canJoin, reason } = await post("/api/check_room", body);
         if (canJoin) {
             this.props.changeView();
             this.context.setRoomKey(roomkey);
             this.context.toggleCreator(false);
+            this.setState({ roomKeyError: '' });
         }
         else {
-            this.setState({roomKeyError: true})
+            this.setState({
+                roomKeyError: reason,
+            })
         }
     };
 
@@ -75,9 +78,9 @@ class RoomForm extends Component {
                         Enter
                     </button>
                     {
-                        this.state.roomKeyError &&
+                        this.state.roomKeyError !== '' &&
                         <div className="warning">
-                            The key you entered does not exist
+                            {this.state.roomKeyError}
                         </div>
                     }
                 </div>

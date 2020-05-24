@@ -38,12 +38,20 @@ router.post("/chat", (req, res) => {
     });
 });
 
-// return whether a game with the given key exists
+// return whether a game with the given key exists/has room
 router.post("/check_room", (req, res) => {
     const requested_key = req.body.roomkey;
     Game.find({key: requested_key})
         .then((foundGame) => {
-            res.send(foundGame.length === 1);
+            if (foundGame.length === 1) {
+                if (foundGame[0].players.length === 6) {
+                    res.send({ canJoin: false, reason: 'Room is already full' });
+                } else {
+                    res.send({ canJoin: true, reason: '' });
+                }
+            } else {
+                res.send({ canJoin: false, reason: 'Invalid room key' });
+            }
         });
 });
 
@@ -51,24 +59,49 @@ router.post("/check_room", (req, res) => {
 router.post("/join_room", (req, res) => {
     const requestedRoomKey = req.body.room_key;
     const playerName = req.body.playerName;
-    Game.findOne({key: requestedRoomKey})
+    Game.findOne({ key: requestedRoomKey })
         .then((foundGame) => {
-          socket.addUser(foundGame.key, socket.getSocketFromSocketID(req.body.socketid), playerName);
-          // joining an ongoing game 
-          if (foundGame.start) {
-            let targetPlayer;
-            for (let player of foundGame.players){
-              if (player.name === playerName) {
-                targetPlayer = player;
-                player.active = true;
-                break;
-              }
-            }
-            
-            foundGame.save().then(game => {
-              res.send({self: targetPlayer, game, return: true, ...g});
-            });
+            // joining an ongoing game 
+            if (foundGame.start) {
+                let targetPlayer;
+                for (let player of foundGame.players){
+                    if (player.name === playerName) {
+                        targetPlayer = player;
+                        player.active = true;
+                        break;
+                    }
+                }
+                // not a returning player
+                if (!targetPlayer) {
+                    res.send({
+                        self: {},
+                        game: foundGame,
+                        error: 'Game already started',
+                    });
+                    return;
+                } 
+                // pretending to be someone already in the game
+                const otherSockets = socket.getAllSocketsFromGame(requestedRoomKey);
+                for (let s of otherSockets) {
+                    if (socket.getUserFromSocketID(s.id) === targetPlayer.name) {
+                        res.send({
+                            self: {},
+                            game: foundGame,
+                            error: targetPlayer.name + ' is already in the game',
+                        });
+                        return;
+                    }
+                }
+                
+                // otherwise, safe to bring player back in 
+                foundGame
+                    .save()
+                    .then(game => {
+                        socket.addUser(foundGame.key, socket.getSocketFromSocketID(req.body.socketid), playerName);
+                        res.send({ self: targetPlayer, game, error: null });
+                    });
           } else {
+            socket.addUser(foundGame.key, socket.getSocketFromSocketID(req.body.socketid), playerName);
             // join the lobby with other players
             const allPlayerNames = foundGame.players.map((player) => player.name);
             let newPlayerName = playerName;

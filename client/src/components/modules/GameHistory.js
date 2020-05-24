@@ -1,9 +1,7 @@
 import React, { Component } from "react";
 import GlobalContext from '../../context/GlobalContext';
 import { nameOfCard } from '../../game-utilities';
-
-const PARITY_TO_TEAM = { "even": "BLUE", "odd": "RED" };
-const FACES = [':)', '•_•', '=U','°_o',':O','°Д°'];
+import { PARITY_TO_TEAM, FACES } from '../../game_constants';
 
 class GameHistory extends Component {
 

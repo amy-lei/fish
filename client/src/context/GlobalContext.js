@@ -2,9 +2,9 @@ import React, { Component } from 'react';
 import { socket } from '../client-socket';
 import { post } from '../utilities';
 import { splitPlayers } from '../game-utilities';
+import { WIN } from '../game_constants';
 
 const Context = React.createContext({});
-const WIN = 5; // FIX WHEN LAUNCH!!!
 
 /*
   Store for game constants that only need to be initialized
@@ -35,10 +35,10 @@ export class GlobalStore extends Component {
     */
     enterRoom = (roomInfo) => {
         const { game, self } = roomInfo;
-        const rem = this.state.index % 2;
+        const rem = self.index % 2;
         if (game.start) { 
             // if returning, set teams, scores, and history
-            const { yourTeam, otherTeam } = splitPlayers(game.players, this.state.index);
+            const { yourTeam, otherTeam } = splitPlayers(game.players, self.index);
             const yourScore = rem === 0 ? game.even : game.odd;
             const otherScore = rem === 0 ? game.odd : game.even;
             this.setState({ 
@@ -46,6 +46,7 @@ export class GlobalStore extends Component {
                 otherTeam,
                 scores: { yourTeam: yourScore, otherTeam: otherScore, },
                 history: game.history,
+                hand: game.hands[self.index],
             });
         } else { 
             // otherwise, set players since teams are undecided 
