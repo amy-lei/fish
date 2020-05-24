@@ -2,9 +2,9 @@ import React, { Component } from 'react';
 import { socket } from '../client-socket';
 import { post } from '../utilities';
 import { splitPlayers } from '../game-utilities';
+import { WIN } from '../game_constants';
 
 const Context = React.createContext({});
-const WIN = 5; // FIX WHEN LAUNCH!!!
 
 /*
   Store for game constants that only need to be initialized
