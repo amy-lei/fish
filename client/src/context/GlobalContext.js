@@ -38,7 +38,7 @@ export class GlobalStore extends Component {
         const rem = self.index % 2;
         if (game.start) { 
             // if returning, set teams, scores, and history
-            const { yourTeam, otherTeam } = splitPlayers(game.players, this.state.index);
+            const { yourTeam, otherTeam } = splitPlayers(game.players, self.index);
             const yourScore = rem === 0 ? game.even : game.odd;
             const otherScore = rem === 0 ? game.odd : game.even;
             this.setState({ 

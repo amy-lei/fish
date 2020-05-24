@@ -132,9 +132,8 @@ class Declare extends Component {
         if (availableCards && availableCards.length > 0) {
             return availableCards
                 .map((card,i) => (
-                    <div draggable>
+                    <div key={i} draggable>
                         <img 
-                            key={i}
                             className={`mini-card`} 
                             src={card_svgs[`${card.rank}-${card.suit}.svg`]}
                             onDragStart={(e) => this.onDragStart(e, card.rank, card.suit, 'cards')}
