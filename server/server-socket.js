@@ -114,5 +114,6 @@ module.exports = {
     removeUser: removeUser,
     getSocketFromSocketID: getSocketFromSocketID,
     getAllSocketsFromGame: getAllSocketsFromGame,
+    getUserFromSocketID: (_id) => socketToUserMap[_id],
     getIo: () => io,
 };

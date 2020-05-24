@@ -61,24 +61,44 @@ router.post("/join_room", (req, res) => {
     const playerName = req.body.playerName;
     Game.findOne({ key: requestedRoomKey })
         .then((foundGame) => {
-          socket.addUser(foundGame.key, socket.getSocketFromSocketID(req.body.socketid), playerName);
-          // joining an ongoing game 
+            socket.addUser(foundGame.key, socket.getSocketFromSocketID(req.body.socketid), playerName);
+            // joining an ongoing game 
             if (foundGame.start) {
-                console.log('joined ongoing game');
                 let targetPlayer;
                 for (let player of foundGame.players){
-                if (player.name === playerName) {
-                    targetPlayer = player;
-                    player.active = true;
-                    break;
+                    if (player.name === playerName) {
+                        targetPlayer = player;
+                        player.active = true;
+                        break;
+                    }
                 }
-            }
-            
-            foundGame
-                .save()
-                .then(game => {
-                    res.send({ self: targetPlayer, game });
-                });
+                // not a returning player
+                if (!targetPlayer) {
+                    res.send({
+                        self: {},
+                        game: foundGame,
+                        error: 'Game already started and you\'re not an original player',
+                    });
+                    return;
+                } 
+                // pretending to be someone already in the game
+                const otherSockets = socket.getAllSocketsFromGame(requestedRoomKey);
+                for (let s of otherSockets) {
+                    if (socket.getUserFromSocketID(s.id) === targetPlayer.name) {
+                        res.send({
+                            self: {},
+                            game: foundGame,
+                            error: targetPlayer.name + 'is already in the game',
+                        });
+                        return;
+                    }
+                }
+                // otherwise, safe to bring player back in 
+                foundGame
+                    .save()
+                    .then(game => {
+                        res.send({ self: targetPlayer, game, error: null });
+                    });
           } else {
             // join the lobby with other players
             const allPlayerNames = foundGame.players.map((player) => player.name);
