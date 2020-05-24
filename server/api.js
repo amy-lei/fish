@@ -45,21 +45,12 @@ router.post("/check_room", (req, res) => {
         .then((foundGame) => {
             if (foundGame.length === 1) {
                 if (foundGame[0].players.length === 6) {
-                    res.send({
-                        canJoin: false,
-                        reason: 'Room is already full',
-                    });
+                    res.send({ canJoin: false, reason: 'Room is already full' });
                 } else {
-                    res.send({
-                        canJoin: true,
-                        reason: '',
-                    });
+                    res.send({ canJoin: true, reason: '' });
                 }
             } else {
-                res.send({
-                    canJoin: false,
-                    reason: 'Invalid room key',
-                });
+                res.send({ canJoin: false, reason: 'Invalid room key' });
             }
         });
 });
@@ -68,23 +59,26 @@ router.post("/check_room", (req, res) => {
 router.post("/join_room", (req, res) => {
     const requestedRoomKey = req.body.room_key;
     const playerName = req.body.playerName;
-    Game.findOne({key: requestedRoomKey})
+    Game.findOne({ key: requestedRoomKey })
         .then((foundGame) => {
           socket.addUser(foundGame.key, socket.getSocketFromSocketID(req.body.socketid), playerName);
           // joining an ongoing game 
-          if (foundGame.start) {
-            let targetPlayer;
-            for (let player of foundGame.players){
-              if (player.name === playerName) {
-                targetPlayer = player;
-                player.active = true;
-                break;
-              }
+            if (foundGame.start) {
+                console.log('joined ongoing game');
+                let targetPlayer;
+                for (let player of foundGame.players){
+                if (player.name === playerName) {
+                    targetPlayer = player;
+                    player.active = true;
+                    break;
+                }
             }
             
-            foundGame.save().then(game => {
-              res.send({self: targetPlayer, game, return: true, ...g});
-            });
+            foundGame
+                .save()
+                .then(game => {
+                    res.send({ self: targetPlayer, game });
+                });
           } else {
             // join the lobby with other players
             const allPlayerNames = foundGame.players.map((player) => player.name);

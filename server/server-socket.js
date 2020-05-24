@@ -15,27 +15,29 @@ const getAllSocketsFromGame = (key) => {
 const getSocketFromSocketID = (socketid) => io.sockets.connected[socketid];
 
 const addUser = (key, socket, name) => {
-  if (key in gameToSocketsMap) {
-    gameToSocketsMap[key].push(socket);
-  } else {
-    gameToSocketsMap[key] = [socket];
-  }
-  socketToUserMap[socket.id] = name;
-  userSocketIdToGameKey[socket.id] = key;
+    if (key in gameToSocketsMap) {
+        gameToSocketsMap[key].push(socket);
+    } else {
+        gameToSocketsMap[key] = [socket];
+    }
+    socketToUserMap[socket.id] = name;
+    userSocketIdToGameKey[socket.id] = key;
 };
 
 const removeUser = (socket, key) => {
-  delete socketToUserMap[socket.id];
-  delete userSocketIdToGameKey[socket.id];
-  if (key in gameToSocketsMap) {
-    gameToSocketsMap[key] = gameToSocketsMap[key].filter((otherSocket) => otherSocket.id !== socket.id);
-  }
+    delete socketToUserMap[socket.id];
+    delete userSocketIdToGameKey[socket.id];
+    if (key in gameToSocketsMap) {
+        gameToSocketsMap[key] = gameToSocketsMap[key].filter((otherSocket) => otherSocket.id !== socket.id);
+    }
 };
 
+/*
+  Remove player from game and update other players' indices
+*/
 const updateGamePlayerList = (user, roomKey) => {
-  Game.findOne({key: roomKey})
+  Game.findOne({ key: roomKey })
       .then((game) => {
-        console.log('before', game);
         let playerList = game.players;
         let targetIndex = 0;
         for (let i = 0; i < playerList.length; i++) {
@@ -59,55 +61,58 @@ const updateGamePlayerList = (user, roomKey) => {
         }
 
         game.save();
-        console.log('after', game);
         getAllSocketsFromGame(roomKey).forEach(client => {
-          client.emit("updatedPlayerList", playerList);
+            client.emit("updatedPlayerList", playerList);
         })
       })
 };
 
 module.exports = {
-  init: (http) => {
-    io = require("socket.io")(http);
+    init: (http) => {
+        io = require("socket.io")(http);
+        io.on("connection", (socket) => {
+            console.log(`socket has connected ${socket.id}`);
+            socket.on("disconnect", (reason) => {
+                const user = socketToUserMap[socket.id];
+                const roomKey = userSocketIdToGameKey[socket.id];
+                const otherUserSockets = getAllSocketsFromGame(roomKey);
+                // delete game if no one left
+                if (otherUserSockets.length <= 1) {
+                    removeUser(socket, roomKey);
+                    delete gameToSocketsMap[roomKey];
+                    Game
+                        .deleteOne({key: roomKey})
+                        .then((game) => console.log("deleted the game with key", roomKey));
+                    Message
+                        .deleteMany({key: roomKey})
+                        .then((messages) => console.log("deleted messages with key", roomKey));
+                }
+                else {
+                    Game
+                        .findOne({key: roomKey})
+                        .then((g) => {
+                            if (g) {
+                                otherUserSockets.forEach(client => {
+                                    client.emit("disconnected", user);
+                                });
+                                removeUser(socket, roomKey);
+                                // delete player info if disconnected in the lobby 
+                                if (!g.start) {
+                                    console.log('disconnected in lobby, delete', user);
+                                    updateGamePlayerList(user, roomKey);
+                                } else {
+                                    // otherwise keep their data 
+                                    console.log('disconnected mid game, dont delete', user);
+                                }
+                            }});
+                }
+            });
+        });
+    },
 
-    io.on("connection", (socket) => {
-      console.log(`socket has connected ${socket.id}`);
-      socket.on("disconnect", (reason) => {
-        const user = socketToUserMap[socket.id];
-        const roomKey = userSocketIdToGameKey[socket.id];
-        const otherUserSockets = getAllSocketsFromGame(roomKey);
-        if (otherUserSockets.length <= 1) {
-          removeUser(socket, roomKey);
-          delete gameToSocketsMap[roomKey];
-          Game.deleteOne({key: roomKey})
-          .then((game) => console.log("deleted the game with key", roomKey));
-          Message.deleteMany({key: roomKey})
-          .then((messages) => console.log("deleted messages with key", roomKey));
-        }// When there are still users in the room, remove the one that disconnected from database
-        else {
-          Game
-          .findOne({key: roomKey})
-          .then(g => {
-            console.log('server g', g);
-            if (g && !g.start) {
-                removeUser(socket, roomKey);
-                updateGamePlayerList(user, roomKey);
-                otherUserSockets.forEach(client => {
-                  client.emit("disconnected", user);
-                });
-              }
-              else {
-                console.log("disconnected mid game, dont delete");
-              }
-            })
-        }
-      });
-    });
-  },
-
-  addUser: addUser,
-  removeUser: removeUser,
-  getSocketFromSocketID: getSocketFromSocketID,
-  getAllSocketsFromGame: getAllSocketsFromGame,
-  getIo: () => io,
+    addUser: addUser,
+    removeUser: removeUser,
+    getSocketFromSocketID: getSocketFromSocketID,
+    getAllSocketsFromGame: getAllSocketsFromGame,
+    getIo: () => io,
 };

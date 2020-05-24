@@ -35,7 +35,7 @@ export class GlobalStore extends Component {
     */
     enterRoom = (roomInfo) => {
         const { game, self } = roomInfo;
-        const rem = this.state.index % 2;
+        const rem = self.index % 2;
         if (game.start) { 
             // if returning, set teams, scores, and history
             const { yourTeam, otherTeam } = splitPlayers(game.players, this.state.index);
@@ -46,6 +46,7 @@ export class GlobalStore extends Component {
                 otherTeam,
                 scores: { yourTeam: yourScore, otherTeam: otherScore, },
                 history: game.history,
+                hand: game.hands[self.index],
             });
         } else { 
             // otherwise, set players since teams are undecided 
